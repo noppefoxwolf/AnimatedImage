@@ -26,22 +26,21 @@ internal final class GifImageViewCache {
         task?.cancel()
         task = Task.detached { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
-                let source = CGImageSourceCreateWithData(image.data as CFData, nil)!
-                let imageCount = source.imageCount
+                let imageCount = image.imageCount
                 
                 let newSize = min(maxSize, renderSize)
                 let imageByteCount = Int(newSize.width) * Int(newSize.height) * 4
                 let memoryPressure = Double(imageByteCount * imageCount) / Double(maxByteCount)
                 let levelOfIntegrity = min(1.0 / memoryPressure, maxLevelOfIntegrity)
                 
-                let delayTimes = (0..<imageCount).map({ source.gifDelayTime(at: $0) })
+                let delayTimes = (0..<imageCount).map({ image.delayTime(at: $0) })
                 let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
                 await MainActor.run {
                     self.indices = indices
                     self.delayTime = delayTime
                 }
-                for i in await self.indices {
-                    let cgImage = source.image(at: i)!
+                for i in indices {
+                    let cgImage = image.image(at: i)!
                     let image = UIImage(cgImage: cgImage)
                     let decodedImage = await image.decoded(for: newSize)!
                     cache.insert(decodedImage, forKey: i)
