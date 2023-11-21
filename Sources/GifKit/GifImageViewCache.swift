@@ -26,6 +26,7 @@ internal final class GifImageViewCache {
         task?.cancel()
         task = Task.detached { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
+                guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
                 let imageCount = image.imageCount
                 
                 let newSize = min(maxSize, renderSize)
@@ -57,9 +58,9 @@ internal final class GifImageViewCache {
     }
     
     @MainActor
-    func index(for targetTimestamp: TimeInterval) -> Int {
-        guard !indices.isEmpty else { return 0 }
-        guard delayTime != 0 else { return 0 }
+    func index(for targetTimestamp: TimeInterval) -> Int? {
+        guard !indices.isEmpty else { return nil }
+        guard delayTime != 0 else { return nil }
         let duration = delayTime * Double(indices.count)
         let timestamp = targetTimestamp.truncatingRemainder(
             dividingBy: duration
@@ -97,6 +98,11 @@ internal final class GifImageViewCache {
         var resultDelayTime: Double = 0.1
         var displayIndices: [Int] = (0..<delays.count).map({ $0 })
         
+        // 2枚未満は無条件で出す
+        if delays.count <= 2 {
+            return (displayIndices, resultDelayTime)
+        }
+        
         for delayTime in vsyncInterval {
             // 候補のフレーム時間で描画された時のvsyncの位置
             let vsyncIndices = timestamps.map { Int($0 / delayTime) }
@@ -112,7 +118,7 @@ internal final class GifImageViewCache {
                 let imageCount = uniqueVsyncIndices.count
                 
                 var oldIndex = 0
-                var newIndex = 1
+                var newIndex = 0
                 displayIndices = []
                 
                 while newIndex <= imageCount && oldIndex < vsyncIndices.count {

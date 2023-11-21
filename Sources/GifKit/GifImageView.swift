@@ -25,9 +25,9 @@ open class GifImageView: AnimatableCGImageView {
     open override func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
         let index = cache?.index(for: targetTimestamp)
         if let index, currentIndex != index {
-            currentIndex = index
             let newContents = cache?.image(at: index)?.cgImage
             if let newContents {
+                currentIndex = index
                 contents = newContents
             }
         }
