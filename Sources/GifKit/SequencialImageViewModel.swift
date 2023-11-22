@@ -7,11 +7,32 @@ fileprivate let logger = Logger(
     category: #file
 )
 
-internal final class GifImageViewCache {
-    let cache = Cache<Int, UIImage>(name: UUID().uuidString)
-    let maxByteCount: Int64 = 1 * 1024 * 1024 * 1 // 1MB
-    let maxSize: CGSize = CGSize(width: 128, height: 128)
-    let maxLevelOfIntegrity: Double = 0.8
+public struct SequencialImageViewConfiguration {
+    public static var `default`: SequencialImageViewConfiguration {
+        SequencialImageViewConfiguration(
+            maxByteCount: 1 * 1024 * 1024 * 1, // 1MB
+            maxSize: CGSize(width: 128, height: 128),
+            maxLevelOfIntegrity: 0.8
+        )
+    }
+    
+    public var maxByteCount: Int64
+    public var maxSize: CGSize
+    public var maxLevelOfIntegrity: Double
+}
+
+internal final class SequencialImageViewModel {
+    let cache: Cache<Int, UIImage>
+    let maxByteCount: Int64
+    let maxSize: CGSize
+    let maxLevelOfIntegrity: Double
+    
+    init(name: String, configuration: SequencialImageViewConfiguration) {
+        self.cache = Cache(name: name)
+        self.maxByteCount = configuration.maxByteCount
+        self.maxSize = configuration.maxSize
+        self.maxLevelOfIntegrity = configuration.maxLevelOfIntegrity
+    }
     
     @MainActor
     var indices: [Int] = []
@@ -21,7 +42,7 @@ internal final class GifImageViewCache {
     
     var task: Task<Void, Never>? = nil
     
-    nonisolated func update(for renderSize: CGSize, image: GifImage) {
+    nonisolated func update(for renderSize: CGSize, image: any SequencialImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
         task = Task.detached { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
@@ -41,10 +62,11 @@ internal final class GifImageViewCache {
                     self.delayTime = delayTime
                 }
                 for i in indices {
-                    let cgImage = image.image(at: i)!
-                    let image = UIImage(cgImage: cgImage)
-                    let decodedImage = await image.decoded(for: newSize)!
-                    cache.insert(decodedImage, forKey: i)
+                    let uiImage = image.image(at: i).map(UIImage.init(cgImage:))
+                    let decodedImage = await uiImage?.decoded(for: newSize)
+                    if let decodedImage {
+                        cache.insert(decodedImage, forKey: i)
+                    }
                 }
             } onCancel: { [cache] in
                 cache.removeAllObjects()

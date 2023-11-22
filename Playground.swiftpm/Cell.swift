@@ -3,24 +3,24 @@ import GifKit
 
 final class Cell: UITableViewCell {
 
-    let gifImageView = GifImageView(frame: .null)
+    let sequencialImageView = SequencialImageView(frame: .null)
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        gifImageView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(gifImageView)
+        sequencialImageView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(sequencialImageView)
         NSLayoutConstraint.activate([
-            gifImageView.topAnchor.constraint(
+            sequencialImageView.topAnchor.constraint(
                 equalTo: contentView.topAnchor
             ),
             contentView.bottomAnchor.constraint(
-                equalTo: gifImageView.bottomAnchor
+                equalTo: sequencialImageView.bottomAnchor
             ),
-            gifImageView.leadingAnchor.constraint(
+            sequencialImageView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor
             ),
             contentView.trailingAnchor.constraint(
-                equalTo: gifImageView.trailingAnchor
+                equalTo: sequencialImageView.trailingAnchor
             ),
         ])
     }

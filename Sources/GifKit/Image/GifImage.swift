@@ -1,25 +1,28 @@
 import Foundation
 import ImageIO
 
-open class GifImage {
+open class GifImage: SequencialImage {
+    public let name: String
     let data: Data
     
-    public init(data: Data) {
+    public init(name: String = UUID().uuidString, data: Data) {
+        self.name = name
         self.data = data
     }
     
-    public var imageCount: Int {
+    public nonisolated var imageCount: Int {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
         return source?.imageCount ?? 0
     }
     
-    public func delayTime(at index: Int) -> Double {
+    public nonisolated func delayTime(at index: Int) -> Double {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
         return source?.gifDelayTime(at: index) ?? 0.1
     }
     
-    public func image(at index: Int) -> CGImage? {
+    public nonisolated func image(at index: Int) -> CGImage? {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
         return source?.image(at: index)
     }
 }
+

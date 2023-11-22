@@ -6,28 +6,35 @@ class TableViewController: UITableViewController {
         super.viewDidLoad()
         tableView.register(Cell.self, forCellReuseIdentifier: "Cell")
     }
+    enum ImageResource {
+        case apng(String)
+        case gif(String)
+        case webp(String)
+    }
     
     // https://emoji.gg/pack/6241-blobs#
-    var resources: [String] = [
-        "1342-splash",
-        "1904-blob-dancing",
-        "2671-blobsupersaiyan",
-        "2697-cookieblob",
-        "4817-blobbottleflip",
-        "5883-blob",
-        "5907-dracthyrdance",
-        "6292-blob-cat-whacky-fast",
-        "7164-blobtrash",
-        "7514-bouncingrainbowblob",
-        "7766-blobpokemon",
-        "7896-blob-jam",
-        "7953-blobknight",
-        "8551-blob-swallow",
-        "8843-blobdrum",
-        "8899-blob-cat-pop",
-        "8967-blob-cat-dance",
-        "8996-blob",
-        "9507-blobsnow",
+    var resources: [ImageResource] = [
+        .apng("elephant"),
+        .webp("animated-webp-supported"),
+        .gif("1342-splash"),
+        .gif("1904-blob-dancing"),
+        .gif("2671-blobsupersaiyan"),
+        .gif("2697-cookieblob"),
+        .gif("4817-blobbottleflip"),
+        .gif("5883-blob"),
+        .gif("5907-dracthyrdance"),
+        .gif("6292-blob-cat-whacky-fast"),
+        .gif("7164-blobtrash"),
+        .gif("7514-bouncingrainbowblob"),
+        .gif("7766-blobpokemon"),
+        .gif("7896-blob-jam"),
+        .gif("7953-blobknight"),
+        .gif("8551-blob-swallow"),
+        .gif("8843-blobdrum"),
+        .gif("8899-blob-cat-pop"),
+        .gif("8967-blob-cat-dance"),
+        .gif("8996-blob"),
+        .gif("9507-blobsnow"),
     ]
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -40,10 +47,24 @@ class TableViewController: UITableViewController {
             for: indexPath
         ) as! Cell
         let resource = resources[indexPath.row]
-        let url = Bundle.main.url(forResource: resource, withExtension: "gif")!
-        let data = try! Data(contentsOf: url)
-        let image = GifImage(data: data)
-        cell.gifImageView.image = image
+        switch resource {
+        case .apng(let name):
+            let url = Bundle.main.url(forResource: name, withExtension: "png")!
+            let data = try! Data(contentsOf: url)
+            let image = APNGImage(name: name, data: data)
+            cell.sequencialImageView.image = image
+        case .gif(let name):
+            let url = Bundle.main.url(forResource: name, withExtension: "gif")!
+            let data = try! Data(contentsOf: url)
+            let image = GifImage(name: name, data: data)
+            cell.sequencialImageView.image = image
+        case .webp(let name):
+            let url = Bundle.main.url(forResource: name, withExtension: "webp")!
+            let data = try! Data(contentsOf: url)
+            let image = WebPImage(name: name, data: data)
+            cell.sequencialImageView.image = image
+        }
+        
         return cell
     }
 
@@ -52,11 +73,11 @@ class TableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        (cell as? Cell)?.gifImageView.startAnimating()
+        (cell as? Cell)?.sequencialImageView.startAnimating()
     }
     
     override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        (cell as? Cell)?.gifImageView.stopAnimating()
+        (cell as? Cell)?.sequencialImageView.stopAnimating()
     }
 }
 
