@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 
-public protocol SequencialImage {
+public protocol AnimatedImage {
     var name: String { get }
     var imageCount: Int { get }
     func delayTime(at index: Int) -> Double

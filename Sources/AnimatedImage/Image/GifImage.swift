@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-open class GifImage: SequencialImage {
+open class GifImage: AnimatedImage {
     public let name: String
     let data: Data
     

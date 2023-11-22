@@ -11,10 +11,20 @@ let package = Package(
             name: "AnimatedImage",
             targets: ["AnimatedImage"]
         ),
+        .library(
+            name: "AnimatedImageSwiftUI",
+            targets: ["AnimatedImageSwiftUI"]
+        )
     ],
     targets: [
         .target(
             name: "AnimatedImage"
+        ),
+        .target(
+            name: "AnimatedImageSwiftUI",
+            dependencies: [
+                "AnimatedImage"
+            ]
         ),
         .testTarget(
             name: "AnimatedImageTests",

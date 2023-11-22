@@ -6,9 +6,9 @@ fileprivate let logger = Logger(
     category: #file
 )
 
-public struct SequencialImageViewConfiguration {
-    public static var `default`: SequencialImageViewConfiguration {
-        SequencialImageViewConfiguration(
+public struct AnimatedImageViewConfiguration {
+    public static var `default`: AnimatedImageViewConfiguration {
+        AnimatedImageViewConfiguration(
             maxByteCount: 1 * 1024 * 1024 * 1, // 1MB
             maxSize: CGSize(width: 128, height: 128),
             maxLevelOfIntegrity: 0.8,
@@ -22,14 +22,14 @@ public struct SequencialImageViewConfiguration {
     public var taskPriority: TaskPriority
 }
 
-internal final class SequencialImageViewModel {
+internal final class AnimatedImageViewModel {
     let cache: Cache<Int, UIImage>
     let maxByteCount: Int64
     let maxSize: CGSize
     let maxLevelOfIntegrity: Double
     let taskPriority: TaskPriority
     
-    init(name: String, configuration: SequencialImageViewConfiguration) {
+    init(name: String, configuration: AnimatedImageViewConfiguration) {
         self.cache = Cache(name: name)
         self.maxByteCount = configuration.maxByteCount
         self.maxSize = configuration.maxSize
@@ -45,7 +45,7 @@ internal final class SequencialImageViewModel {
     
     var task: Task<Void, Never>? = nil
     
-    nonisolated func update(for renderSize: CGSize, image: any SequencialImage) {
+    nonisolated func update(for renderSize: CGSize, image: any AnimatedImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
         task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in

@@ -1,26 +1,26 @@
 import UIKit
-import GifKit
+import AnimatedImage
 
 final class Cell: UITableViewCell {
 
-    let sequencialImageView = SequencialImageView(frame: .null)
+    let animatedImageView = AnimatedImageView(frame: .null)
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        sequencialImageView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(sequencialImageView)
+        animatedImageView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(animatedImageView)
         NSLayoutConstraint.activate([
-            sequencialImageView.topAnchor.constraint(
+            animatedImageView.topAnchor.constraint(
                 equalTo: contentView.topAnchor
             ),
             contentView.bottomAnchor.constraint(
-                equalTo: sequencialImageView.bottomAnchor
+                equalTo: animatedImageView.bottomAnchor
             ),
-            sequencialImageView.leadingAnchor.constraint(
+            animatedImageView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor
             ),
             contentView.trailingAnchor.constraint(
-                equalTo: sequencialImageView.trailingAnchor
+                equalTo: animatedImageView.trailingAnchor
             ),
         ])
     }

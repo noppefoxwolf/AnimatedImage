@@ -5,17 +5,13 @@ import UIKit
 struct App: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
-            ViewController().ignoresSafeArea()
+            NavigationView(content: {
+                List {
+                    NavigationLink(destination: SwiftUIDemoView()) { Text("SwiftUI Demo") }
+                    NavigationLink(destination: UIKitDemoView()) { Text("UIKit Demo") }
+                }
+            })
         }
     }
 }
 
-struct ViewController: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> some UIViewController {
-        TableViewController(style: .plain)
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        
-    }
-}

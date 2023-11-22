@@ -1,23 +1,23 @@
 import UIKit
 
-open class SequencialImageView: AnimatableCGImageView {
-    public var image: (any SequencialImage)? = nil {
+open class AnimatedImageView: AnimatableCGImageView {
+    public var image: (any AnimatedImage)? = nil {
         didSet {
             if let image {
-                imageViewModel = SequencialImageViewModel(name: image.name, configuration: configuration)
+                imageViewModel = AnimatedImageViewModel(name: image.name, configuration: configuration)
             }
         }
     }
     
-    public var configuration: SequencialImageViewConfiguration = .default {
+    public var configuration: AnimatedImageViewConfiguration = .default {
         didSet {
             if let image {
-                imageViewModel = SequencialImageViewModel(name: image.name, configuration: configuration)
+                imageViewModel = AnimatedImageViewModel(name: image.name, configuration: configuration)
             }
         }
     }
     
-    private var imageViewModel: SequencialImageViewModel? = nil {
+    private var imageViewModel: AnimatedImageViewModel? = nil {
         didSet {
             contents = nil
             currentIndex = nil

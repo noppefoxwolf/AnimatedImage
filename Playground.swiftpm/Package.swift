@@ -39,7 +39,8 @@ let package = Package(
         .executableTarget(
             name: "AppModule",
             dependencies: [
-                .product(name: "GifKit", package: "GifKit")
+                .product(name: "AnimatedImage", package: "AnimatedImage"),
+                .product(name: "AnimatedImageSwiftUI", package: "AnimatedImage")
             ],
             path: ".",
             resources: [

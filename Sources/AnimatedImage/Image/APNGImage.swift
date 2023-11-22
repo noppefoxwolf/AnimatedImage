@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-open class APNGImage: SequencialImage {
+open class APNGImage: AnimatedImage {
     public let name: String
     let data: Data
     

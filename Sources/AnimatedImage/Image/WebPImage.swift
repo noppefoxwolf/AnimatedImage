@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-open class WebPImage: SequencialImage {
+open class WebPImage: AnimatedImage {
     public let name: String
     let data: Data
     
