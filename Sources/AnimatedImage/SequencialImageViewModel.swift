@@ -1,6 +1,5 @@
 import UIKit
 import os
-import Algorithms
 
 fileprivate let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier! + ".logger",
@@ -12,13 +11,15 @@ public struct SequencialImageViewConfiguration {
         SequencialImageViewConfiguration(
             maxByteCount: 1 * 1024 * 1024 * 1, // 1MB
             maxSize: CGSize(width: 128, height: 128),
-            maxLevelOfIntegrity: 0.8
+            maxLevelOfIntegrity: 0.8,
+            taskPriority: .medium
         )
     }
     
     public var maxByteCount: Int64
     public var maxSize: CGSize
     public var maxLevelOfIntegrity: Double
+    public var taskPriority: TaskPriority
 }
 
 internal final class SequencialImageViewModel {
@@ -26,12 +27,14 @@ internal final class SequencialImageViewModel {
     let maxByteCount: Int64
     let maxSize: CGSize
     let maxLevelOfIntegrity: Double
+    let taskPriority: TaskPriority
     
     init(name: String, configuration: SequencialImageViewConfiguration) {
         self.cache = Cache(name: name)
         self.maxByteCount = configuration.maxByteCount
         self.maxSize = configuration.maxSize
         self.maxLevelOfIntegrity = configuration.maxLevelOfIntegrity
+        self.taskPriority = configuration.taskPriority
     }
     
     @MainActor
@@ -45,7 +48,7 @@ internal final class SequencialImageViewModel {
     nonisolated func update(for renderSize: CGSize, image: any SequencialImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
-        task = Task.detached { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
+        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
                 guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
                 let imageCount = image.imageCount
@@ -92,7 +95,8 @@ internal final class SequencialImageViewModel {
         return indices[index]
     }
     
-    /// Based on https://github.com/kirualex/SwiftyGif/blob/7b6f8039b288ec5840501d504e1e3fca486916ec/SwiftyGif/UIImage%2BSwiftyGif.swift#L208C62-L208C78
+    /// Based on https://github.com/kirualex/SwiftyGif
+    /// See also UIImage+SwiftyGif.swift
     private func decimateFrames(
         delays: [Double],
         levelOfIntegrity: Double
@@ -100,7 +104,7 @@ internal final class SequencialImageViewModel {
         // 保証する表示フレームの割合
         let levelOfIntegrity = max(0.0, min(1.0, levelOfIntegrity))
         // 各フレームが表示されるはずのtimestamp
-        let timestamps = delays.reductions(+)
+        let timestamps = delays.runningSum.map({ $0 })
         // １フレームあたりの時間の候補
         let vsyncInterval: [Double] = [
             1.0 / 1.0,
@@ -128,7 +132,7 @@ internal final class SequencialImageViewModel {
         for delayTime in vsyncInterval {
             // 候補のフレーム時間で描画された時のvsyncの位置
             let vsyncIndices = timestamps.map { Int($0 / delayTime) }
-            let uniqueVsyncIndices = vsyncIndices.uniqued().map({ $0 })
+            let uniqueVsyncIndices = Set(vsyncIndices).map({ $0 })
             // 表示に必要なフレーム数
             let needsDisplayFrameCount = Int(
                 Double(vsyncIndices.count) * levelOfIntegrity

@@ -4,27 +4,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "GifKit",
+    name: "AnimatedImage",
     platforms: [.iOS(.v16)],
     products: [
         .library(
-            name: "GifKit",
-            targets: ["GifKit"]
+            name: "AnimatedImage",
+            targets: ["AnimatedImage"]
         ),
-    ],
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0")
     ],
     targets: [
         .target(
-            name: "GifKit",
-            dependencies: [
-                .product(name: "Algorithms", package: "swift-algorithms")
-            ]
+            name: "AnimatedImage"
         ),
         .testTarget(
-            name: "GifKitTests",
-            dependencies: ["GifKit"]
+            name: "AnimatedImageTests",
+            dependencies: ["AnimatedImage"]
         ),
     ]
 )
