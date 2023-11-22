@@ -1,13 +1,13 @@
 import UIKit
 
-open class AnimatableCGImageView: CGImageView {
+open class AnimatableCGImageView: CGImageView, DisplayLinkTarget {
     private var displayLink: CADisplayLink? = nil
     
     open func startAnimating() {
         stopAnimating()
         displayLink = CADisplayLink(
-            target: self,
-            selector: #selector(updateContents)
+            target: DisplayLinkProxy(target: self),
+            selector: #selector(DisplayLinkProxy<Self>.updateContents)
         )
         displayLink?.add(to: .main, forMode: .common)
     }
@@ -17,7 +17,7 @@ open class AnimatableCGImageView: CGImageView {
         displayLink = nil
     }
     
-    @objc private func updateContents(_ displayLink: CADisplayLink) {
+    func updateContents(_ displayLink: CADisplayLink) {
         willUpdateContents(&contents, for: displayLink.targetTimestamp)
     }
     
