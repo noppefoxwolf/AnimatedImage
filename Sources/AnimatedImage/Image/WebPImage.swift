@@ -17,7 +17,7 @@ public final class WebPImage: AnimatedImage {
     
     public nonisolated func makeDelayTime(at index: Int) -> Double {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.webpMakeDelayTime(at: index) ?? 0.1
+        return source?.makeWebPDelayTime(at: index) ?? 0.1
     }
     
     public nonisolated func makeImage(at index: Int) -> CGImage? {

@@ -17,7 +17,7 @@ public final class APNGImage: AnimatedImage {
     
     public nonisolated func makeDelayTime(at index: Int) -> Double {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.apngMakeDelayTime(at: index) ?? 0.1
+        return source?.makeAPNGDelayTime(at: index) ?? 0.1
     }
     
     public nonisolated func makeImage(at index: Int) -> CGImage? {

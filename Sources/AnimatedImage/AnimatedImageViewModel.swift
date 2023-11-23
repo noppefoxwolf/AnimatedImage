@@ -65,38 +65,28 @@ internal final class AnimatedImageViewModel: Sendable {
                     self.delayTime = delayTime
                 }
                 
-                await withTaskGroup(of: (Int, CGImage?).self) { [taskPriority] taskGroup in
-                    print("indices.count:", Set(indices).count)
+                await withTaskGroup(of: Void.self) { [taskPriority] taskGroup in
                     for i in Set(indices) {
                         taskGroup.addTask(priority: taskPriority) { [i] in
-                            print("make", i)
-                            return (i, image.makeImage(at: i))
-                        }
-                    }
-                    await withDiscardingTaskGroup { taskGroup2 in
-                        for await (i, image) in taskGroup {
-                            taskGroup2.addTask {
-                                print("decode", i)
-                                let uiImage = image.map(UIImage.init(cgImage:))
-                                let decodedImage = await uiImage?.decoded(for: newSize)
-                                if let decodedImage {
-                                    cache.insert(decodedImage, forKey: i)
-                                } else {
-                                    cache.removeValue(forKey: i)
-                                }
-                                print("decode done", i)
+                            guard !Task.isCancelled else { return }
+                            let image = image.makeImage(at: i)
+                            let uiImage = image.map(UIImage.init(cgImage:))
+                            
+                            guard !Task.isCancelled else { return }
+                            let decodedImage = await uiImage?.decoded(for: newSize)
+                            
+                            guard !Task.isCancelled else { return }
+                            if let decodedImage {
+                                cache.insert(decodedImage, forKey: i)
+                            } else {
+                                cache.removeValue(forKey: i)
                             }
                         }
                     }
                 }
             } onCancel: { [cache] in
-                print("-----cancel-----")
                 cache.removeAllObjects()
             }
-        }
-        Task {
-            try await Task.sleep(for: .seconds(0.025))
-            task?.cancel()
         }
     }
     
