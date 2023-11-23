@@ -17,7 +17,7 @@ struct SwiftUIDemoView: View {
     
     var body: some View {
         let layout = [
-            GridItem(.adaptive(minimum: 20, maximum: 20)),
+            GridItem(.adaptive(minimum: 200, maximum: 200)),
         ]
         
         ScrollView {
