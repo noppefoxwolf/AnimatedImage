@@ -7,8 +7,17 @@ struct App: SwiftUI.App {
         WindowGroup {
             NavigationView(content: {
                 List {
-                    NavigationLink(destination: SwiftUIDemoView()) { Text("SwiftUI Demo") }
-                    NavigationLink(destination: UIKitDemoView()) { Text("UIKit Demo") }
+                    NavigationLink {
+                        SwiftUIDemoView()
+                    } label: {
+                        Text("SwiftUI Demo")
+                    }
+                    
+                    NavigationLink {
+                        UIKitDemoView()
+                    } label: {
+                        Text("UIKit Demo")
+                    }
                 }
             })
         }

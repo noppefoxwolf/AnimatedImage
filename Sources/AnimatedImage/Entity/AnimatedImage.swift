@@ -1,9 +1,9 @@
 import Foundation
 import CoreGraphics
 
-public protocol AnimatedImage {
+public protocol AnimatedImage: Sendable {
     var name: String { get }
-    var imageCount: Int { get }
-    func delayTime(at index: Int) -> Double
-    func image(at index: Int) -> CGImage?
+    func makeImageCount() -> Int
+    func makeDelayTime(at index: Int) -> Double
+    func makeImage(at index: Int) -> CGImage?
 }

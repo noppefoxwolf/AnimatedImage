@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-open class WebPImage: AnimatedImage {
+public final class WebPImage: AnimatedImage {
     public let name: String
     let data: Data
     
@@ -10,19 +10,19 @@ open class WebPImage: AnimatedImage {
         self.data = data
     }
     
-    public nonisolated var imageCount: Int {
+    public nonisolated func makeImageCount() -> Int {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.imageCount ?? 0
+        return source?.makeImageCount() ?? 0
     }
     
-    public nonisolated func delayTime(at index: Int) -> Double {
+    public nonisolated func makeDelayTime(at index: Int) -> Double {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.webpDelayTime(at: index) ?? 0.1
+        return source?.webpMakeDelayTime(at: index) ?? 0.1
     }
     
-    public nonisolated func image(at index: Int) -> CGImage? {
+    public nonisolated func makeImage(at index: Int) -> CGImage? {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.image(at: index)
+        return source?.makeImage(at: index)
     }
 }
 

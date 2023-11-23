@@ -6,7 +6,7 @@ fileprivate let logger = Logger(
     category: #file
 )
 
-public struct AnimatedImageViewConfiguration {
+public struct AnimatedImageViewConfiguration: Sendable {
     public static var `default`: AnimatedImageViewConfiguration {
         AnimatedImageViewConfiguration(
             maxByteCount: 1 * 1024 * 1024 * 1, // 1MB
@@ -22,7 +22,8 @@ public struct AnimatedImageViewConfiguration {
     public var taskPriority: TaskPriority
 }
 
-internal final class AnimatedImageViewModel {
+@MainActor
+internal final class AnimatedImageViewModel: Sendable {
     let cache: Cache<Int, UIImage>
     let maxByteCount: Int64
     let maxSize: CGSize
@@ -37,52 +38,72 @@ internal final class AnimatedImageViewModel {
         self.taskPriority = configuration.taskPriority
     }
     
-    @MainActor
     var indices: [Int] = []
     
-    @MainActor
     var delayTime: Double = 0.1
     
     var task: Task<Void, Never>? = nil
     
-    nonisolated func update(for renderSize: CGSize, image: any AnimatedImage) {
+    func update(for renderSize: CGSize, image: any AnimatedImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
-        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
+        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity, taskPriority] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
                 guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
-                let imageCount = image.imageCount
+                let imageCount = image.makeImageCount()
                 
                 let newSize = min(maxSize, renderSize)
                 let imageByteCount = Int(newSize.width) * Int(newSize.height) * 4
                 let memoryPressure = Double(imageByteCount * imageCount) / Double(maxByteCount)
                 let levelOfIntegrity = min(1.0 / memoryPressure, maxLevelOfIntegrity)
                 
-                let delayTimes = (0..<imageCount).map({ image.delayTime(at: $0) })
+                let delayTimes = (0..<imageCount).map({ image.makeDelayTime(at: $0) })
                 let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
+                
                 await MainActor.run {
                     self.indices = indices
                     self.delayTime = delayTime
                 }
-                for i in indices {
-                    let uiImage = image.image(at: i).map(UIImage.init(cgImage:))
-                    let decodedImage = await uiImage?.decoded(for: newSize)
-                    if let decodedImage {
-                        cache.insert(decodedImage, forKey: i)
+                
+                await withTaskGroup(of: (Int, CGImage?).self) { [taskPriority] taskGroup in
+                    print("indices.count:", Set(indices).count)
+                    for i in Set(indices) {
+                        taskGroup.addTask(priority: taskPriority) { [i] in
+                            print("make", i)
+                            return (i, image.makeImage(at: i))
+                        }
+                    }
+                    await withDiscardingTaskGroup { taskGroup2 in
+                        for await (i, image) in taskGroup {
+                            taskGroup2.addTask {
+                                print("decode", i)
+                                let uiImage = image.map(UIImage.init(cgImage:))
+                                let decodedImage = await uiImage?.decoded(for: newSize)
+                                if let decodedImage {
+                                    cache.insert(decodedImage, forKey: i)
+                                } else {
+                                    cache.removeValue(forKey: i)
+                                }
+                                print("decode done", i)
+                            }
+                        }
                     }
                 }
             } onCancel: { [cache] in
+                print("-----cancel-----")
                 cache.removeAllObjects()
             }
         }
+        Task {
+            try await Task.sleep(for: .seconds(0.025))
+            task?.cancel()
+        }
     }
     
-    @MainActor
-    func image(at index: Int) -> UIImage? {
+    func makeImage(at index: Int) -> UIImage? {
         cache.value(forKey: index)
     }
     
-    @MainActor
     func index(for targetTimestamp: TimeInterval) -> Int? {
         guard !indices.isEmpty else { return nil }
         guard delayTime != 0 else { return nil }
@@ -97,7 +118,7 @@ internal final class AnimatedImageViewModel {
     
     /// Based on https://github.com/kirualex/SwiftyGif
     /// See also UIImage+SwiftyGif.swift
-    private func decimateFrames(
+    nonisolated private func decimateFrames(
         delays: [Double],
         levelOfIntegrity: Double
     ) -> (displayIndices: [Int], delay: Double) {

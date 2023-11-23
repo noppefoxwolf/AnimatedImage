@@ -1,7 +1,7 @@
 import UIKit
 
 extension UIImage {
-    func decoded(for size: CGSize, usePreparingForDisplay: Bool = false) async -> UIImage? {
+    nonisolated func decoded(for size: CGSize, usePreparingForDisplay: Bool = false) async -> UIImage? {
         let newSize = aspectFitSize(for: self.size, maxSize: size)
         if newSize == self.size && usePreparingForDisplay {
             return await self.byPreparingForDisplay()
@@ -9,7 +9,7 @@ extension UIImage {
         return resize(image: self, newSize: newSize)
     }
     
-    func aspectFitSize(for currentSize: CGSize, maxSize: CGSize) -> CGSize {
+    nonisolated func aspectFitSize(for currentSize: CGSize, maxSize: CGSize) -> CGSize {
         let aspectWidth = maxSize.width / currentSize.width
         let aspectHeight = maxSize.height / currentSize.height
         let scalingFactor = min(aspectWidth, aspectHeight)
@@ -17,7 +17,7 @@ extension UIImage {
         return currentSize.applying(transform)
     }
     
-    func resize(image: UIImage, newSize: CGSize) -> UIImage? {
+    nonisolated func resize(image: UIImage, newSize: CGSize) -> UIImage? {
         let rendererFormat = UIGraphicsImageRendererFormat.default()
         let renderer = UIGraphicsImageRenderer(size: newSize, format: rendererFormat)
         return renderer.image { context in
