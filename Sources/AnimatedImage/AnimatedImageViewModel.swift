@@ -7,9 +7,18 @@ fileprivate let logger = Logger(
 )
 
 public struct AnimatedImageViewConfiguration: Sendable {
+    public static var unlimited: AnimatedImageViewConfiguration {
+        AnimatedImageViewConfiguration(
+            maxByteCount: .max,
+            maxSize: CGSize(width: Double.infinity, height: Double.infinity),
+            maxLevelOfIntegrity: 1,
+            taskPriority: .medium
+        )
+    }
+    
     public static var `default`: AnimatedImageViewConfiguration {
         AnimatedImageViewConfiguration(
-            maxByteCount: 1 * 1024 * 1024 * 1, // 1MB
+            maxByteCount: 1 * 1024 * 1024, // 1MB
             maxSize: CGSize(width: 128, height: 128),
             maxLevelOfIntegrity: 0.8,
             taskPriority: .medium
@@ -139,7 +148,11 @@ internal final class AnimatedImageViewModel: Sendable {
         
         // 2枚未満は無条件で出す
         if delays.count <= 2 {
-            return (displayIndices, resultDelayTime)
+            return (displayIndices, delays.first ?? resultDelayTime)
+        }
+        // 間引かない場合は計算しない
+        if levelOfIntegrity == 1 {
+            return (displayIndices, delays.first ?? resultDelayTime)
         }
         
         for delayTime in vsyncInterval {
