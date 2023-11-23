@@ -2,7 +2,21 @@
 
 High-performance animation image library.
 
+# Install
 
+```swift
+let package = Package(
+    dependencies: [
+        .package(url: "https://github.com/noppefoxwolf/AnimatedImage", from: "0.0.x")
+    ],
+)
+```
+
+# How It Works
+
+AnimatedImage pre-decodes and caches all animation frames.
+Optimize the number of drawing frames from the drawing size and drawing timestamp to prevent the cache size from becoming too large.
+It is designed so that all processing does not depend on the MainActor.
 
 # Features
 
