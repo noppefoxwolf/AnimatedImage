@@ -25,6 +25,7 @@ struct SwiftUIDemoView: View {
                 ForEach(items) { item in
                     AnimatedImagePlayer(image: image(for: item))
                         .scaledToFill()
+                        .background(Color.gray)
                 }
             }
         }
