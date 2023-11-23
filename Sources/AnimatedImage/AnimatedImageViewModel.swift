@@ -47,7 +47,7 @@ internal final class AnimatedImageViewModel: Sendable {
     func update(for renderSize: CGSize, image: any AnimatedImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
-        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity, taskPriority] in
+        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
                 guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
                 let imageCount = autoreleasepool(invoking: { image.makeImageCount() })
@@ -65,9 +65,9 @@ internal final class AnimatedImageViewModel: Sendable {
                     self.delayTime = delayTime
                 }
                 
-                await withTaskGroup(of: Void.self) { [taskPriority] taskGroup in
+                await withTaskGroup(of: Void.self) { taskGroup in
                     for i in Set(indices) {
-                        taskGroup.addTask(priority: taskPriority) { [i] in
+                        taskGroup.addTask { [i] in
                             guard !Task.isCancelled else { return }
                             let image = autoreleasepool(invoking: { image.makeImage(at: i) })
                             let uiImage = image.map(UIImage.init(cgImage:))
@@ -90,7 +90,7 @@ internal final class AnimatedImageViewModel: Sendable {
         }
     }
     
-    func makeImage(at index: Int) -> UIImage? {
+    nonisolated func makeImage(at index: Int) -> UIImage? {
         cache.value(forKey: index)
     }
     
