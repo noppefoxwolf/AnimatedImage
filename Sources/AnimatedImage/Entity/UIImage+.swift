@@ -1,7 +1,7 @@
 import UIKit
 
 extension UIImage {
-    nonisolated func decoded(for size: CGSize, usePreparingForDisplay: Bool = false) async -> UIImage? {
+    nonisolated func decoded(for size: CGSize, usePreparingForDisplay: Bool = true) async -> UIImage? {
         let newSize = aspectFitSize(for: self.size, maxSize: size)
         if newSize == self.size && usePreparingForDisplay {
             return await self.byPreparingForDisplay()
