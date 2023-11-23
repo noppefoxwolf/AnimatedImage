@@ -50,14 +50,14 @@ internal final class AnimatedImageViewModel: Sendable {
         task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity, taskPriority] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
                 guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
-                let imageCount = image.makeImageCount()
+                let imageCount = autoreleasepool(invoking: { image.makeImageCount() })
                 
                 let newSize = min(maxSize, renderSize)
                 let imageByteCount = Int(newSize.width) * Int(newSize.height) * 4
                 let memoryPressure = Double(imageByteCount * imageCount) / Double(maxByteCount)
                 let levelOfIntegrity = min(1.0 / memoryPressure, maxLevelOfIntegrity)
                 
-                let delayTimes = (0..<imageCount).map({ image.makeDelayTime(at: $0) })
+                let delayTimes = (0..<imageCount).map({ index in autoreleasepool(invoking: { image.makeDelayTime(at: index) }) })
                 let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
                 
                 await MainActor.run {
@@ -69,7 +69,7 @@ internal final class AnimatedImageViewModel: Sendable {
                     for i in Set(indices) {
                         taskGroup.addTask(priority: taskPriority) { [i] in
                             guard !Task.isCancelled else { return }
-                            let image = image.makeImage(at: i)
+                            let image = autoreleasepool(invoking: { image.makeImage(at: i) })
                             let uiImage = image.map(UIImage.init(cgImage:))
                             
                             guard !Task.isCancelled else { return }
