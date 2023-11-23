@@ -13,6 +13,7 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
+        uiView.configuration = context.environment.animatedImageViewConfiguration
         uiView.image = image
         uiView.startAnimating()
     }
@@ -20,5 +21,17 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     public static func dismantleUIView(_ uiView: AnimatedImageView, coordinator: ()) {
         uiView.stopAnimating()
         uiView.image = nil
+    }
+}
+
+private struct AnimatedImageConfigurationKey: EnvironmentKey {
+    static let defaultValue: AnimatedImageViewConfiguration = .default
+}
+
+extension EnvironmentValues {
+    @MainActor
+    public var animatedImageViewConfiguration: AnimatedImageViewConfiguration {
+        get { self[AnimatedImageConfigurationKey.self] }
+        set { self[AnimatedImageConfigurationKey.self] = newValue }
     }
 }

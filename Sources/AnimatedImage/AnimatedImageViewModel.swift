@@ -25,6 +25,15 @@ public struct AnimatedImageViewConfiguration: Sendable {
         )
     }
     
+    public static var performance: AnimatedImageViewConfiguration {
+        AnimatedImageViewConfiguration(
+            maxByteCount: 1 * 1024 * 1024 / 50, // 20KB
+            maxSize: CGSize(width: 32, height: 32),
+            maxLevelOfIntegrity: 0.25,
+            taskPriority: .medium
+        )
+    }
+    
     public var maxByteCount: Int64
     public var maxSize: CGSize
     public var maxLevelOfIntegrity: Double
