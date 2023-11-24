@@ -18,6 +18,27 @@ AnimatedImage pre-decodes and caches all animation frames.
 Optimize the number of drawing frames from the drawing size and drawing timestamp to prevent the cache size from becoming too large.
 It is designed so that all processing does not depend on the MainActor.
 
+# Usage
+
+## UIKit
+
+```swift
+let imageView = AnimatedImage(frame: .null)
+let image = APNGImage(data: data)
+imageView.image = image
+imageView.startAnimating()
+```
+
+## SwiftUI
+
+```swift
+@State var image = GIFImage(data: data)
+
+var body: some View {
+    AnimatedImagePlayer(image: image)
+}
+```
+
 # Features
 
 - [x] Support playback APNG, GIF, WebP
