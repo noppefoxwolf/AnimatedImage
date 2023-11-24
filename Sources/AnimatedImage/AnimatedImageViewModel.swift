@@ -56,16 +56,16 @@ internal final class AnimatedImageViewModel: Sendable {
         self.taskPriority = configuration.taskPriority
     }
     
-    private var indices: [Int] = []
+    var indices: [Int] = []
     
-    private var delayTime: Double = 0.1
+    var delayTime: Double = 0.1
     
-    private var task: Task<Void, Never>? = nil
+    var task: Task<Void, Never>? = nil
     
     func update(for renderSize: CGSize, image: any AnimatedImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
-        task = Task.detached(priority: taskPriority) { [weak self, image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
+        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
             await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
                 guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
                 
@@ -78,16 +78,15 @@ internal final class AnimatedImageViewModel: Sendable {
                 let memoryPressure = Double(imageByteCount * imageCount) / Double(maxByteCount)
                 let levelOfIntegrity = min(1.0 / memoryPressure, maxLevelOfIntegrity)
                 let delayTimes = (0..<imageCount).map({ index in autoreleasepool(invoking: { image.makeDelayTime(at: index) }) })
-                let frames: (displayIndices: [Int], delay: Double)? = self?.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
-                guard let frames else { return }
+                let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
                 
-                await MainActor.run { [weak self] in
-                    self?.indices = frames.displayIndices
-                    self?.delayTime = frames.delay
+                await MainActor.run {
+                    self.indices = indices
+                    self.delayTime = delayTime
                 }
                 
                 await withTaskGroup(of: Void.self) { taskGroup in
-                    for i in Set(frames.displayIndices) {
+                    for i in Set(indices) {
                         taskGroup.addTask { [i] in
                             guard !Task.isCancelled else { return }
                             let image = autoreleasepool(invoking: { image.makeImage(at: i) })
@@ -109,10 +108,6 @@ internal final class AnimatedImageViewModel: Sendable {
                 cache.removeAllObjects()
             }
         }
-    }
-    
-    func reset() {
-        task?.cancel()
     }
     
     nonisolated func makeImage(at index: Int) -> UIImage? {
