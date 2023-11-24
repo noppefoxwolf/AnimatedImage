@@ -12,7 +12,7 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxByteCount: .max,
             maxSize: CGSize(width: Double.infinity, height: Double.infinity),
             maxLevelOfIntegrity: 1,
-            taskPriority: .medium
+            taskPriority: .userInitiated
         )
     }
     

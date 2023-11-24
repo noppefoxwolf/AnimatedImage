@@ -7,16 +7,35 @@ struct App: SwiftUI.App {
         WindowGroup {
             NavigationView(content: {
                 List {
-                    NavigationLink {
-                        SwiftUIDemoView()
-                    } label: {
-                        Text("SwiftUI Demo")
+                    Section {
+                        NavigationLink {
+                            SwiftUIDemoView()
+                        } label: {
+                            Text("SwiftUI Demo")
+                        }
+                        
+                        NavigationLink {
+                            UIKitDemoView()
+                        } label: {
+                            Text("UIKit Demo")
+                        }
                     }
-                    
-                    NavigationLink {
-                        UIKitDemoView()
-                    } label: {
-                        Text("UIKit Demo")
+                    Section {
+                        NavigationLink {
+                            FormatDemoView()
+                        } label: {
+                            Text("Format Demo")
+                        }
+                        NavigationLink {
+                            QualityDemoView()
+                        } label: {
+                            Text("Adjust quality Demo")
+                        }
+                        NavigationLink {
+                            SynchronizeDemoView()
+                        } label: {
+                            Text("Synchronize Demo")
+                        }
                     }
                 }
             })
