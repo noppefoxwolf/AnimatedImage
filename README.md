@@ -2,6 +2,8 @@
 
 High-performance animation image library.
 
+![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
+
 # Install
 
 ```swift
