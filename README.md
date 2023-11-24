@@ -2,6 +2,8 @@
 
 High-performance animation image library.
 
+![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
+
 # Install
 
 ```swift
@@ -41,10 +43,47 @@ var body: some View {
 
 # Features
 
-- [x] Support playback APNG, GIF, WebP
-- [x] Automatically adjust playback quality
-- [x] Synchronize frame update 
-- [x] Customizable playback format
+## Low access main actor
+
+![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Instruments.png)
+
+## Support playback APNG, GIF, WebP
+
+![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
+
+## Automatically adjust playback quality
+
+![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/AdjustQuality.gif)
+
+## Synchronize frame update 
+
+![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Synchronize.gif)
+
+## Customizable playback format
+
+```swift
+public final class ManualAnimatedImage: AnimatedImage {
+    public let name: String
+    let images: [CGImage]
+    
+    public init(name: String = UUID().uuidString, images: [CGImage]) {
+        self.name = name
+        self.images = images
+    }
+    
+    public nonisolated func makeImageCount() -> Int {
+        images.count
+    }
+    
+    public nonisolated func makeDelayTime(at index: Int) -> Double {
+        0.1
+    }
+    
+    public nonisolated func makeImage(at index: Int) -> CGImage? {
+        images[index]
+    }
+}
+```
 
 # Required
 
