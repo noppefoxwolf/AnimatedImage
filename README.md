@@ -90,6 +90,12 @@ public final class ManualAnimatedImage: AnimatedImage {
 - Swift 5.9
 - iOS 16+
 
+## Apps Using
+
+<p float="left">
+    <a href="https://apps.apple.com/app/id1668645019"><img src="https://github.com/noppefoxwolf/MediaViewer/blob/main/.github/dawn.png" height="65"></a>
+</p>
+
 # License
 
 AnimatedImage is available under the MIT license. See the LICENSE file for more info.
