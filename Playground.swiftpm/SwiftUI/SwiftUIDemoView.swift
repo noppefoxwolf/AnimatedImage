@@ -8,7 +8,7 @@ struct SwiftUIDemoView: View {
     
     init() {
         //let dataSource = [AnimatedImageResource.examples[0]]
-        let dataSource = (0..<100).reduce(into: [], { result, _ in
+        let dataSource = (0..<10).reduce(into: [], { result, _ in
             result += AnimatedImageResource.examples
         })
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
@@ -17,7 +17,7 @@ struct SwiftUIDemoView: View {
     
     var body: some View {
         let layout = [
-            GridItem(.adaptive(minimum: 200, maximum: 200)),
+            GridItem(.adaptive(minimum: 60, maximum: 60)),
         ]
         
         ScrollView {
