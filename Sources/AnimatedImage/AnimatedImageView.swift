@@ -34,7 +34,7 @@ open class AnimatedImageView: AnimatableCGImageView {
     open override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if superview == nil {
-            imageViewModel?.task?.cancel()
+            imageViewModel?.reset()
         }
     }
     

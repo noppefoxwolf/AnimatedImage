@@ -8,7 +8,7 @@ struct SwiftUIDemoView: View {
     
     init() {
         //let dataSource = [AnimatedImageResource.examples[0]]
-        let dataSource = (0..<10).reduce(into: [], { result, _ in
+        let dataSource = (0..<100).reduce(into: [], { result, _ in
             result += AnimatedImageResource.examples
         })
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
@@ -28,7 +28,8 @@ struct SwiftUIDemoView: View {
                         .background(Color.gray)
                 }
             }
-        }.environment(\.animatedImageViewConfiguration, .performance)
+        }
+        //.environment(\.animatedImageViewConfiguration, .performance)
     }
     
     func image(for item: AnimatedImageResourceItem) -> any AnimatedImage {
