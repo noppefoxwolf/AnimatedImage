@@ -44,6 +44,5 @@ open class CGImageView: UIView {
     
     open override func display(_ layer: CALayer) {
         layer.contents = contents
-        layer.contentsGravity = .resizeAspect
     }
 }
