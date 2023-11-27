@@ -12,6 +12,9 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxByteCount: .max,
             maxSize: CGSize(width: Double.infinity, height: Double.infinity),
             maxLevelOfIntegrity: 1,
+            interpolationQuality: .high,
+            contentsFilter: .trilinear,
+            usesAlternativeHazyImage: true,
             taskPriority: .userInitiated
         )
     }
@@ -21,6 +24,9 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxByteCount: 1 * 1024 * 1024, // 1MB
             maxSize: CGSize(width: 128, height: 128),
             maxLevelOfIntegrity: 0.8,
+            interpolationQuality: .default,
+            contentsFilter: .linear,
+            usesAlternativeHazyImage: true,
             taskPriority: .medium
         )
     }
@@ -30,30 +36,34 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxByteCount: 1 * 1024 * 1024 / 50, // 20KB
             maxSize: CGSize(width: 32, height: 32),
             maxLevelOfIntegrity: 0.25,
-            taskPriority: .medium
+            interpolationQuality: .none,
+            contentsFilter: .nearest,
+            usesAlternativeHazyImage: false,
+            taskPriority: .low
         )
     }
     
     public var maxByteCount: Int64
     public var maxSize: CGSize
     public var maxLevelOfIntegrity: Double
+    public var interpolationQuality: CGInterpolationQuality
+    public var contentsFilter: CALayerContentsFilter
+    public var usesAlternativeHazyImage: Bool
     public var taskPriority: TaskPriority
 }
 
 @MainActor
 internal final class AnimatedImageViewModel: Sendable {
-    let cache: Cache<Int, UIImage>
-    let maxByteCount: Int64
-    let maxSize: CGSize
-    let maxLevelOfIntegrity: Double
-    let taskPriority: TaskPriority
+    enum CacheKey: Hashable {
+        case hazyImage
+        case index(Int)
+    }
+    let cache: Cache<CacheKey, UIImage>
+    let configuration: AnimatedImageViewConfiguration
     
     init(name: String, configuration: AnimatedImageViewConfiguration) {
         self.cache = Cache(name: name)
-        self.maxByteCount = configuration.maxByteCount
-        self.maxSize = configuration.maxSize
-        self.maxLevelOfIntegrity = configuration.maxLevelOfIntegrity
-        self.taskPriority = configuration.taskPriority
+        self.configuration = configuration
     }
     
     var indices: [Int] = []
@@ -65,18 +75,45 @@ internal final class AnimatedImageViewModel: Sendable {
     func update(for renderSize: CGSize, image: any AnimatedImage) {
         // TODO: 既にキャッシュ済み、生成中なら無視する
         task?.cancel()
-        task = Task.detached(priority: taskPriority) { [image, cache, maxSize, maxByteCount, maxLevelOfIntegrity] in
-            await withTaskCancellationHandler { [image, maxSize, maxByteCount, maxLevelOfIntegrity] in
-                guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
+        task = Task.detached(priority: configuration.taskPriority) { [image, cache, configuration] in
+            await withTaskCancellationHandler { [image, configuration] in
+                @Sendable func makeAndCacheImage(
+                    size: CGSize,
+                    index: Int,
+                    key: CacheKey,
+                    interpolationQuality: CGInterpolationQuality
+                ) async {
+                    let image = autoreleasepool(invoking: { image.makeImage(at: index) })
+                    let uiImage = image.map(UIImage.init(cgImage:))
+                    
+                    guard !Task.isCancelled else { return }
+                    let decodedImage = await uiImage?.decoded(for: size, interpolationQuality: interpolationQuality)
+                    
+                    guard !Task.isCancelled else { return }
+                    if let decodedImage {
+                        cache.insert(decodedImage, forKey: key)
+                    } else {
+                        cache.removeValue(forKey: key)
+                    }
+                }
                 
+                guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
+                if configuration.usesAlternativeHazyImage {
+                    await makeAndCacheImage(
+                        size: CGSize(width: 1, height: 1),
+                        index: 0,
+                        key: .hazyImage,
+                        interpolationQuality: .none
+                    )
+                }
                 guard !Task.isCancelled else { return }
                 let imageCount = autoreleasepool(invoking: { image.makeImageCount() })
                 
                 guard !Task.isCancelled else { return }
-                let newSize = min(maxSize, renderSize)
+                let newSize = min(configuration.maxSize, renderSize)
                 let imageByteCount = Int(newSize.width) * Int(newSize.height) * 4
-                let memoryPressure = Double(imageByteCount * imageCount) / Double(maxByteCount)
-                let levelOfIntegrity = min(1.0 / memoryPressure, maxLevelOfIntegrity)
+                let memoryPressure = Double(imageByteCount * imageCount) / Double(configuration.maxByteCount)
+                let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
                 let delayTimes = (0..<imageCount).map({ index in autoreleasepool(invoking: { image.makeDelayTime(at: index) }) })
                 let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
                 
@@ -85,22 +122,15 @@ internal final class AnimatedImageViewModel: Sendable {
                     self.delayTime = delayTime
                 }
                 
-                await withTaskGroup(of: Void.self) { taskGroup in
+                await withTaskGroup(of: Void.self) { [configuration] taskGroup in
                     for i in Set(indices) {
                         taskGroup.addTask { [i] in
-                            guard !Task.isCancelled else { return }
-                            let image = autoreleasepool(invoking: { image.makeImage(at: i) })
-                            let uiImage = image.map(UIImage.init(cgImage:))
-                            
-                            guard !Task.isCancelled else { return }
-                            let decodedImage = await uiImage?.decoded(for: newSize)
-                            
-                            guard !Task.isCancelled else { return }
-                            if let decodedImage {
-                                cache.insert(decodedImage, forKey: i)
-                            } else {
-                                cache.removeValue(forKey: i)
-                            }
+                            await makeAndCacheImage(
+                                size: newSize,
+                                index: i,
+                                key: .index(i),
+                                interpolationQuality: configuration.interpolationQuality
+                            )
                         }
                     }
                 }
@@ -111,7 +141,7 @@ internal final class AnimatedImageViewModel: Sendable {
     }
     
     nonisolated func makeImage(at index: Int) -> UIImage? {
-        cache.value(forKey: index)
+        cache.value(forKey: .index(index)) ?? cache.value(forKey: .hazyImage)
     }
     
     func index(for targetTimestamp: TimeInterval) -> Int? {

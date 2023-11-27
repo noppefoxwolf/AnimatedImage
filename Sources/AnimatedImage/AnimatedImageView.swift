@@ -14,6 +14,7 @@ open class AnimatedImageView: AnimatableCGImageView {
             if let image {
                 imageViewModel = AnimatedImageViewModel(name: image.name, configuration: configuration)
             }
+            layer.magnificationFilter = configuration.contentsFilter
         }
     }
     

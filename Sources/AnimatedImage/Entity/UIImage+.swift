@@ -1,12 +1,12 @@
 import UIKit
 
 extension UIImage {
-    nonisolated func decoded(for size: CGSize, usePreparingForDisplay: Bool = true) async -> UIImage? {
+    nonisolated func decoded(for size: CGSize, usePreparingForDisplay: Bool = true, interpolationQuality: CGInterpolationQuality) async -> UIImage? {
         let newSize = aspectFitSize(for: self.size, maxSize: size)
         if newSize == self.size && usePreparingForDisplay {
             return await self.byPreparingForDisplay()
         }
-        return resize(image: self, newSize: newSize)
+        return resize(image: self, newSize: newSize, interpolationQuality: interpolationQuality)
     }
     
     nonisolated func aspectFitSize(for currentSize: CGSize, maxSize: CGSize) -> CGSize {
@@ -17,10 +17,11 @@ extension UIImage {
         return currentSize.applying(transform)
     }
     
-    nonisolated func resize(image: UIImage, newSize: CGSize) -> UIImage? {
+    nonisolated func resize(image: UIImage, newSize: CGSize, interpolationQuality: CGInterpolationQuality) -> UIImage? {
         let rendererFormat = UIGraphicsImageRendererFormat.default()
         let renderer = UIGraphicsImageRenderer(size: newSize, format: rendererFormat)
         return renderer.image { context in
+            context.cgContext.interpolationQuality = interpolationQuality
             image.draw(in: CGRect(origin: .zero, size: newSize))
         }
     }
