@@ -8,11 +8,17 @@ struct SwiftUIDemoView: View {
     
     init() {
         //let dataSource = [AnimatedImageResource.examples[0]]
-        let dataSource = (0..<10).reduce(into: [], { result, _ in
+        let dataSource = (0..<50).reduce(into: [], { result, _ in
             result += AnimatedImageResource.examples
         })
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
         print(self.items.count)
+    }
+    
+    var animatedImageViewConfiguration: AnimatedImageViewConfiguration {
+        var configuration = AnimatedImageViewConfiguration.performance
+        configuration.usesAlternativeHazyImage = true
+        return configuration
     }
     
     var body: some View {
@@ -28,7 +34,7 @@ struct SwiftUIDemoView: View {
                         .background(Color.gray)
                 }
             }
-        }.environment(\.animatedImageViewConfiguration, .performance)
+        }.environment(\.animatedImageViewConfiguration, animatedImageViewConfiguration)
     }
     
     func image(for item: AnimatedImageResourceItem) -> any AnimatedImage {

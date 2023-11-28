@@ -98,14 +98,6 @@ internal final class AnimatedImageViewModel: Sendable {
                 }
                 
                 guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
-                if configuration.usesAlternativeHazyImage {
-                    await makeAndCacheImage(
-                        size: CGSize(width: 1, height: 1),
-                        index: 0,
-                        key: .hazyImage,
-                        interpolationQuality: .none
-                    )
-                }
                 guard !Task.isCancelled else { return }
                 let imageCount = autoreleasepool(invoking: { image.makeImageCount() })
                 
@@ -116,6 +108,15 @@ internal final class AnimatedImageViewModel: Sendable {
                 let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
                 let delayTimes = (0..<imageCount).map({ index in autoreleasepool(invoking: { image.makeDelayTime(at: index) }) })
                 let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
+                
+                if configuration.usesAlternativeHazyImage, indices.count > 1 {
+                    await makeAndCacheImage(
+                        size: CGSize(width: 1, height: 1),
+                        index: 0,
+                        key: .hazyImage,
+                        interpolationQuality: .none
+                    )
+                }
                 
                 await MainActor.run {
                     self.indices = indices
