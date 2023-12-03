@@ -94,6 +94,7 @@ public final class ManualAnimatedImage: AnimatedImage {
 
 <p float="left">
     <a href="https://apps.apple.com/app/id1668645019"><img src="https://github.com/noppefoxwolf/MediaViewer/blob/main/.github/dawn.png" height="65"></a>
+    <a href="https://apps.apple.com/app/id6470347919"><img src="https://tweetpd.com/wp-content/uploads/2023/11/5nyan.png" height="65"></a>
 </p>
 
 # License
