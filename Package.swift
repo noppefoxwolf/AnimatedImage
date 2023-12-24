@@ -18,13 +18,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "AnimatedImage"
+            name: "AnimatedImage",
+            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
         .target(
             name: "AnimatedImageSwiftUI",
             dependencies: [
                 "AnimatedImage"
-            ]
+            ],
+            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "AnimatedImageTests",
