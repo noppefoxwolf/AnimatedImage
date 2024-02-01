@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-public final class GifImage: AnimatedImage {
+public final class GifImage: AnimatedImage, Sendable {
     public let name: String
     let data: Data
     

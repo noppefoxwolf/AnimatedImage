@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-public final class WebPImage: AnimatedImage {
+public final class WebPImage: AnimatedImage, Sendable {
     public let name: String
     let data: Data
     

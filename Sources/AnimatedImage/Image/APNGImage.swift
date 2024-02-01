@@ -1,7 +1,7 @@
 import Foundation
 import ImageIO
 
-public final class APNGImage: AnimatedImage {
+public final class APNGImage: AnimatedImage, Sendable {
     public let name: String
     let data: Data
     
