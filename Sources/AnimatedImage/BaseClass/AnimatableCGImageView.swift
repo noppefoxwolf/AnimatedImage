@@ -9,6 +9,7 @@ open class AnimatableCGImageView: CGImageView, DisplayLinkTarget {
             target: DisplayLinkProxy(target: self),
             selector: #selector(DisplayLinkProxy<Self>.updateContents)
         )
+        displayLink?.preferredFrameRateRange = CAFrameRateRange(minimum: 1, maximum: 60)
         displayLink?.add(to: .main, forMode: .common)
     }
     
