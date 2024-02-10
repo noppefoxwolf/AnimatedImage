@@ -14,7 +14,6 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxLevelOfIntegrity: 1,
             interpolationQuality: .high,
             contentsFilter: .trilinear,
-            usesAlternativeHazyImage: true,
             taskPriority: .userInitiated
         )
     }
@@ -26,7 +25,6 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxLevelOfIntegrity: 0.8,
             interpolationQuality: .default,
             contentsFilter: .linear,
-            usesAlternativeHazyImage: true,
             taskPriority: .medium
         )
     }
@@ -38,7 +36,6 @@ public struct AnimatedImageViewConfiguration: Sendable {
             maxLevelOfIntegrity: 0.25,
             interpolationQuality: .none,
             contentsFilter: .nearest,
-            usesAlternativeHazyImage: false,
             taskPriority: .low
         )
     }
@@ -48,14 +45,12 @@ public struct AnimatedImageViewConfiguration: Sendable {
     public var maxLevelOfIntegrity: Double
     public var interpolationQuality: CGInterpolationQuality
     public var contentsFilter: CALayerContentsFilter
-    public var usesAlternativeHazyImage: Bool
     public var taskPriority: TaskPriority
 }
 
 @MainActor
 internal final class AnimatedImageViewModel: Sendable {
     enum CacheKey: Hashable {
-        case hazyImage
         case index(Int)
     }
     let cache: Cache<CacheKey, UIImage>
@@ -109,15 +104,6 @@ internal final class AnimatedImageViewModel: Sendable {
                 let delayTimes = (0..<imageCount).map({ index in autoreleasepool(invoking: { image.makeDelayTime(at: index) }) })
                 let (indices, delayTime) = self.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
                 
-                if configuration.usesAlternativeHazyImage, indices.count > 1 {
-                    await makeAndCacheImage(
-                        size: CGSize(width: 1, height: 1),
-                        index: 0,
-                        key: .hazyImage,
-                        interpolationQuality: .none
-                    )
-                }
-                
                 await MainActor.run {
                     self.indices = indices
                     self.delayTime = delayTime
@@ -142,7 +128,7 @@ internal final class AnimatedImageViewModel: Sendable {
     }
     
     nonisolated func makeImage(at index: Int) -> UIImage? {
-        cache.value(forKey: .index(index)) ?? cache.value(forKey: .hazyImage)
+        cache.value(forKey: .index(index))
     }
     
     func index(for targetTimestamp: TimeInterval) -> Int? {

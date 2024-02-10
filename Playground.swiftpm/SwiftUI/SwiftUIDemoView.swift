@@ -17,7 +17,6 @@ struct SwiftUIDemoView: View {
     
     var animatedImageViewConfiguration: AnimatedImageViewConfiguration {
         var configuration = AnimatedImageViewConfiguration.performance
-        configuration.usesAlternativeHazyImage = true
         return configuration
     }
     
