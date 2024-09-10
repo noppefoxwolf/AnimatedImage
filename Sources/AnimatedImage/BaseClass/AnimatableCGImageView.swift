@@ -1,4 +1,4 @@
-import UIKit
+public import UIKit
 
 open class AnimatableCGImageView: CGImageView, DisplayLinkTarget {
     private var displayLink: CADisplayLink? = nil

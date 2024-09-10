@@ -1,5 +1,6 @@
-import Foundation
+public import Foundation
 import ImageIO
+public import CoreGraphics
 
 public final class APNGImage: AnimatedImage, Sendable {
     public let name: String

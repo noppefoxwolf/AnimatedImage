@@ -1,5 +1,5 @@
 import Foundation
-import CoreGraphics
+public import CoreGraphics
 
 public protocol AnimatedImage: Sendable {
     var name: String { get }

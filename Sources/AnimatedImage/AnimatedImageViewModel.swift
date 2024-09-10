@@ -1,4 +1,4 @@
-import UIKit
+public import UIKit
 import os
 
 fileprivate let logger = Logger(

@@ -1,4 +1,4 @@
-import UIKit
+public import UIKit
 
 open class CGImageView: UIView {
     public var contents: CGImage? = nil {
