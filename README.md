@@ -87,8 +87,8 @@ public final class ManualAnimatedImage: AnimatedImage {
 
 # Required
 
-- Swift 5.9
-- iOS 16+
+- Swift 6.0
+- iOS 16
 
 ## Apps Using
 
