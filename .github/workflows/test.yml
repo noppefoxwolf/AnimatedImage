@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   test:
     name: Test
-    runs-on: macos-14
+    runs-on: macos-latest
     
     steps:
     - name: Select Xcode version
@@ -15,4 +15,4 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Build and test
-      run: swift test
+      run: xcodebuild -scheme AnimatedImage test -destination "platform=iOS Simulator,name=iPhone 16,OS=latest"
