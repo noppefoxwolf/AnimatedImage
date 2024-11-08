@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "70F14186-BF34-4133-80FC-9A814CD9D5AC",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "AnimatedImageTests",
+        "name" : "AnimatedImageTests"
+      }
+    }
+  ],
+  "version" : 1
+}

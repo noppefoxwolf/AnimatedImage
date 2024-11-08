@@ -3,7 +3,7 @@ import UIKit
 extension UIImage {
     nonisolated func decoded(for size: CGSize, usePreparingForDisplay: Bool = true, interpolationQuality: CGInterpolationQuality) async -> UIImage? {
         let newSize = aspectFitSize(for: self.size, maxSize: size)
-        if newSize == self.size && usePreparingForDisplay {
+        if self.size.isLessThanOrEqualTo(newSize) && usePreparingForDisplay {
             return await self.byPreparingForDisplay()
         }
         return resize(image: self, newSize: newSize, interpolationQuality: interpolationQuality)
@@ -24,5 +24,11 @@ extension UIImage {
             context.cgContext.interpolationQuality = interpolationQuality
             image.draw(in: CGRect(origin: .zero, size: newSize))
         }
+    }
+}
+
+extension CGSize {
+    func isLessThanOrEqualTo(_ size: CGSize) -> Bool {
+        width <= size.width && height <= size.height
     }
 }

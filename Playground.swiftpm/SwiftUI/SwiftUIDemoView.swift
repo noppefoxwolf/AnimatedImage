@@ -16,7 +16,7 @@ struct SwiftUIDemoView: View {
     }
     
     var animatedImageViewConfiguration: AnimatedImageViewConfiguration {
-        var configuration = AnimatedImageViewConfiguration.performance
+        let configuration = AnimatedImageViewConfiguration.performance
         return configuration
     }
     
