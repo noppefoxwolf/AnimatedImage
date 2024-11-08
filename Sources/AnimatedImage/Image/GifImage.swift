@@ -1,6 +1,6 @@
 public import Foundation
 import ImageIO
-public import CoreGraphics
+import CoreGraphics
 
 public final class GifImage: AnimatedImage, Sendable {
     public let name: String
