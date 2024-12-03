@@ -19,7 +19,13 @@ let package = Package(
     targets: [
         .target(
             name: "AnimatedImage",
+            dependencies: [
+                "UpdateLink"
+            ],
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
+        ),
+        .target(
+            name: "UpdateLink"
         ),
         .target(
             name: "AnimatedImageSwiftUI",
