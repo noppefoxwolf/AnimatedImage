@@ -5,7 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "AnimatedImage",
-    platforms: [.iOS(.v16)],
+    platforms: [
+        .iOS(.v16),
+        .visionOS(.v1)
+    ],
     products: [
         .library(
             name: "AnimatedImage",

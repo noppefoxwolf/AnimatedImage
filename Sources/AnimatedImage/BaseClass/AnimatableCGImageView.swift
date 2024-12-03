@@ -6,7 +6,7 @@ open class AnimatableCGImageView: CGImageView {
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, visionOS 2.0, *) {
             updateLink = UIUpdateLink(view: self)
         } else {
             updateLink = BackportUpdateLink(view: self)
