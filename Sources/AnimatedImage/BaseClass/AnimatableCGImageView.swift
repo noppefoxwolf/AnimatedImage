@@ -2,12 +2,17 @@ public import UIKit
 import UpdateLink
 
 open class AnimatableCGImageView: CGImageView {
-    var updateLink: (any UpdateLink)!
+    lazy var updateLink: (any UpdateLink) = { preconditionFailure() }()
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
         if #available(iOS 18.0, visionOS 2.0, *) {
-            updateLink = UIUpdateLink(view: self)
+            // workaround: Designed for iPad doesn't have UIUpdateLink.
+            if ProcessInfo.processInfo.isiOSAppOnMac {
+                updateLink = BackportUpdateLink(view: self)
+            } else {
+                updateLink = UIUpdateLink(view: self)
+            }
         } else {
             updateLink = BackportUpdateLink(view: self)
         }
