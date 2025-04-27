@@ -93,8 +93,9 @@ public final class ManualAnimatedImage: AnimatedImage {
 ## Apps Using
 
 <p float="left">
-    <a href="https://apps.apple.com/app/id1668645019"><img src="https://github.com/noppefoxwolf/MediaViewer/blob/main/.github/dawn.png" height="65"></a>
-    <a href="https://apps.apple.com/app/id6470347919"><img src="https://tweetpd.com/wp-content/uploads/2023/11/5nyan.png" height="65"></a>
+    <a href="https://apps.apple.com/app/id1668645019"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/dev.noppe.snowfox.png" height="65"></a>
+    <a href="https://apps.apple.com/app/id6470347919"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/lynnpd.threadpd.png" height="65"></a>
+    <a href="https://apps.apple.com/app/id6736725704"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/com.nintendo.znsa.png" height="65"></a>
 </p>
 
 # License
