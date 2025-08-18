@@ -11,18 +11,21 @@ internal final class AnimatedImageViewModel: Sendable {
     enum CacheKey: Hashable {
         case index(Int)
     }
-    let cache: Cache<CacheKey, UIImage>
-    let configuration: AnimatedImageViewConfiguration
+    
+    private let cache: Cache<CacheKey, UIImage>
+    private let configuration: AnimatedImageViewConfiguration
+    private let imageProcessor: ImageProcessor
+    private let timingCalculator: AnimationTimingCalculator
     
     init(name: String, configuration: AnimatedImageViewConfiguration) {
         self.cache = Cache(name: name)
         self.configuration = configuration
+        self.imageProcessor = ImageProcessor(configuration: configuration)
+        self.timingCalculator = AnimationTimingCalculator()
     }
     
     var indices: [Int] = []
-    
     var delayTime: Double = 0.1
-    
     var task: Task<Void, Never>? = nil
     
     func update(for renderSize: CGSize, image: any AnimatedImage) {
@@ -45,109 +48,26 @@ internal final class AnimatedImageViewModel: Sendable {
     }
     
     nonisolated private func processAnimatedImage(renderSize: CGSize, image: any AnimatedImage) async {
-        guard validateRenderSize(renderSize) else { return }
-        guard !Task.isCancelled else { return }
-        
-        let imageCount = autoreleasepool { image.makeImageCount() }
-        guard !Task.isCancelled else { return }
-        
-        let optimizedSize = calculateOptimizedSize(renderSize: renderSize)
-        let frameConfiguration = calculateFrameConfiguration(
-            imageSize: optimizedSize,
-            imageCount: imageCount,
+        guard let processingResult = await imageProcessor.processAnimatedImage(
+            renderSize: renderSize,
             image: image
-        )
+        ) else { return }
         
-        await updateFrameIndices(frameConfiguration)
-        await generateFrameImages(frameConfiguration, image: image, cache: cache)
+        await updateFrameIndices(processingResult.frameConfiguration)
+        await cacheGeneratedImages(processingResult.generatedImages)
     }
     
-    nonisolated private func validateRenderSize(_ renderSize: CGSize) -> Bool {
-        !CGRect(origin: .zero, size: renderSize).isEmpty
-    }
-    
-    nonisolated private func calculateOptimizedSize(renderSize: CGSize) -> CGSize {
-        min(configuration.maxSize, renderSize)
-    }
-    
-    private struct FrameConfiguration {
-        let optimizedSize: CGSize
-        let indices: [Int]
-        let delayTime: Double
-        let interpolationQuality: CGInterpolationQuality
-    }
-    
-    nonisolated private func calculateFrameConfiguration(
-        imageSize: CGSize,
-        imageCount: Int,
-        image: any AnimatedImage
-    ) -> FrameConfiguration {
-        let imageByteCount = Int(imageSize.width) * Int(imageSize.height) * 4
-        let memoryPressure = Double(imageByteCount * imageCount) / Double(configuration.maxByteCount)
-        let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
-        
-        let delayTimes = (0..<imageCount).map { index in
-            autoreleasepool { image.makeDelayTime(at: index) }
-        }
-        
-        let decimator = FrameDecimator()
-        let decimationResult = decimator.decimateFrames(
-            delays: delayTimes,
-            levelOfIntegrity: levelOfIntegrity
-        )
-        
-        return FrameConfiguration(
-            optimizedSize: imageSize,
-            indices: decimationResult.displayIndices,
-            delayTime: decimationResult.delayTime,
-            interpolationQuality: configuration.interpolationQuality
-        )
-    }
     
     @MainActor
-    private func updateFrameIndices(_ frameConfiguration: FrameConfiguration) {
+    private func updateFrameIndices(_ frameConfiguration: ImageProcessor.FrameConfiguration) {
         self.indices = frameConfiguration.indices
         self.delayTime = frameConfiguration.delayTime
     }
     
-    nonisolated private func generateFrameImages(
-        _ frameConfiguration: FrameConfiguration,
-        image: any AnimatedImage,
-        cache: Cache<CacheKey, UIImage>
-    ) async {
-        await withTaskGroup(of: Void.self) { taskGroup in
-            for index in Set(frameConfiguration.indices) {
-                taskGroup.addTask {
-                    await self.makeAndCacheImage(
-                        image: image,
-                        cache: cache,
-                        size: frameConfiguration.optimizedSize,
-                        index: index,
-                        interpolationQuality: frameConfiguration.interpolationQuality
-                    )
-                }
-            }
-        }
-    }
-    
-    nonisolated private func makeAndCacheImage(
-        image: any AnimatedImage,
-        cache: Cache<CacheKey, UIImage>,
-        size: CGSize,
-        index: Int,
-        interpolationQuality: CGInterpolationQuality
-    ) async {
-        let cgImage = autoreleasepool { image.makeImage(at: index) }
-        let uiImage = cgImage.map(UIImage.init(cgImage:))
-        
-        guard !Task.isCancelled else { return }
-        let decodedImage = await uiImage?.decoded(for: size, interpolationQuality: interpolationQuality)
-        
-        guard !Task.isCancelled else { return }
-        if let decodedImage {
-            cache.insert(decodedImage, forKey: .index(index))
-        } else {
-            cache.removeValue(forKey: .index(index))
+    nonisolated private func cacheGeneratedImages(_ generatedImages: [Int: UIImage]) async {
+        for (index, image) in generatedImages {
+            guard !Task.isCancelled else { return }
+            cache.insert(image, forKey: .index(index))
         }
     }
     
@@ -156,15 +76,11 @@ internal final class AnimatedImageViewModel: Sendable {
     }
     
     func index(for targetTimestamp: TimeInterval) -> Int? {
-        guard !indices.isEmpty else { return nil }
-        guard delayTime != 0 else { return nil }
-        let duration = delayTime * Double(indices.count)
-        let timestamp = targetTimestamp.truncatingRemainder(
-            dividingBy: duration
+        timingCalculator.calculateFrameIndex(
+            for: targetTimestamp,
+            indices: indices,
+            delayTime: delayTime
         )
-        let factor = timestamp / duration
-        let index = Int(Double(indices.count) * factor)
-        return indices[index]
     }
     
 }
