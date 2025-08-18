@@ -44,7 +44,7 @@ internal final class AnimatedImageViewModel: Sendable {
         }
     }
     
-    private func processAnimatedImage(renderSize: CGSize, image: any AnimatedImage) async {
+    nonisolated private func processAnimatedImage(renderSize: CGSize, image: any AnimatedImage) async {
         guard validateRenderSize(renderSize) else { return }
         guard !Task.isCancelled else { return }
         
@@ -62,11 +62,11 @@ internal final class AnimatedImageViewModel: Sendable {
         await generateFrameImages(frameConfiguration, image: image, cache: cache)
     }
     
-    private func validateRenderSize(_ renderSize: CGSize) -> Bool {
+    nonisolated private func validateRenderSize(_ renderSize: CGSize) -> Bool {
         !CGRect(origin: .zero, size: renderSize).isEmpty
     }
     
-    private func calculateOptimizedSize(renderSize: CGSize) -> CGSize {
+    nonisolated private func calculateOptimizedSize(renderSize: CGSize) -> CGSize {
         min(configuration.maxSize, renderSize)
     }
     
@@ -77,7 +77,7 @@ internal final class AnimatedImageViewModel: Sendable {
         let interpolationQuality: CGInterpolationQuality
     }
     
-    private func calculateFrameConfiguration(
+    nonisolated private func calculateFrameConfiguration(
         imageSize: CGSize,
         imageCount: Int,
         image: any AnimatedImage
@@ -104,14 +104,13 @@ internal final class AnimatedImageViewModel: Sendable {
         )
     }
     
-    private func updateFrameIndices(_ frameConfiguration: FrameConfiguration) async {
-        await MainActor.run {
-            self.indices = frameConfiguration.indices
-            self.delayTime = frameConfiguration.delayTime
-        }
+    @MainActor
+    private func updateFrameIndices(_ frameConfiguration: FrameConfiguration) {
+        self.indices = frameConfiguration.indices
+        self.delayTime = frameConfiguration.delayTime
     }
     
-    private func generateFrameImages(
+    nonisolated private func generateFrameImages(
         _ frameConfiguration: FrameConfiguration,
         image: any AnimatedImage,
         cache: Cache<CacheKey, UIImage>
@@ -131,7 +130,7 @@ internal final class AnimatedImageViewModel: Sendable {
         }
     }
     
-    @Sendable private func makeAndCacheImage(
+    nonisolated private func makeAndCacheImage(
         image: any AnimatedImage,
         cache: Cache<CacheKey, UIImage>,
         size: CGSize,
