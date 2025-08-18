@@ -1,26 +1,29 @@
-
-import SwiftUI
 import AnimatedImage
+import SwiftUI
 
 struct SwiftUIDemoView: View {
     let items: [AnimatedImageResourceItem]
-    
+
     init() {
         //let dataSource = [AnimatedImageResource.examples[0]]
-        let dataSource = (0..<50).reduce(into: [], { result, _ in
-            result += AnimatedImageResource.examples
-        })
+        let dataSource = (0..<50)
+            .reduce(
+                into: [],
+                { result, _ in
+                    result += AnimatedImageResource.examples
+                }
+            )
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
         print(self.items.count)
     }
-    
+
     let animatedImageViewConfiguration: AnimatedImageProviderConfiguration = .performance
-    
+
     var body: some View {
         let layout = [
-            GridItem(.adaptive(minimum: 60, maximum: 60)),
+            GridItem(.adaptive(minimum: 60, maximum: 60))
         ]
-        
+
         ScrollView {
             LazyVGrid(columns: layout) {
                 ForEach(items) { item in
@@ -29,9 +32,10 @@ struct SwiftUIDemoView: View {
                         .background(Color.gray)
                 }
             }
-        }.environment(\.animatedImageViewConfiguration, animatedImageViewConfiguration)
+        }
+        .environment(\.animatedImageViewConfiguration, animatedImageViewConfiguration)
     }
-    
+
     func image(for item: AnimatedImageResourceItem) -> any AnimatedImage {
         let image: any AnimatedImage
         switch item.rawValue {

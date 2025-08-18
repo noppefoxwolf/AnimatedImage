@@ -1,5 +1,5 @@
-import SwiftUI
 import AnimatedImage
+import SwiftUI
 
 struct FormatDemoView: View {
     var body: some View {
@@ -13,7 +13,10 @@ struct FormatDemoView: View {
                 Text("APNG")
             }
             VStack {
-                let url = Bundle.main.url(forResource: "animated-webp-supported", withExtension: "webp")!
+                let url = Bundle.main.url(
+                    forResource: "animated-webp-supported",
+                    withExtension: "webp"
+                )!
                 let data = try! Data(contentsOf: url)
                 let image = WebPImage(data: data)
                 AnimatedImagePlayer(image: image)

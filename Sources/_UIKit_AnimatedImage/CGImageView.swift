@@ -6,12 +6,12 @@ open class CGImageView: UIView {
             layer.setNeedsDisplay()
         }
     }
-    
+
     open override var contentMode: UIView.ContentMode {
         get { layer.contentsGravity.contentMode }
         set { layer.contentsGravity = newValue.contentsGravity }
     }
-    
+
     open override func display(_ layer: CALayer) {
         layer.contents = contents
     }

@@ -1,5 +1,5 @@
-import UIKit
 import AnimatedImage
+import UIKit
 
 final class Cell: UITableViewCell {
 
@@ -25,7 +25,7 @@ final class Cell: UITableViewCell {
             ),
         ])
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

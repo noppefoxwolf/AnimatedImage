@@ -5,7 +5,7 @@ import UIKit
 
 @Suite("ContentMode変換テスト")
 struct ContentModeTests {
-    
+
     @Test("UIView.ContentModeからCALayerContentsGravityへの変換")
     func contentModeToContentsGravity() {
         #expect(UIView.ContentMode.scaleToFill.contentsGravity == .resize)
@@ -22,7 +22,7 @@ struct ContentModeTests {
         #expect(UIView.ContentMode.bottomLeft.contentsGravity == .bottomLeft)
         #expect(UIView.ContentMode.bottomRight.contentsGravity == .bottomRight)
     }
-    
+
     @Test("CALayerContentsGravityからUIView.ContentModeへの変換")
     func contentsGravityToContentMode() {
         #expect(CALayerContentsGravity.resize.contentMode == .scaleToFill)
@@ -38,19 +38,19 @@ struct ContentModeTests {
         #expect(CALayerContentsGravity.bottomLeft.contentMode == .bottomLeft)
         #expect(CALayerContentsGravity.bottomRight.contentMode == .bottomRight)
     }
-    
+
     @Test("往復変換の一貫性")
     func roundTripConsistency() {
         let contentModes: [UIView.ContentMode] = [
             .scaleToFill, .scaleAspectFit, .scaleAspectFill,
             .center, .top, .bottom, .left, .right,
-            .topLeft, .topRight, .bottomLeft, .bottomRight
+            .topLeft, .topRight, .bottomLeft, .bottomRight,
         ]
-        
+
         for contentMode in contentModes {
             let contentsGravity = contentMode.contentsGravity
             let convertedBack = contentsGravity.contentMode
-            
+
             // redrawは特別扱い（resizeに変換される）
             if contentMode == .redraw {
                 #expect(convertedBack == .scaleToFill)
@@ -59,21 +59,21 @@ struct ContentModeTests {
             }
         }
     }
-    
+
     @Test("CGImageViewでのcontentMode使用")
     @MainActor
     func cgImageViewContentMode() {
         let imageView = CGImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-        
+
         imageView.contentMode = .scaleAspectFit
         #expect(imageView.layer.contentsGravity == .resizeAspect)
-        
+
         imageView.contentMode = .scaleAspectFill
         #expect(imageView.layer.contentsGravity == .resizeAspectFill)
-        
+
         imageView.contentMode = .center
         #expect(imageView.layer.contentsGravity == .center)
-        
+
         imageView.contentMode = .topLeft
         #expect(imageView.layer.contentsGravity == .topLeft)
     }

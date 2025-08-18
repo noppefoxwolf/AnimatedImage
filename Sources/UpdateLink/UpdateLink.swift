@@ -12,4 +12,3 @@ public protocol UpdateLink: AnyObject {
 public protocol UpdateInfo: AnyObject {
     var modelTime: TimeInterval { get }
 }
-

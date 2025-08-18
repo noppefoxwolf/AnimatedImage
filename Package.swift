@@ -21,7 +21,10 @@ let package = Package(
             name: "AnimatedImage",
             dependencies: [
                 "AnimatedImageCore",
-                .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
+                .target(
+                    name: "_UIKit_AnimatedImage",
+                    condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])
+                ),
                 .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
                 "_SwiftUI_AnimatedImage",
             ],
@@ -50,7 +53,10 @@ let package = Package(
         .target(
             name: "_SwiftUI_AnimatedImage",
             dependencies: [
-                .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
+                .target(
+                    name: "_UIKit_AnimatedImage",
+                    condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])
+                ),
                 .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
             ]
         ),

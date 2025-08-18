@@ -2,9 +2,9 @@ import Foundation
 
 /// アニメーションのタイミング計算を行うクラス
 public struct AnimationTimingCalculator: Sendable {
-    
+
     public init() {}
-    
+
     /// 指定されたタイムスタンプに対応するフレームインデックスを計算
     /// - Parameters:
     ///   - targetTimestamp: 対象のタイムスタンプ
@@ -18,18 +18,18 @@ public struct AnimationTimingCalculator: Sendable {
     ) -> Int? {
         guard !indices.isEmpty else { return nil }
         guard delayTime != 0 else { return nil }
-        
+
         let duration = delayTime * Double(indices.count)
         let timestamp = targetTimestamp.truncatingRemainder(dividingBy: duration)
         let factor = timestamp / duration
         let index = Int(Double(indices.count) * factor)
-        
+
         // インデックス範囲チェック
         guard index >= 0 && index < indices.count else { return nil }
-        
+
         return indices[index]
     }
-    
+
     /// アニメーションの総継続時間を計算
     /// - Parameters:
     ///   - indices: 表示フレームのインデックス配列
@@ -42,7 +42,7 @@ public struct AnimationTimingCalculator: Sendable {
         guard !indices.isEmpty else { return 0 }
         return delayTime * Double(indices.count)
     }
-    
+
     /// 指定された時間でのアニメーション進行率を計算
     /// - Parameters:
     ///   - currentTime: 現在時刻
@@ -56,7 +56,7 @@ public struct AnimationTimingCalculator: Sendable {
     ) -> Double {
         let totalDuration = calculateTotalDuration(indices: indices, delayTime: delayTime)
         guard totalDuration > 0 else { return 0 }
-        
+
         let normalizedTime = currentTime.truncatingRemainder(dividingBy: totalDuration)
         return normalizedTime / totalDuration
     }

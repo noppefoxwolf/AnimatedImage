@@ -1,6 +1,6 @@
+import CoreGraphics
 import Foundation
 import QuartzCore
-import CoreGraphics
 
 public struct AnimatedImageProviderConfiguration: Sendable {
     public static var unlimited: Self {
@@ -13,7 +13,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
             taskPriority: .userInitiated
         )
     }
-    
+
     public static var `default`: Self {
         Self(
             maxMemoryUsage: .init(value: 1, unit: .megabytes),
@@ -24,7 +24,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
             taskPriority: .medium
         )
     }
-    
+
     public static var performance: Self {
         Self(
             maxMemoryUsage: .init(value: 20, unit: .kilobytes),
@@ -35,7 +35,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
             taskPriority: .low
         )
     }
-    
+
     public var maxMemoryUsage: Measurement<UnitInformationStorage>
     public var maxSize: CGSize
     public var maxLevelOfIntegrity: Double
