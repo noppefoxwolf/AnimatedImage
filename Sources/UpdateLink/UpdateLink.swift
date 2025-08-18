@@ -1,4 +1,4 @@
-import UIKit
+import QuartzCore
 
 @MainActor
 public protocol UpdateLink: AnyObject {
