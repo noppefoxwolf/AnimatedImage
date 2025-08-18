@@ -42,4 +42,3 @@ open class AnimatableCGImageView: CGImageView {
     open func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
     }
 }
-

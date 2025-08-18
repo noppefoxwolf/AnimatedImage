@@ -1,4 +1,4 @@
-import UIKit
+import QuartzCore
 import os
 
 fileprivate let logger = Logger(
@@ -7,17 +7,17 @@ fileprivate let logger = Logger(
 )
 
 @MainActor
-internal final class AnimatedImageViewModel: Sendable {
+public final class AnimatedImageProvider: Sendable {
     enum CacheKey: Hashable {
         case index(Int)
     }
     
     private let cache: Cache<CacheKey, CGImage>
-    private let configuration: AnimatedImageViewConfiguration
+    private let configuration: AnimatedImageProviderConfiguration
     private let imageProcessor: ImageProcessor
     private let timingCalculator: AnimationTimingCalculator
     
-    init(name: String, configuration: AnimatedImageViewConfiguration) {
+    public init(name: String, configuration: AnimatedImageProviderConfiguration) {
         self.cache = Cache(name: name)
         self.configuration = configuration
         self.imageProcessor = ImageProcessor(configuration: configuration)
@@ -29,30 +29,36 @@ internal final class AnimatedImageViewModel: Sendable {
     var task: Task<Void, Never>? = nil
     var currentIndex: Int? = nil
     
-    func update(for renderSize: CGSize, image: any AnimatedImage) {
+    public func update(for renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
         cancelCurrentTask()
-        startImageProcessingTask(renderSize: renderSize, image: image)
+        startImageProcessingTask(renderSize: renderSize, scale: scale, image: image)
     }
     
-    private func cancelCurrentTask() {
+    public func cancelCurrentTask() {
         task?.cancel()
     }
     
-    private func startImageProcessingTask(renderSize: CGSize, image: any AnimatedImage) {
+    private func startImageProcessingTask(renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
         task = Task.detached(priority: configuration.taskPriority) { [image, cache] in
             await withTaskCancellationHandler {
-                await self.processAnimatedImage(renderSize: renderSize, image: image)
+                await self.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
             } onCancel: { [cache] in
                 cache.removeAllObjects()
             }
         }
     }
     
-    nonisolated private func processAnimatedImage(renderSize: CGSize, image: any AnimatedImage) async {
-        guard let processingResult = await imageProcessor.processAnimatedImage(
+    nonisolated private func processAnimatedImage(
+        renderSize: CGSize,
+        scale: CGFloat,
+        image: any AnimatedImage
+    ) async {
+        let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: renderSize,
+            scale: scale,
             image: image
-        ) else { return }
+        )
+        guard let processingResult else { return }
         
         await updateFrameIndices(processingResult.frameConfiguration)
         await cacheGeneratedImages(processingResult.generatedImages)
@@ -84,7 +90,7 @@ internal final class AnimatedImageViewModel: Sendable {
         )
     }
     
-    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
+    public func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
         let index = self.index(for: targetTimestamp)
         guard let index, currentIndex != index else { return nil }
         

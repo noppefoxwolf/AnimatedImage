@@ -1,6 +1,5 @@
 import SwiftUI
 import AnimatedImage
-import AnimatedImageSwiftUI
 
 struct SynchronizeDemoView: View {
     @State var image1: (any AnimatedImage)? = nil

@@ -16,47 +16,7 @@ jobs:
 
     - name: ⚙️ Set Xcode version
       run: sudo xcode-select -s /Applications/Xcode_16.4.app
-
-    - name: 📦 Restore iOS Runtime DMG Cache
-      id: cache-ios-runtime-dmg
-      uses: actions/cache/restore@v4
-      with:
-        path: ~/ios-runtime-cache
-        key: ${{ runner.os }}-ios-runtime-dmg-${{ hashFiles('Package.swift', 'Package.resolved') }}
-        restore-keys: |
-          ${{ runner.os }}-ios-runtime-dmg-
-
-    - name: 📋 List available simulators (debug)
-      run: xcrun simctl list devices
-
-    - name: 📱 Download iOS Runtime DMG
-      if: steps.cache-ios-runtime-dmg.outputs.cache-hit != 'true'
-      run: |
-        mkdir -p ~/ios-runtime-cache
-        xcodebuild -downloadPlatform iOS -exportPath ~/ios-runtime-cache -buildVersion 22G86
-
-    - name: 📦 Save iOS Runtime DMG Cache
-      if: steps.cache-ios-runtime-dmg.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
-      with:
-        path: ~/ios-runtime-cache
-        key: ${{ runner.os }}-ios-runtime-dmg-${{ hashFiles('Package.swift', 'Package.resolved') }}
-
-    - name: 📱 Install iOS Runtime from DMG
-      if: steps.cache-ios-runtime-dmg.outputs.cache-hit != 'true'
-      run: |
-        # DMGファイルを検索
-        DMG_FILE=$(find ~/ios-runtime-cache -name "*.dmg" | head -1)
-        if [ -z "$DMG_FILE" ]; then
-          echo "❌ DMG file not found in cache"
-          exit 1
-        fi
-        echo "📱 Found DMG: $DMG_FILE"
-        
-        # xcodebuild -importPlatformでDMGを直接インストール
-        echo "⚙️ Installing iOS Runtime from DMG..."
-        xcodebuild -importPlatform "$DMG_FILE"
-        
+    
     - name: ✅ Run Tests
-      run: |
-        xcodebuild -scheme AnimatedImage test -destination "platform=iOS Simulator,name=iPhone 16,OS=latest"
+      run: swift test
+        

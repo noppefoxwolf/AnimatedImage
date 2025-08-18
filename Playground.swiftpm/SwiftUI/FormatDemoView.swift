@@ -1,6 +1,5 @@
 import SwiftUI
 import AnimatedImage
-import AnimatedImageSwiftUI
 
 struct FormatDemoView: View {
     var body: some View {

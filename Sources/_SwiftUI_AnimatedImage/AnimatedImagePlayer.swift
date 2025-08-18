@@ -1,5 +1,8 @@
+#if canImport(_UIKit_AnimatedImage)
 public import SwiftUI
-public import AnimatedImage
+public import AnimatedImageCore
+import _UIKit_AnimatedImage
+import UIKit
 
 public struct AnimatedImagePlayer: UIViewRepresentable {
     let image: any AnimatedImage
@@ -15,7 +18,7 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
-        uiView.configuration = context.environment.animatedImageViewConfiguration
+        uiView.configuration = context.environment.AnimatedImageProviderConfiguration
         uiView.contentMode = contentMode.asUIKit()
         uiView.image = image
         uiView.startAnimating()
@@ -28,12 +31,12 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
 }
 
 private struct AnimatedImageConfigurationKey: EnvironmentKey {
-    static let defaultValue: AnimatedImageViewConfiguration = .default
+    static let defaultValue: AnimatedImageProviderConfiguration = .default
 }
 
 extension EnvironmentValues {
     @MainActor
-    public var animatedImageViewConfiguration: AnimatedImageViewConfiguration {
+    public var AnimatedImageProviderConfiguration: AnimatedImageProviderConfiguration {
         get { self[AnimatedImageConfigurationKey.self] }
         set { self[AnimatedImageConfigurationKey.self] = newValue }
     }
@@ -49,3 +52,4 @@ extension ContentMode {
         }
     }
 }
+#endif

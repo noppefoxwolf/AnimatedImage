@@ -2,9 +2,9 @@ import Foundation
 import QuartzCore
 import CoreGraphics
 
-public struct AnimatedImageViewConfiguration: Sendable {
-    public static var unlimited: AnimatedImageViewConfiguration {
-        AnimatedImageViewConfiguration(
+public struct AnimatedImageProviderConfiguration: Sendable {
+    public static var unlimited: Self {
+        Self(
             maxMemoryUsage: .init(value: 1, unit: .gigabytes),
             maxSize: CGSize(width: Double.infinity, height: Double.infinity),
             maxLevelOfIntegrity: 1,
@@ -14,8 +14,8 @@ public struct AnimatedImageViewConfiguration: Sendable {
         )
     }
     
-    public static var `default`: AnimatedImageViewConfiguration {
-        AnimatedImageViewConfiguration(
+    public static var `default`: Self {
+        Self(
             maxMemoryUsage: .init(value: 1, unit: .megabytes),
             maxSize: CGSize(width: 128, height: 128),
             maxLevelOfIntegrity: 0.8,
@@ -25,8 +25,8 @@ public struct AnimatedImageViewConfiguration: Sendable {
         )
     }
     
-    public static var performance: AnimatedImageViewConfiguration {
-        AnimatedImageViewConfiguration(
+    public static var performance: Self {
+        Self(
             maxMemoryUsage: .init(value: 20, unit: .kilobytes),
             maxSize: CGSize(width: 32, height: 32),
             maxLevelOfIntegrity: 0.25,

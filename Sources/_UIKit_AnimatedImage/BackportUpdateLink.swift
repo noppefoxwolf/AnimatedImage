@@ -1,4 +1,5 @@
 import UIKit
+import UpdateLink
 
 public final class BackportUpdateLink: UpdateLink, DisplayLinkTarget {
     private var displayLink: CADisplayLink!
@@ -37,7 +38,7 @@ public final class BackportUpdateLink: UpdateLink, DisplayLinkTarget {
         handlers.append(handler)
     }
     
-    func updateContents(_ displayLink: CADisplayLink) {
+    public func updateContents(_ displayLink: CADisplayLink) {
         let info = BackportUpdateInfo(modelTime: displayLink.targetTimestamp)
         handlers.forEach { action in
             action(self, info)

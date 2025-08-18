@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -7,35 +7,52 @@ let package = Package(
     name: "AnimatedImage",
     platforms: [
         .iOS(.v16),
-        .visionOS(.v1)
+        .visionOS(.v1),
+        .macOS(.v14),
     ],
     products: [
         .library(
             name: "AnimatedImage",
             targets: ["AnimatedImage"]
-        ),
-        .library(
-            name: "AnimatedImageSwiftUI",
-            targets: ["AnimatedImageSwiftUI"]
         )
     ],
     targets: [
         .target(
             name: "AnimatedImage",
             dependencies: [
-                "UpdateLink"
+                "AnimatedImageCore",
+                .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
+                .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
+                "_SwiftUI_AnimatedImage",
             ],
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
+        ),
+        .target(
+            name: "AnimatedImageCore"
         ),
         .target(
             name: "UpdateLink"
         ),
         .target(
-            name: "AnimatedImageSwiftUI",
+            name: "_UIKit_AnimatedImage",
             dependencies: [
-                "AnimatedImage"
-            ],
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
+                "UpdateLink",
+                "AnimatedImageCore",
+            ]
+        ),
+        .target(
+            name: "_AppKit_AnimatedImage",
+            dependencies: [
+                "UpdateLink",
+                "AnimatedImageCore",
+            ]
+        ),
+        .target(
+            name: "_SwiftUI_AnimatedImage",
+            dependencies: [
+                .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
+                .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
+            ]
         ),
         .testTarget(
             name: "AnimatedImageTests",

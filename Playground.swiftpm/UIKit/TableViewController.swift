@@ -1,6 +1,5 @@
 import UIKit
 import AnimatedImage
-import AnimatedImageSwiftUI
 
 class TableViewController: UITableViewController {
     override func viewDidLoad() {

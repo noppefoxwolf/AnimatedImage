@@ -1,29 +1,30 @@
 public import UIKit
+import AnimatedImageCore
 
 open class AnimatedImageView: AnimatableCGImageView {
     public var image: (any AnimatedImage)? = nil {
         didSet {
             if let image {
-                imageViewModel = AnimatedImageViewModel(name: image.name, configuration: configuration)
+                provider = AnimatedImageProvider(name: image.name, configuration: configuration)
             }
         }
     }
     
-    public var configuration: AnimatedImageViewConfiguration = .default {
+    public var configuration: AnimatedImageProviderConfiguration = .default {
         didSet {
             if let image {
-                imageViewModel = AnimatedImageViewModel(name: image.name, configuration: configuration)
+                provider = AnimatedImageProvider(name: image.name, configuration: configuration)
             }
             layer.magnificationFilter = configuration.contentsFilter
         }
     }
     
-    private var imageViewModel: AnimatedImageViewModel? = nil {
+    private var provider: AnimatedImageProvider? = nil {
         didSet {
             contents = nil
             
             if let image {
-                imageViewModel?.update(for: bounds.size, image: image)
+                provider?.update(for: bounds.size, scale: traitCollection.displayScale, image: image)
             }
             
             setNeedsDisplay()
@@ -33,19 +34,19 @@ open class AnimatedImageView: AnimatableCGImageView {
     open override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if superview == nil {
-            imageViewModel?.task?.cancel()
+            provider?.cancelCurrentTask()
         }
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
         if let image {
-            imageViewModel?.update(for: bounds.size, image: image)
+            provider?.update(for: bounds.size, scale: traitCollection.displayScale, image: image)
         }
     }
     
     open override func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
-        if let image = imageViewModel?.contentsForTimestamp(targetTimestamp) {
+        if let image = provider?.contentsForTimestamp(targetTimestamp) {
             contents = image
         }
     }

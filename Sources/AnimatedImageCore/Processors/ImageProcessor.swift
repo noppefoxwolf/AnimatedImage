@@ -1,5 +1,6 @@
-import UIKit
+import Foundation
 import os
+import QuartzCore
 
 /// アニメーション画像の処理パイプライン
 public struct ImageProcessor: Sendable {
@@ -9,17 +10,20 @@ public struct ImageProcessor: Sendable {
         public let optimizedSize: CGSize
         public let indices: [Int]
         public let delayTime: Double
+        public let scale: CGFloat
         public let interpolationQuality: CGInterpolationQuality
         
         public init(
             optimizedSize: CGSize,
             indices: [Int],
             delayTime: Double,
+            scale: CGFloat,
             interpolationQuality: CGInterpolationQuality
         ) {
             self.optimizedSize = optimizedSize
             self.indices = indices
             self.delayTime = delayTime
+            self.scale = scale
             self.interpolationQuality = interpolationQuality
         }
     }
@@ -35,15 +39,16 @@ public struct ImageProcessor: Sendable {
         }
     }
     
-    private let configuration: AnimatedImageViewConfiguration
+    private let configuration: AnimatedImageProviderConfiguration
     
-    public init(configuration: AnimatedImageViewConfiguration) {
+    public init(configuration: AnimatedImageProviderConfiguration) {
         self.configuration = configuration
     }
     
     /// アニメーション画像を処理する
     public func processAnimatedImage(
         renderSize: CGSize,
+        scale: CGFloat,
         image: any AnimatedImage
     ) async -> ProcessingResult? {
         guard isValidRenderSize(renderSize) else { return nil }
@@ -56,6 +61,7 @@ public struct ImageProcessor: Sendable {
         let frameConfiguration = calculateFrameConfiguration(
             imageSize: optimizedSize,
             imageCount: imageCount,
+            scale: scale,
             image: image
         )
         
@@ -81,6 +87,7 @@ public struct ImageProcessor: Sendable {
     public func calculateFrameConfiguration(
         imageSize: CGSize,
         imageCount: Int,
+        scale: CGFloat,
         image: any AnimatedImage
     ) -> FrameConfiguration {
         let imageByteCount = Int(imageSize.width) * Int(imageSize.height) * 4
@@ -101,6 +108,7 @@ public struct ImageProcessor: Sendable {
             optimizedSize: imageSize,
             indices: decimationResult.displayIndices,
             delayTime: decimationResult.delayTime,
+            scale: scale,
             interpolationQuality: configuration.interpolationQuality
         )
     }
@@ -119,6 +127,7 @@ public struct ImageProcessor: Sendable {
                         image: image,
                         size: frameConfiguration.optimizedSize,
                         index: index,
+                        scale: frameConfiguration.scale,
                         interpolationQuality: frameConfiguration.interpolationQuality
                     )
                     return (index, processedImage)
@@ -140,15 +149,19 @@ public struct ImageProcessor: Sendable {
         image: any AnimatedImage,
         size: CGSize,
         index: Int,
+        scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let cgImage = autoreleasepool { image.image(at: index) }
-        let uiImage = cgImage.map(UIImage.init(cgImage:))
         
         guard !Task.isCancelled else { return nil }
-        let decodedImage = await uiImage?.decoded(for: size, interpolationQuality: interpolationQuality)
+        let decodedImage = await cgImage?.decoded(
+            for: size,
+            scale: scale,
+            interpolationQuality: interpolationQuality
+        )
         
         guard !Task.isCancelled else { return nil }
-        return decodedImage?.cgImage
+        return decodedImage
     }
 }
