@@ -84,7 +84,7 @@ public struct ImageProcessor: Sendable {
         image: any AnimatedImage
     ) -> FrameConfiguration {
         let imageByteCount = Int(imageSize.width) * Int(imageSize.height) * 4
-        let memoryPressure = Double(imageByteCount * imageCount) / Double(configuration.maxByteCount)
+        let memoryPressure = Double(imageByteCount * imageCount) / configuration.maxMemoryUsage.converted(to: .bytes).value
         let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
         
         let delayTimes = (0..<imageCount).map { index in

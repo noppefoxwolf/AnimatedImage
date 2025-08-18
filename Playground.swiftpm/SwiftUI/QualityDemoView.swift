@@ -35,9 +35,9 @@ struct QualityDemoView: View {
                 Text("Max Cache size")
                 Slider(
                     value: Binding<Double>(get: {
-                        Double(configuration.maxByteCount) / (1 * 1024 * 1024)
+                        configuration.maxMemoryUsage.converted(to: .bytes).value / (1 * 1024 * 1024)
                     }, set: { newValue in
-                        configuration.maxByteCount = Int64((1 * 1024 * 1024) * newValue)
+                        configuration.maxMemoryUsage = .init(value: (1 * 1024 * 1024) * newValue, unit: .bytes)
                     }),
                     in: 0.001...1
                 )
@@ -54,7 +54,7 @@ struct QualityDemoView: View {
 extension AnimatedImageViewConfiguration {
     public static var qualityDemo: AnimatedImageViewConfiguration {
         var configuation = AnimatedImageViewConfiguration.default
-        configuation.maxByteCount = 1 * 1024 * 1024
+        configuation.maxMemoryUsage = .init(value: 1, unit: .megabytes)
         configuation.taskPriority = .userInitiated
         return configuation
     }
