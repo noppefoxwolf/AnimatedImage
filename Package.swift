@@ -27,11 +27,11 @@ let package = Package(
                 "AnimatedImageCore",
                 .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
                 .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS]))
-            ]
+            ],
+            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
         .target(
-            name: "AnimatedImageCore",
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
+            name: "AnimatedImageCore"
         ),
         .target(
             name: "UpdateLink"
