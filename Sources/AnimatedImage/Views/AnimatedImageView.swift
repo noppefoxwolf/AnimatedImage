@@ -46,7 +46,7 @@ open class AnimatedImageView: AnimatableCGImageView {
     
     open override func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
         if let image = imageViewModel?.contentsForTimestamp(targetTimestamp) {
-            contents = image.cgImage
+            contents = image
         }
     }
 }

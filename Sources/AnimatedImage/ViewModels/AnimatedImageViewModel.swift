@@ -12,7 +12,7 @@ internal final class AnimatedImageViewModel: Sendable {
         case index(Int)
     }
     
-    private let cache: Cache<CacheKey, UIImage>
+    private let cache: Cache<CacheKey, CGImage>
     private let configuration: AnimatedImageViewConfiguration
     private let imageProcessor: ImageProcessor
     private let timingCalculator: AnimationTimingCalculator
@@ -65,14 +65,14 @@ internal final class AnimatedImageViewModel: Sendable {
         self.delayTime = frameConfiguration.delayTime
     }
     
-    nonisolated private func cacheGeneratedImages(_ generatedImages: [Int: UIImage]) async {
+    nonisolated private func cacheGeneratedImages(_ generatedImages: [Int: CGImage]) async {
         for (index, image) in generatedImages {
             guard !Task.isCancelled else { return }
             cache.insert(image, forKey: .index(index))
         }
     }
     
-    nonisolated func image(at index: Int) -> UIImage? {
+    nonisolated func image(at index: Int) -> CGImage? {
         cache.value(forKey: .index(index))
     }
     
@@ -84,7 +84,7 @@ internal final class AnimatedImageViewModel: Sendable {
         )
     }
     
-    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> UIImage? {
+    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
         let index = self.index(for: targetTimestamp)
         guard let index, currentIndex != index else { return nil }
         
