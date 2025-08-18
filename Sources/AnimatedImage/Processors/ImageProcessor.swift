@@ -46,10 +46,10 @@ public struct ImageProcessor: Sendable {
         renderSize: CGSize,
         image: any AnimatedImage
     ) async -> ProcessingResult? {
-        guard validateRenderSize(renderSize) else { return nil }
+        guard isValidRenderSize(renderSize) else { return nil }
         guard !Task.isCancelled else { return nil }
         
-        let imageCount = autoreleasepool { image.makeImageCount() }
+        let imageCount = autoreleasepool { image.imageCount }
         guard !Task.isCancelled else { return nil }
         
         let optimizedSize = calculateOptimizedSize(renderSize: renderSize)
@@ -68,7 +68,7 @@ public struct ImageProcessor: Sendable {
     }
     
     /// レンダリングサイズの検証
-    public func validateRenderSize(_ renderSize: CGSize) -> Bool {
+    public func isValidRenderSize(_ renderSize: CGSize) -> Bool {
         !CGRect(origin: .zero, size: renderSize).isEmpty
     }
     
@@ -88,11 +88,11 @@ public struct ImageProcessor: Sendable {
         let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
         
         let delayTimes = (0..<imageCount).map { index in
-            autoreleasepool { image.makeDelayTime(at: index) }
+            autoreleasepool { image.delayTime(at: index) }
         }
         
         let decimator = FrameDecimator()
-        let decimationResult = decimator.decimateFrames(
+        let decimationResult = decimator.optimizeFrameSelection(
             delays: delayTimes,
             levelOfIntegrity: levelOfIntegrity
         )
@@ -115,7 +115,7 @@ public struct ImageProcessor: Sendable {
         await withTaskGroup(of: (Int, UIImage?).self) { taskGroup in
             for index in Set(frameConfiguration.indices) {
                 taskGroup.addTask {
-                    let processedImage = await makeAndCacheImage(
+                    let processedImage = await createAndCacheImage(
                         image: image,
                         size: frameConfiguration.optimizedSize,
                         index: index,
@@ -136,13 +136,13 @@ public struct ImageProcessor: Sendable {
     }
     
     /// 個別画像を作成
-    public func makeAndCacheImage(
+    public func createAndCacheImage(
         image: any AnimatedImage,
         size: CGSize,
         index: Int,
         interpolationQuality: CGInterpolationQuality
     ) async -> UIImage? {
-        let cgImage = autoreleasepool { image.makeImage(at: index) }
+        let cgImage = autoreleasepool { image.image(at: index) }
         let uiImage = cgImage.map(UIImage.init(cgImage:))
         
         guard !Task.isCancelled else { return nil }

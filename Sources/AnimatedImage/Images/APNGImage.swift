@@ -11,17 +11,17 @@ public final class APNGImage: AnimatedImage, Sendable {
         self.data = data
     }
     
-    public nonisolated func makeImageCount() -> Int {
+    public nonisolated var imageCount: Int {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
         return source?.makeImageCount() ?? 0
     }
     
-    public nonisolated func makeDelayTime(at index: Int) -> Double {
+    public nonisolated func delayTime(at index: Int) -> Double {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
         return source?.makeAPNGDelayTime(at: index) ?? 0.1
     }
     
-    public nonisolated func makeImage(at index: Int) -> CGImage? {
+    public nonisolated func image(at index: Int) -> CGImage? {
         let source = CGImageSourceCreateWithData(data as CFData, nil)
         return source?.makeImage(at: index)
     }

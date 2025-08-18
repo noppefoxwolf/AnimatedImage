@@ -3,7 +3,7 @@ public import CoreGraphics
 
 public protocol AnimatedImage: Sendable {
     var name: String { get }
-    func makeImageCount() -> Int
-    func makeDelayTime(at index: Int) -> Double
-    func makeImage(at index: Int) -> CGImage?
+    var imageCount: Int { get }
+    func delayTime(at index: Int) -> Double
+    func image(at index: Int) -> CGImage?
 }

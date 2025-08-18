@@ -9,7 +9,7 @@ struct FrameDecimatorTests {
         let decimator = FrameDecimator()
         let delays = [0.1, 0.1, 0.1, 0.1, 0.1] // 5フレーム、各0.1秒
         
-        let result = decimator.decimateFrames(delays: delays, levelOfIntegrity: 0.6)
+        let result = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.6)
         
         #expect(!result.displayIndices.isEmpty)
         #expect(result.displayIndices.count <= delays.count)
@@ -21,7 +21,7 @@ struct FrameDecimatorTests {
         let decimator = FrameDecimator()
         let delays = [0.1, 0.1, 0.1, 0.1, 0.1]
         
-        let result = decimator.decimateFrames(delays: delays, levelOfIntegrity: 1.0)
+        let result = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 1.0)
         
         #expect(result.displayIndices == [0, 1, 2, 3, 4])
         #expect(result.delayTime == 0.1)
@@ -32,12 +32,12 @@ struct FrameDecimatorTests {
         let decimator = FrameDecimator()
         
         // 1フレームの場合
-        let singleFrameResult = decimator.decimateFrames(delays: [0.1], levelOfIntegrity: 0.5)
+        let singleFrameResult = decimator.optimizeFrameSelection(delays: [0.1], levelOfIntegrity: 0.5)
         #expect(singleFrameResult.displayIndices == [0])
         #expect(singleFrameResult.delayTime == 0.1)
         
         // 2フレームの場合
-        let twoFrameResult = decimator.decimateFrames(delays: [0.1, 0.1], levelOfIntegrity: 0.5)
+        let twoFrameResult = decimator.optimizeFrameSelection(delays: [0.1, 0.1], levelOfIntegrity: 0.5)
         #expect(twoFrameResult.displayIndices == [0, 1])
         #expect(twoFrameResult.delayTime == 0.1)
     }
@@ -46,7 +46,7 @@ struct FrameDecimatorTests {
     func emptyDelaysArray() {
         let decimator = FrameDecimator()
         
-        let result = decimator.decimateFrames(delays: [], levelOfIntegrity: 0.5)
+        let result = decimator.optimizeFrameSelection(delays: [], levelOfIntegrity: 0.5)
         
         #expect(result.displayIndices.isEmpty)
         #expect(result.delayTime == 0.1) // デフォルト値
@@ -58,20 +58,20 @@ struct FrameDecimatorTests {
         let delays = Array(repeating: 0.1, count: 10)
         
         // 品質レベル0.0（最小）
-        let minResult = decimator.decimateFrames(delays: delays, levelOfIntegrity: 0.0)
+        let minResult = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.0)
         #expect(!minResult.displayIndices.isEmpty)
         #expect(minResult.displayIndices.count <= delays.count)
         
         // 品質レベル1.0（最大）
-        let maxResult = decimator.decimateFrames(delays: delays, levelOfIntegrity: 1.0)
+        let maxResult = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 1.0)
         #expect(maxResult.displayIndices.count == delays.count)
         
         // 範囲外の値（負の値）
-        let negativeResult = decimator.decimateFrames(delays: delays, levelOfIntegrity: -0.5)
+        let negativeResult = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: -0.5)
         #expect(!negativeResult.displayIndices.isEmpty)
         
         // 範囲外の値（1.0を超える値）
-        let overResult = decimator.decimateFrames(delays: delays, levelOfIntegrity: 1.5)
+        let overResult = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 1.5)
         #expect(overResult.displayIndices.count == delays.count)
     }
     
@@ -80,7 +80,7 @@ struct FrameDecimatorTests {
         let decimator = FrameDecimator()
         let delays = [0.05, 0.1, 0.15, 0.2, 0.1] // 可変フレーム時間
         
-        let result = decimator.decimateFrames(delays: delays, levelOfIntegrity: 0.8)
+        let result = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.8)
         
         #expect(!result.displayIndices.isEmpty)
         #expect(result.displayIndices.count <= delays.count)
@@ -96,8 +96,8 @@ struct FrameDecimatorTests {
         let decimator = FrameDecimator()
         let delays = Array(repeating: 0.05, count: 20) // 高フレームレート
         
-        let highIntegrityResult = decimator.decimateFrames(delays: delays, levelOfIntegrity: 0.9)
-        let lowIntegrityResult = decimator.decimateFrames(delays: delays, levelOfIntegrity: 0.3)
+        let highIntegrityResult = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.9)
+        let lowIntegrityResult = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.3)
         
         // 低品質の方がフレーム数が少ないことを確認
         #expect(lowIntegrityResult.displayIndices.count <= highIntegrityResult.displayIndices.count)
@@ -108,7 +108,7 @@ struct FrameDecimatorTests {
         let decimator = FrameDecimator()
         let delays = Array(repeating: 1.0/60.0, count: 60) // 60FPSのフレーム
         
-        let result = decimator.decimateFrames(delays: delays, levelOfIntegrity: 0.5)
+        let result = decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.5)
         
         // 結果のフレーム時間が候補の中から選ばれていることを確認
         let expectedCandidates: Set<Double> = [

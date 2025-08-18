@@ -71,7 +71,7 @@ internal final class AnimatedImageViewModel: Sendable {
         }
     }
     
-    nonisolated func makeImage(at index: Int) -> UIImage? {
+    nonisolated func image(at index: Int) -> UIImage? {
         cache.value(forKey: .index(index))
     }
     

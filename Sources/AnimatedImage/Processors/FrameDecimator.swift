@@ -40,7 +40,7 @@ public struct FrameDecimator: Sendable {
     ///   - delays: 各フレームの表示時間（秒）
     ///   - levelOfIntegrity: 品質レベル（0.0〜1.0）。1.0で全フレーム表示、0.0で最小フレーム
     /// - Returns: 間引き結果
-    public func decimateFrames(
+    public func optimizeFrameSelection(
         delays: [Double],
         levelOfIntegrity: Double
     ) -> Result {

@@ -12,8 +12,8 @@ struct ImageProcessorTests {
         
         let renderSize = CGSize(width: 100, height: 100)
         
-        #expect(processor.validateRenderSize(renderSize))
-        #expect(!processor.validateRenderSize(.zero))
+        #expect(processor.isValidRenderSize(renderSize))
+        #expect(!processor.isValidRenderSize(.zero))
         
         let optimizedSize = processor.calculateOptimizedSize(renderSize: renderSize)
         #expect(optimizedSize.width <= configuration.maxSize.width)
@@ -44,7 +44,7 @@ struct ImageProcessorTests {
         let processor = ImageProcessor(configuration: configuration)
         
         let mockImage = MockAnimatedImage(frameCount: 5, delayTime: 0.1)
-        let image = await processor.makeAndCacheImage(
+        let image = await processor.createAndCacheImage(
             image: mockImage,
             size: CGSize(width: 50, height: 50),
             index: 0,
@@ -67,15 +67,15 @@ private final class MockAnimatedImage: AnimatedImage, @unchecked Sendable {
         self.delayTime = delayTime
     }
     
-    nonisolated func makeImageCount() -> Int {
+    nonisolated var imageCount: Int {
         frameCount
     }
     
-    nonisolated func makeDelayTime(at index: Int) -> Double {
+    nonisolated func delayTime(at index: Int) -> Double {
         delayTime
     }
     
-    nonisolated func makeImage(at index: Int) -> CGImage? {
+    nonisolated func image(at index: Int) -> CGImage? {
         guard index >= 0 && index < frameCount else { return nil }
         
         // 簡単なテスト用CGImageを作成
