@@ -27,6 +27,7 @@ internal final class AnimatedImageViewModel: Sendable {
     var indices: [Int] = []
     var delayTime: Double = 0.1
     var task: Task<Void, Never>? = nil
+    var currentIndex: Int? = nil
     
     func update(for renderSize: CGSize, image: any AnimatedImage) {
         cancelCurrentTask()
@@ -81,6 +82,17 @@ internal final class AnimatedImageViewModel: Sendable {
             indices: indices,
             delayTime: delayTime
         )
+    }
+    
+    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> UIImage? {
+        let index = self.index(for: targetTimestamp)
+        guard let index, currentIndex != index else { return nil }
+        
+        let image = self.image(at: index)
+        if image != nil {
+            currentIndex = index
+        }
+        return image
     }
     
 }
