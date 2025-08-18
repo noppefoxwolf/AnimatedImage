@@ -1,96 +1,132 @@
 # AnimatedImage
 
-High-performance animation image library.
+High-performance animation image library for Swift.
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
 
-# Install
+## Installation
+
+### Swift Package Manager
 
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/noppefoxwolf/AnimatedImage", from: "0.0.x")
+        .package(url: "https://github.com/noppefoxwolf/AnimatedImage", from: "0.0.14")
     ],
+    targets: [
+        .target(
+            name: "YourTarget",
+            dependencies: [
+                .product(name: "AnimatedImage", package: "AnimatedImage"),        // UIKit
+                .product(name: "AnimatedImageSwiftUI", package: "AnimatedImage") // SwiftUI
+            ]
+        )
+    ]
 )
 ```
 
-# How It Works
+## How It Works
 
-AnimatedImage pre-decodes and caches all animation frames.
-Optimize the number of drawing frames from the drawing size and drawing timestamp to prevent the cache size from becoming too large.
-It is designed so that all processing does not depend on the MainActor.
+AnimatedImage pre-decodes and caches all animation frames for optimal performance. It optimizes the number of drawing frames based on drawing size and timestamp to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
 
-# Usage
+## Usage
 
-## UIKit
+### UIKit
 
 ```swift
-let imageView = AnimatedImage(frame: .null)
-let image = APNGImage(data: data)
+import AnimatedImage
+
+let imageView = AnimatedImageView(frame: .zero)
+let image = APNGImage(data: data) // or GIFImage(data: data), WebPImage(data: data)
 imageView.image = image
 imageView.startAnimating()
 ```
 
-## SwiftUI
+### SwiftUI
 
 ```swift
-@State var image = GIFImage(data: data)
+import AnimatedImageSwiftUI
 
-var body: some View {
-    AnimatedImagePlayer(image: image)
+struct ContentView: View {
+    @State var image = GIFImage(data: data)
+
+    var body: some View {
+        AnimatedImagePlayer(image: image)
+    }
 }
 ```
 
-# Features
+## Features
 
-## Low access main actor
+### Low MainActor Usage
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Instruments.png)
 
-## Support playback APNG, GIF, WebP
+All heavy processing is performed off the main thread, keeping your UI responsive.
+
+### Multiple Format Support
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
 
-## Automatically adjust playback quality
+Supports APNG, GIF, and WebP animated formats.
+
+### Automatic Quality Adjustment
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/AdjustQuality.gif)
 
-## Synchronize frame update 
+Automatically adjusts playback quality based on available resources.
+
+### Frame Synchronization
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Synchronize.gif)
 
-## Customizable playback format
+Synchronizes frame updates for smooth animation playback.
+
+### Custom Animation Support
+
+Create your own animated images by conforming to the `AnimatedImage` protocol:
 
 ```swift
 public final class ManualAnimatedImage: AnimatedImage {
     public let name: String
-    let images: [CGImage]
+    public let imageCount: Int
+    private let images: [CGImage]
     
     public init(name: String = UUID().uuidString, images: [CGImage]) {
         self.name = name
         self.images = images
+        self.imageCount = images.count
     }
     
-    public nonisolated func makeImageCount() -> Int {
-        images.count
-    }
-    
-    public nonisolated func makeDelayTime(at index: Int) -> Double {
+    public func delayTime(at index: Int) -> Double {
         0.1
     }
     
-    public nonisolated func makeImage(at index: Int) -> CGImage? {
+    public func image(at index: Int) -> CGImage? {
         images[index]
     }
 }
 ```
 
-# Required
+## Requirements
 
-- Swift 6.0
-- iOS 16
+- Swift 6.0+
+- iOS 16.0+
+- visionOS 1.0+
 
-## Apps Using
+## Architecture
+
+The library consists of three main modules:
+
+- **`AnimatedImage`**: Core library with UIKit support
+  - Image decoders for APNG, GIF, and WebP
+  - Animation caching and frame management
+  - `AnimatedImageView` for UIKit
+- **`AnimatedImageSwiftUI`**: SwiftUI integration
+  - `AnimatedImagePlayer` view component
+- **`UpdateLink`**: Display link and frame timing control
+
+## Apps Using AnimatedImage
 
 <p float="left">
     <a href="https://apps.apple.com/app/id1668645019"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/dev.noppe.snowfox.png" height="65"></a>
@@ -98,6 +134,6 @@ public final class ManualAnimatedImage: AnimatedImage {
     <a href="https://apps.apple.com/app/id6736725704"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/com.nintendo.znsa.png" height="65"></a>
 </p>
 
-# License
+## License
 
 AnimatedImage is available under the MIT license. See the LICENSE file for more info.
