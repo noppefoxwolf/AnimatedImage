@@ -1,4 +1,4 @@
-@testable import AnimatedImage
+@testable import AnimatedImageCore
 import Testing
 import Foundation
 

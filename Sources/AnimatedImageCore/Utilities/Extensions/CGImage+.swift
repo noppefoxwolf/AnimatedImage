@@ -11,10 +11,13 @@ extension CGImage {
         scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
-        let newSize = aspectFitSize(for: self.size, maxSize: size).applying(CGAffineTransform(scaleX: scale, y: scale))
-//        if self.size.isLessThanOrEqualTo(newSize) && usePreparingForDisplay {
-//            return await self.byPreparingForDisplay()
-//        }
+        let newSize = aspectFitSize(
+            for: self.size,
+            maxSize: size
+        ).applying(CGAffineTransform(scaleX: scale, y: scale))
+        if self.size.isLessThanOrEqualTo(newSize) && usePreparingForDisplay {
+            return self
+        }
         return resize(image: self, newSize: newSize, interpolationQuality: interpolationQuality)
     }
     

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import Testing
 import UIKit
 @testable import AnimatedImage
@@ -77,3 +78,4 @@ struct ContentModeTests {
         #expect(imageView.layer.contentsGravity == .topLeft)
     }
 }
+#endif
