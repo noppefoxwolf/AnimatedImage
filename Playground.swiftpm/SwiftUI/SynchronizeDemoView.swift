@@ -1,10 +1,10 @@
-import SwiftUI
 import AnimatedImage
+import SwiftUI
 
 struct SynchronizeDemoView: View {
     @State var image1: (any AnimatedImage)? = nil
     @State var image2: (any AnimatedImage)? = nil
-    
+
     var body: some View {
         HStack {
             VStack {
@@ -19,7 +19,8 @@ struct SynchronizeDemoView: View {
                     image1 = GifImage(data: data)
                 } label: {
                     Text("Load 1")
-                }.disabled(image1 != nil)
+                }
+                .disabled(image1 != nil)
             }
             VStack {
                 if let image2 {
@@ -33,7 +34,8 @@ struct SynchronizeDemoView: View {
                     image2 = GifImage(data: data)
                 } label: {
                     Text("Load 2")
-                }.disabled(image2 != nil)
+                }
+                .disabled(image2 != nil)
             }
         }
     }

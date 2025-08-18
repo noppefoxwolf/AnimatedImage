@@ -13,7 +13,7 @@ struct App: SwiftUI.App {
                         } label: {
                             Text("SwiftUI Demo")
                         }
-                        
+
                         NavigationLink {
                             UIKitDemoView()
                         } label: {
@@ -42,4 +42,3 @@ struct App: SwiftUI.App {
         }
     }
 }
-

@@ -1,4 +1,3 @@
-
 extension Sequence {
     /// A sequence of the partial results that `reduce` would employ.
     func scan<Result>(
@@ -8,9 +7,10 @@ extension Sequence {
         var iterator = makeIterator()
         return .init(
             sequence(first: initialResult) { partialResult in
-                iterator.next().map {
-                    nextPartialResult(partialResult, $0)
-                }
+                iterator.next()
+                    .map {
+                        nextPartialResult(partialResult, $0)
+                    }
             }
         )
     }

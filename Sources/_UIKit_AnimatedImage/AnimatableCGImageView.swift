@@ -3,7 +3,7 @@ import UpdateLink
 
 open class AnimatableCGImageView: CGImageView {
     lazy var updateLink: (any UpdateLink) = { preconditionFailure() }()
-    
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
         if #available(iOS 18.0, visionOS 2.0, *) {
@@ -26,19 +26,19 @@ open class AnimatableCGImageView: CGImageView {
         })
         updateLink.requiresContinuousUpdates = true
     }
-    
+
     @MainActor public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     open func startAnimating() {
         updateLink.isEnabled = true
     }
-    
+
     open func stopAnimating() {
         updateLink.isEnabled = false
     }
-    
+
     open func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
     }
 }

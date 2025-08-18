@@ -1,23 +1,26 @@
-import UIKit
 import AnimatedImage
+import UIKit
 
 class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(Cell.self, forCellReuseIdentifier: "Cell")
     }
-    
+
     let resources = AnimatedImageResource.examples
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         resources.count
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: "Cell",
-            for: indexPath
-        ) as! Cell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
+        -> UITableViewCell
+    {
+        let cell =
+            tableView.dequeueReusableCell(
+                withIdentifier: "Cell",
+                for: indexPath
+            ) as! Cell
         let resource = resources[indexPath.row]
         switch resource {
         case .apng(let name):
@@ -36,20 +39,29 @@ class TableViewController: UITableViewController {
             let image = WebPImage(name: name, data: data)
             cell.animatedImageView.image = image
         }
-        
+
         return cell
     }
 
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath)
+        -> CGFloat
+    {
         200
     }
-    
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+
+    override func tableView(
+        _ tableView: UITableView,
+        willDisplay cell: UITableViewCell,
+        forRowAt indexPath: IndexPath
+    ) {
         (cell as? Cell)?.animatedImageView.startAnimating()
     }
-    
-    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+
+    override func tableView(
+        _ tableView: UITableView,
+        didEndDisplaying cell: UITableViewCell,
+        forRowAt indexPath: IndexPath
+    ) {
         (cell as? Cell)?.animatedImageView.stopAnimating()
     }
 }
-

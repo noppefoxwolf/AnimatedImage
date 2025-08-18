@@ -1,6 +1,7 @@
-@testable import AnimatedImageCore
-import Testing
 import Foundation
+import Testing
+
+@testable import AnimatedImageCore
 
 @Suite
 struct CGSizeTests {
