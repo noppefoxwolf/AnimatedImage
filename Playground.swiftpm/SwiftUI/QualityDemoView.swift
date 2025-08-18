@@ -61,7 +61,7 @@ struct QualityDemoView: View {
 extension AnimatedImageViewConfiguration {
     public static var qualityDemo: AnimatedImageViewConfiguration {
         var configuation = AnimatedImageViewConfiguration.default
-        configuation.maxMemoryUsage = .init(value: 1, unit: .megabytes)
+        configuation.maxMemoryUsage = .init(value: 1, unit: .megabits)
         configuation.taskPriority = .userInitiated
         return configuation
     }
