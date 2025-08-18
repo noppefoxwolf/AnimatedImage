@@ -1,5 +1,4 @@
 import Testing
-import UIKit
 @testable import AnimatedImage
 
 @Suite("ImageProcessor テスト")
