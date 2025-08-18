@@ -15,7 +15,7 @@ struct QualityDemoView: View {
                 let data = try! Data(contentsOf: url)
                 let image = APNGImage(data: data)
                 AnimatedImagePlayer(image: image)
-                    .environment(\.animatedImageViewConfiguration, configuration)
+                    .environment(\.animatedImageProviderConfiguration, configuration)
                     .frame(width: width, height: width)
                     .background(Color.gray)
             }

@@ -17,7 +17,7 @@ struct SwiftUIDemoView: View {
         print(self.items.count)
     }
 
-    let animatedImageViewConfiguration: AnimatedImageProviderConfiguration = .performance
+    let animatedImageConfiguration: AnimatedImageProviderConfiguration = .performance
 
     var body: some View {
         let layout = [
@@ -33,7 +33,7 @@ struct SwiftUIDemoView: View {
                 }
             }
         }
-        .environment(\.animatedImageViewConfiguration, animatedImageViewConfiguration)
+        .environment(\.animatedImageProviderConfiguration, animatedImageConfiguration)
     }
 
     func image(for item: AnimatedImageResourceItem) -> any AnimatedImage {
