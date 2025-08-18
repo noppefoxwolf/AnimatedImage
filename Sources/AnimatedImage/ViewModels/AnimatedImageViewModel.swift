@@ -29,30 +29,36 @@ internal final class AnimatedImageViewModel: Sendable {
     var task: Task<Void, Never>? = nil
     var currentIndex: Int? = nil
     
-    func update(for renderSize: CGSize, image: any AnimatedImage) {
+    func update(for renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
         cancelCurrentTask()
-        startImageProcessingTask(renderSize: renderSize, image: image)
+        startImageProcessingTask(renderSize: renderSize, scale: scale, image: image)
     }
     
     private func cancelCurrentTask() {
         task?.cancel()
     }
     
-    private func startImageProcessingTask(renderSize: CGSize, image: any AnimatedImage) {
+    private func startImageProcessingTask(renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
         task = Task.detached(priority: configuration.taskPriority) { [image, cache] in
             await withTaskCancellationHandler {
-                await self.processAnimatedImage(renderSize: renderSize, image: image)
+                await self.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
             } onCancel: { [cache] in
                 cache.removeAllObjects()
             }
         }
     }
     
-    nonisolated private func processAnimatedImage(renderSize: CGSize, image: any AnimatedImage) async {
-        guard let processingResult = await imageProcessor.processAnimatedImage(
+    nonisolated private func processAnimatedImage(
+        renderSize: CGSize,
+        scale: CGFloat,
+        image: any AnimatedImage
+    ) async {
+        let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: renderSize,
+            scale: scale,
             image: image
-        ) else { return }
+        )
+        guard let processingResult else { return }
         
         await updateFrameIndices(processingResult.frameConfiguration)
         await cacheGeneratedImages(processingResult.generatedImages)

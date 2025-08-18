@@ -23,7 +23,7 @@ open class AnimatedImageView: AnimatableCGImageView {
             contents = nil
             
             if let image {
-                imageViewModel?.update(for: bounds.size, image: image)
+                imageViewModel?.update(for: bounds.size, scale: traitCollection.displayScale, image: image)
             }
             
             setNeedsDisplay()
@@ -40,7 +40,7 @@ open class AnimatedImageView: AnimatableCGImageView {
     open override func layoutSubviews() {
         super.layoutSubviews()
         if let image {
-            imageViewModel?.update(for: bounds.size, image: image)
+            imageViewModel?.update(for: bounds.size, scale: traitCollection.displayScale, image: image)
         }
     }
     

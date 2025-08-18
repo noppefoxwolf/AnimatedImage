@@ -7,6 +7,7 @@ final class Cell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        animatedImageView.contentMode = .scaleAspectFit
         animatedImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(animatedImageView)
         NSLayoutConstraint.activate([
