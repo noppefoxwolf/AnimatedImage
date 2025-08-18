@@ -1,4 +1,4 @@
-public import UIKit
+import UIKit
 import os
 
 fileprivate let logger = Logger(
@@ -26,64 +26,129 @@ internal final class AnimatedImageViewModel: Sendable {
     var task: Task<Void, Never>? = nil
     
     func update(for renderSize: CGSize, image: any AnimatedImage) {
-        // TODO: 既にキャッシュ済み、生成中なら無視する
+        cancelCurrentTask()
+        startImageProcessingTask(renderSize: renderSize, image: image)
+    }
+    
+    private func cancelCurrentTask() {
         task?.cancel()
-        task = Task.detached(priority: configuration.taskPriority) { [image, cache, configuration] in
-            await withTaskCancellationHandler { [image, configuration] in
-                @Sendable func makeAndCacheImage(
-                    size: CGSize,
-                    index: Int,
-                    key: CacheKey,
-                    interpolationQuality: CGInterpolationQuality
-                ) async {
-                    let image = autoreleasepool(invoking: { image.makeImage(at: index) })
-                    let uiImage = image.map(UIImage.init(cgImage:))
-                    
-                    guard !Task.isCancelled else { return }
-                    let decodedImage = await uiImage?.decoded(for: size, interpolationQuality: interpolationQuality)
-                    
-                    guard !Task.isCancelled else { return }
-                    if let decodedImage {
-                        cache.insert(decodedImage, forKey: key)
-                    } else {
-                        cache.removeValue(forKey: key)
-                    }
-                }
-                
-                guard !CGRect(origin: .zero, size: renderSize).isEmpty else { return }
-                guard !Task.isCancelled else { return }
-                let imageCount = autoreleasepool(invoking: { image.makeImageCount() })
-                
-                guard !Task.isCancelled else { return }
-                let newSize = min(configuration.maxSize, renderSize)
-                let imageByteCount = Int(newSize.width) * Int(newSize.height) * 4
-                let memoryPressure = Double(imageByteCount * imageCount) / Double(configuration.maxByteCount)
-                let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
-                let delayTimes = (0..<imageCount).map({ index in autoreleasepool(invoking: { image.makeDelayTime(at: index) }) })
-                let decimator = FrameDecimator()
-                let decimationResult = decimator.decimateFrames(delays: delayTimes, levelOfIntegrity: levelOfIntegrity)
-                let (indices, delayTime) = (decimationResult.displayIndices, decimationResult.delayTime)
-                
-                await MainActor.run {
-                    self.indices = indices
-                    self.delayTime = delayTime
-                }
-                
-                await withTaskGroup(of: Void.self) { [configuration] taskGroup in
-                    for i in Set(indices) {
-                        taskGroup.addTask { [i] in
-                            await makeAndCacheImage(
-                                size: newSize,
-                                index: i,
-                                key: .index(i),
-                                interpolationQuality: configuration.interpolationQuality
-                            )
-                        }
-                    }
-                }
+    }
+    
+    private func startImageProcessingTask(renderSize: CGSize, image: any AnimatedImage) {
+        task = Task.detached(priority: configuration.taskPriority) { [image, cache] in
+            await withTaskCancellationHandler {
+                await self.processAnimatedImage(renderSize: renderSize, image: image)
             } onCancel: { [cache] in
                 cache.removeAllObjects()
             }
+        }
+    }
+    
+    private func processAnimatedImage(renderSize: CGSize, image: any AnimatedImage) async {
+        guard validateRenderSize(renderSize) else { return }
+        guard !Task.isCancelled else { return }
+        
+        let imageCount = autoreleasepool { image.makeImageCount() }
+        guard !Task.isCancelled else { return }
+        
+        let optimizedSize = calculateOptimizedSize(renderSize: renderSize)
+        let frameConfiguration = calculateFrameConfiguration(
+            imageSize: optimizedSize,
+            imageCount: imageCount,
+            image: image
+        )
+        
+        await updateFrameIndices(frameConfiguration)
+        await generateFrameImages(frameConfiguration, image: image, cache: cache)
+    }
+    
+    private func validateRenderSize(_ renderSize: CGSize) -> Bool {
+        !CGRect(origin: .zero, size: renderSize).isEmpty
+    }
+    
+    private func calculateOptimizedSize(renderSize: CGSize) -> CGSize {
+        min(configuration.maxSize, renderSize)
+    }
+    
+    private struct FrameConfiguration {
+        let optimizedSize: CGSize
+        let indices: [Int]
+        let delayTime: Double
+        let interpolationQuality: CGInterpolationQuality
+    }
+    
+    private func calculateFrameConfiguration(
+        imageSize: CGSize,
+        imageCount: Int,
+        image: any AnimatedImage
+    ) -> FrameConfiguration {
+        let imageByteCount = Int(imageSize.width) * Int(imageSize.height) * 4
+        let memoryPressure = Double(imageByteCount * imageCount) / Double(configuration.maxByteCount)
+        let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
+        
+        let delayTimes = (0..<imageCount).map { index in
+            autoreleasepool { image.makeDelayTime(at: index) }
+        }
+        
+        let decimator = FrameDecimator()
+        let decimationResult = decimator.decimateFrames(
+            delays: delayTimes,
+            levelOfIntegrity: levelOfIntegrity
+        )
+        
+        return FrameConfiguration(
+            optimizedSize: imageSize,
+            indices: decimationResult.displayIndices,
+            delayTime: decimationResult.delayTime,
+            interpolationQuality: configuration.interpolationQuality
+        )
+    }
+    
+    private func updateFrameIndices(_ frameConfiguration: FrameConfiguration) async {
+        await MainActor.run {
+            self.indices = frameConfiguration.indices
+            self.delayTime = frameConfiguration.delayTime
+        }
+    }
+    
+    private func generateFrameImages(
+        _ frameConfiguration: FrameConfiguration,
+        image: any AnimatedImage,
+        cache: Cache<CacheKey, UIImage>
+    ) async {
+        await withTaskGroup(of: Void.self) { taskGroup in
+            for index in Set(frameConfiguration.indices) {
+                taskGroup.addTask {
+                    await self.makeAndCacheImage(
+                        image: image,
+                        cache: cache,
+                        size: frameConfiguration.optimizedSize,
+                        index: index,
+                        interpolationQuality: frameConfiguration.interpolationQuality
+                    )
+                }
+            }
+        }
+    }
+    
+    @Sendable private func makeAndCacheImage(
+        image: any AnimatedImage,
+        cache: Cache<CacheKey, UIImage>,
+        size: CGSize,
+        index: Int,
+        interpolationQuality: CGInterpolationQuality
+    ) async {
+        let cgImage = autoreleasepool { image.makeImage(at: index) }
+        let uiImage = cgImage.map(UIImage.init(cgImage:))
+        
+        guard !Task.isCancelled else { return }
+        let decodedImage = await uiImage?.decoded(for: size, interpolationQuality: interpolationQuality)
+        
+        guard !Task.isCancelled else { return }
+        if let decodedImage {
+            cache.insert(decodedImage, forKey: .index(index))
+        } else {
+            cache.removeValue(forKey: .index(index))
         }
     }
     
