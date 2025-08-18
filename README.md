@@ -17,8 +17,7 @@ let package = Package(
         .target(
             name: "YourTarget",
             dependencies: [
-                .product(name: "AnimatedImage", package: "AnimatedImage"),        // UIKit
-                .product(name: "AnimatedImageSwiftUI", package: "AnimatedImage") // SwiftUI
+                .product(name: "AnimatedImage", package: "AnimatedImage")
             ]
         )
     ]
@@ -27,7 +26,7 @@ let package = Package(
 
 ## How It Works
 
-AnimatedImage pre-decodes and caches all animation frames for optimal performance. It optimizes the number of drawing frames based on drawing size and timestamp to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
+AnimatedImage uses `AnimatedImageProvider` to pre-decode and cache animation frames for optimal performance. It dynamically optimizes frame processing based on drawing size and timing to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
 
 ## Usage
 
@@ -45,7 +44,7 @@ imageView.startAnimating()
 ### SwiftUI
 
 ```swift
-import AnimatedImageSwiftUI
+import AnimatedImage
 
 struct ContentView: View {
     @State var image = GIFImage(data: data)
@@ -110,20 +109,23 @@ public final class ManualAnimatedImage: AnimatedImage {
 
 ## Requirements
 
-- Swift 6.0+
+- Swift 6.1+
 - iOS 16.0+
+- macOS 14.0+
 - visionOS 1.0+
 
 ## Architecture
 
-The library consists of three main modules:
+The library consists of multiple internal modules unified under a single product:
 
-- **`AnimatedImage`**: Core library with UIKit support
+- **`AnimatedImageCore`**: Core animation logic and image processing
   - Image decoders for APNG, GIF, and WebP
-  - Animation caching and frame management
-  - `AnimatedImageView` for UIKit
-- **`AnimatedImageSwiftUI`**: SwiftUI integration
-  - `AnimatedImagePlayer` view component
+  - `AnimatedImageProvider` for animation caching and frame management
+  - Image processing and timing calculations
+- **Platform-specific modules**:
+  - `_UIKit_AnimatedImage`: UIKit support with `AnimatedImageView`
+  - `_AppKit_AnimatedImage`: macOS support (in development)
+  - `_SwiftUI_AnimatedImage`: SwiftUI integration with `AnimatedImagePlayer`
 - **`UpdateLink`**: Display link and frame timing control
 
 ## Apps Using AnimatedImage
