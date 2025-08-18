@@ -1,4 +1,5 @@
 public import UIKit
+import AnimatedImageCore
 
 open class AnimatedImageView: AnimatableCGImageView {
     public var image: (any AnimatedImage)? = nil {

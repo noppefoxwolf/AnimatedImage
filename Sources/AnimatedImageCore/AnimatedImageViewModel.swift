@@ -1,4 +1,4 @@
-import UIKit
+import QuartzCore
 import os
 
 fileprivate let logger = Logger(
@@ -7,7 +7,7 @@ fileprivate let logger = Logger(
 )
 
 @MainActor
-internal final class AnimatedImageViewModel: Sendable {
+public final class AnimatedImageViewModel: Sendable {
     enum CacheKey: Hashable {
         case index(Int)
     }
@@ -17,7 +17,7 @@ internal final class AnimatedImageViewModel: Sendable {
     private let imageProcessor: ImageProcessor
     private let timingCalculator: AnimationTimingCalculator
     
-    init(name: String, configuration: AnimatedImageViewConfiguration) {
+    public init(name: String, configuration: AnimatedImageViewConfiguration) {
         self.cache = Cache(name: name)
         self.configuration = configuration
         self.imageProcessor = ImageProcessor(configuration: configuration)
@@ -26,10 +26,10 @@ internal final class AnimatedImageViewModel: Sendable {
     
     var indices: [Int] = []
     var delayTime: Double = 0.1
-    var task: Task<Void, Never>? = nil
+    public var task: Task<Void, Never>? = nil
     var currentIndex: Int? = nil
     
-    func update(for renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
+    public func update(for renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
         cancelCurrentTask()
         startImageProcessingTask(renderSize: renderSize, scale: scale, image: image)
     }
@@ -90,7 +90,7 @@ internal final class AnimatedImageViewModel: Sendable {
         )
     }
     
-    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
+    public func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
         let index = self.index(for: targetTimestamp)
         guard let index, currentIndex != index else { return nil }
         

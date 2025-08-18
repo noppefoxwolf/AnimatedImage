@@ -7,7 +7,8 @@ let package = Package(
     name: "AnimatedImage",
     platforms: [
         .iOS(.v16),
-        .visionOS(.v1)
+        .visionOS(.v1),
+        .macOS(.v14),
     ],
     products: [
         .library(
@@ -23,12 +24,31 @@ let package = Package(
         .target(
             name: "AnimatedImage",
             dependencies: [
-                "UpdateLink"
-            ],
+                "AnimatedImageCore",
+                .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
+                .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS]))
+            ]
+        ),
+        .target(
+            name: "AnimatedImageCore",
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
         .target(
             name: "UpdateLink"
+        ),
+        .target(
+            name: "_UIKit_AnimatedImage",
+            dependencies: [
+                "UpdateLink",
+                "AnimatedImageCore",
+            ]
+        ),
+        .target(
+            name: "_AppKit_AnimatedImage",
+            dependencies: [
+                "UpdateLink",
+                "AnimatedImageCore",
+            ]
         ),
         .target(
             name: "AnimatedImageSwiftUI",

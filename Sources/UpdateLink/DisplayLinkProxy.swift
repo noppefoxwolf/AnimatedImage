@@ -1,16 +1,16 @@
 import QuartzCore
 
-protocol DisplayLinkTarget: AnyObject {
+public protocol DisplayLinkTarget: AnyObject {
     @MainActor
     func updateContents(_ displayLink: CADisplayLink)
 }
 
-final class DisplayLinkProxy<T: DisplayLinkTarget> {
+public final class DisplayLinkProxy<T: DisplayLinkTarget> {
     private weak var target: T?
-    init(target: T) { self.target = target }
+    public init(target: T) { self.target = target }
 
     @MainActor
-    @objc func updateContents(_ displayLink: CADisplayLink) {
+    @objc public func updateContents(_ displayLink: CADisplayLink) {
         target?.updateContents(displayLink)
     }
 }
