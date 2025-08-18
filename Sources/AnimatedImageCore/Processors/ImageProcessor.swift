@@ -39,9 +39,9 @@ public struct ImageProcessor: Sendable {
         }
     }
     
-    private let configuration: AnimatedImageViewConfiguration
+    private let configuration: AnimatedImageProviderConfiguration
     
-    public init(configuration: AnimatedImageViewConfiguration) {
+    public init(configuration: AnimatedImageProviderConfiguration) {
         self.configuration = configuration
     }
     

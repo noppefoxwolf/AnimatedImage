@@ -7,17 +7,17 @@ fileprivate let logger = Logger(
 )
 
 @MainActor
-public final class AnimatedImageViewModel: Sendable {
+public final class AnimatedImageProvider: Sendable {
     enum CacheKey: Hashable {
         case index(Int)
     }
     
     private let cache: Cache<CacheKey, CGImage>
-    private let configuration: AnimatedImageViewConfiguration
+    private let configuration: AnimatedImageProviderConfiguration
     private let imageProcessor: ImageProcessor
     private let timingCalculator: AnimationTimingCalculator
     
-    public init(name: String, configuration: AnimatedImageViewConfiguration) {
+    public init(name: String, configuration: AnimatedImageProviderConfiguration) {
         self.cache = Cache(name: name)
         self.configuration = configuration
         self.imageProcessor = ImageProcessor(configuration: configuration)
@@ -26,7 +26,7 @@ public final class AnimatedImageViewModel: Sendable {
     
     var indices: [Int] = []
     var delayTime: Double = 0.1
-    public var task: Task<Void, Never>? = nil
+    var task: Task<Void, Never>? = nil
     var currentIndex: Int? = nil
     
     public func update(for renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
@@ -34,7 +34,7 @@ public final class AnimatedImageViewModel: Sendable {
         startImageProcessingTask(renderSize: renderSize, scale: scale, image: image)
     }
     
-    private func cancelCurrentTask() {
+    public func cancelCurrentTask() {
         task?.cancel()
     }
     

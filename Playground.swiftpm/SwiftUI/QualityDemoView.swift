@@ -3,7 +3,7 @@ import AnimatedImage
 
 struct QualityDemoView: View {
     @State
-    var configuration: AnimatedImageViewConfiguration = .qualityDemo
+    var configuration: AnimatedImageProviderConfiguration = .qualityDemo
     
     @State
     var width: Double = 100
@@ -57,9 +57,9 @@ struct QualityDemoView: View {
     }
 }
 
-extension AnimatedImageViewConfiguration {
-    public static var qualityDemo: AnimatedImageViewConfiguration {
-        var configuation = AnimatedImageViewConfiguration.default
+extension AnimatedImageProviderConfiguration {
+    public static var qualityDemo: Self {
+        var configuation = Self.default
         configuation.maxMemoryUsage = .init(value: 1, unit: .megabits)
         configuation.taskPriority = .userInitiated
         return configuation

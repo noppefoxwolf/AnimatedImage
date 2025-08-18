@@ -14,10 +14,7 @@ struct SwiftUIDemoView: View {
         print(self.items.count)
     }
     
-    var animatedImageViewConfiguration: AnimatedImageViewConfiguration {
-        let configuration = AnimatedImageViewConfiguration.performance
-        return configuration
-    }
+    let animatedImageViewConfiguration: AnimatedImageProviderConfiguration = .performance
     
     var body: some View {
         let layout = [
