@@ -5,7 +5,7 @@ import CoreGraphics
 public struct AnimatedImageViewConfiguration: Sendable {
     public static var unlimited: AnimatedImageViewConfiguration {
         AnimatedImageViewConfiguration(
-            maxByteCount: .max,
+            maxMemoryUsage: .init(value: 1, unit: .gigabytes),
             maxSize: CGSize(width: Double.infinity, height: Double.infinity),
             maxLevelOfIntegrity: 1,
             interpolationQuality: .high,
@@ -16,7 +16,7 @@ public struct AnimatedImageViewConfiguration: Sendable {
     
     public static var `default`: AnimatedImageViewConfiguration {
         AnimatedImageViewConfiguration(
-            maxByteCount: 1 * 1024 * 1024, // 1MB
+            maxMemoryUsage: .init(value: 1, unit: .megabytes),
             maxSize: CGSize(width: 128, height: 128),
             maxLevelOfIntegrity: 0.8,
             interpolationQuality: .default,
@@ -27,7 +27,7 @@ public struct AnimatedImageViewConfiguration: Sendable {
     
     public static var performance: AnimatedImageViewConfiguration {
         AnimatedImageViewConfiguration(
-            maxByteCount: 1 * 1024 * 1024 / 50, // 20KB
+            maxMemoryUsage: .init(value: 20, unit: .kilobytes),
             maxSize: CGSize(width: 32, height: 32),
             maxLevelOfIntegrity: 0.25,
             interpolationQuality: .none,
@@ -36,7 +36,7 @@ public struct AnimatedImageViewConfiguration: Sendable {
         )
     }
     
-    public var maxByteCount: Int64
+    public var maxMemoryUsage: Measurement<UnitInformationStorage>
     public var maxSize: CGSize
     public var maxLevelOfIntegrity: Double
     public var interpolationQuality: CGInterpolationQuality
