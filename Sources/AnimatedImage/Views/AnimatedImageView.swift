@@ -21,7 +21,6 @@ open class AnimatedImageView: AnimatableCGImageView {
     private var imageViewModel: AnimatedImageViewModel? = nil {
         didSet {
             contents = nil
-            currentIndex = nil
             
             if let image {
                 imageViewModel?.update(for: bounds.size, image: image)
@@ -30,7 +29,6 @@ open class AnimatedImageView: AnimatableCGImageView {
             setNeedsDisplay()
         }
     }
-    private var currentIndex: Int? = nil
     
     open override func didMoveToSuperview() {
         super.didMoveToSuperview()
@@ -47,13 +45,8 @@ open class AnimatedImageView: AnimatableCGImageView {
     }
     
     open override func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
-        let index = imageViewModel?.index(for: targetTimestamp)
-        if let index, currentIndex != index {
-            let newContents = imageViewModel?.image(at: index)?.cgImage
-            if let newContents {
-                currentIndex = index
-                contents = newContents
-            }
+        if let image = imageViewModel?.contentsForTimestamp(targetTimestamp) {
+            contents = image
         }
     }
 }

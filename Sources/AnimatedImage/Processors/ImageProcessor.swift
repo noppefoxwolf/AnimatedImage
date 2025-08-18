@@ -27,9 +27,9 @@ public struct ImageProcessor: Sendable {
     /// 処理結果
     public struct ProcessingResult: Sendable {
         public let frameConfiguration: FrameConfiguration
-        public let generatedImages: [Int: UIImage]
+        public let generatedImages: [Int: CGImage]
         
-        public init(frameConfiguration: FrameConfiguration, generatedImages: [Int: UIImage]) {
+        public init(frameConfiguration: FrameConfiguration, generatedImages: [Int: CGImage]) {
             self.frameConfiguration = frameConfiguration
             self.generatedImages = generatedImages
         }
@@ -109,10 +109,10 @@ public struct ImageProcessor: Sendable {
     public func generateFrameImages(
         _ frameConfiguration: FrameConfiguration,
         image: any AnimatedImage
-    ) async -> [Int: UIImage] {
-        var generatedImages: [Int: UIImage] = [:]
+    ) async -> [Int: CGImage] {
+        var generatedImages: [Int: CGImage] = [:]
         
-        await withTaskGroup(of: (Int, UIImage?).self) { taskGroup in
+        await withTaskGroup(of: (Int, CGImage?).self) { taskGroup in
             for index in Set(frameConfiguration.indices) {
                 taskGroup.addTask {
                     let processedImage = await createAndCacheImage(
@@ -141,7 +141,7 @@ public struct ImageProcessor: Sendable {
         size: CGSize,
         index: Int,
         interpolationQuality: CGInterpolationQuality
-    ) async -> UIImage? {
+    ) async -> CGImage? {
         let cgImage = autoreleasepool { image.image(at: index) }
         let uiImage = cgImage.map(UIImage.init(cgImage:))
         
@@ -149,6 +149,6 @@ public struct ImageProcessor: Sendable {
         let decodedImage = await uiImage?.decoded(for: size, interpolationQuality: interpolationQuality)
         
         guard !Task.isCancelled else { return nil }
-        return decodedImage
+        return decodedImage?.cgImage
     }
 }
