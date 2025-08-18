@@ -1,4 +1,5 @@
 @_exported import AnimatedImageCore
+@_exported import _SwiftUI_AnimatedImage
 
 #if canImport(_UIKit_AnimatedImage)
 @_exported import _UIKit_AnimatedImage

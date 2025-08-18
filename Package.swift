@@ -14,10 +14,6 @@ let package = Package(
         .library(
             name: "AnimatedImage",
             targets: ["AnimatedImage"]
-        ),
-        .library(
-            name: "AnimatedImageSwiftUI",
-            targets: ["AnimatedImageSwiftUI"]
         )
     ],
     targets: [
@@ -26,7 +22,8 @@ let package = Package(
             dependencies: [
                 "AnimatedImageCore",
                 .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
-                .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS]))
+                .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
+                "_SwiftUI_AnimatedImage",
             ],
             resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
         ),
@@ -51,11 +48,11 @@ let package = Package(
             ]
         ),
         .target(
-            name: "AnimatedImageSwiftUI",
+            name: "_SwiftUI_AnimatedImage",
             dependencies: [
-                "AnimatedImage"
-            ],
-            resources: [.copy("Resources/PrivacyInfo.xcprivacy")]
+                .target(name: "_UIKit_AnimatedImage", condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])),
+                .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
+            ]
         ),
         .testTarget(
             name: "AnimatedImageTests",

@@ -1,6 +1,5 @@
 
 import SwiftUI
-import AnimatedImageSwiftUI
 import AnimatedImage
 
 struct SwiftUIDemoView: View {

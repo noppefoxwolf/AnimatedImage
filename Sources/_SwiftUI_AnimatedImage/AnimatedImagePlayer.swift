@@ -1,5 +1,8 @@
+#if canImport(_UIKit_AnimatedImage)
 public import SwiftUI
-public import AnimatedImage
+public import AnimatedImageCore
+import _UIKit_AnimatedImage
+import UIKit
 
 public struct AnimatedImagePlayer: UIViewRepresentable {
     let image: any AnimatedImage
@@ -49,3 +52,4 @@ extension ContentMode {
         }
     }
 }
+#endif
