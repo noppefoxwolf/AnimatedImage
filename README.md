@@ -1,8 +1,14 @@
 # AnimatedImage
 
+[![Swift Package Manager Test](https://github.com/noppefoxwolf/AnimatedImage/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/noppefoxwolf/AnimatedImage/actions/workflows/test.yml)
+
 High-performance animation image library for Swift.
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
+
+## Overview
+
+`AnimatedImage` provides a fast, memory-aware pipeline to render animated images (APNG, GIF, WebP) on Apple platforms. The public `AnimatedImage` module re-exports platform and SwiftUI layers so you can `import AnimatedImage` and use it from UIKit and SwiftUI. Heavy processing is kept off the main thread.
 
 ## Installation
 
@@ -36,7 +42,7 @@ AnimatedImage uses `AnimatedImageProvider` to pre-decode and cache animation fra
 import AnimatedImage
 
 let imageView = AnimatedImageView(frame: .zero)
-let image = APNGImage(data: data) // or GIFImage(data: data), WebPImage(data: data)
+let image = APNGImage(data: data) // or GifImage(data: data), WebPImage(data: data)
 imageView.image = image
 imageView.startAnimating()
 ```
@@ -47,13 +53,36 @@ imageView.startAnimating()
 import AnimatedImage
 
 struct ContentView: View {
-    @State var image = GIFImage(data: data)
+    @State var image = GifImage(data: data)
 
     var body: some View {
-        AnimatedImagePlayer(image: image)
+        AnimatedImagePlayer(image: image) // .init(image:contentMode:) supports .fit/.fill
     }
 }
 ```
+
+### Configuration
+
+Control memory, size, quality, and processing priority using `AnimatedImageProviderConfiguration`.
+
+- UIKit
+  ```swift
+  let imageView = AnimatedImageView(frame: .zero)
+  imageView.configuration = .default // .default, .performance, .unlimited
+  imageView.contentMode = .scaleAspectFill
+  imageView.image = GifImage(data: data)
+  imageView.startAnimating()
+  ```
+
+- SwiftUI
+  ```swift
+  let config: AnimatedImageProviderConfiguration = .default
+
+  var body: some View {
+      AnimatedImagePlayer(image: GifImage(data: data))
+          .environment(\.animatedImageProviderConfiguration, config)
+  }
+  ```
 
 ## Features
 
@@ -86,7 +115,7 @@ Synchronizes frame updates for smooth animation playback.
 Create your own animated images by conforming to the `AnimatedImage` protocol:
 
 ```swift
-public final class ManualAnimatedImage: AnimatedImage {
+public final class ManualAnimatedImage: AnimatedImage, @unchecked Sendable {
     public let name: String
     public let imageCount: Int
     private let images: [CGImage]
@@ -128,6 +157,10 @@ The library consists of multiple internal modules unified under a single product
   - `_SwiftUI_AnimatedImage`: SwiftUI integration with `AnimatedImagePlayer`
 - **`UpdateLink`**: Display link and frame timing control
 
+Notes:
+- `Sources/AnimatedImage/` is the public API that re-exports platform layers and includes `Resources/PrivacyInfo.xcprivacy`.
+- `UpdateLink` uses `UIUpdateLink` on iOS 18+/visionOS 2+ and a `CADisplayLink` backport otherwise.
+
 ## Apps Using AnimatedImage
 
 <p float="left">
@@ -135,6 +168,26 @@ The library consists of multiple internal modules unified under a single product
     <a href="https://apps.apple.com/app/id6470347919"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/lynnpd.threadpd.png" height="65"></a>
     <a href="https://apps.apple.com/app/id6736725704"><img src="https://github.com/noppefoxwolf/markdown-resources/blob/main/app-icons/com.nintendo.znsa.png" height="65"></a>
 </p>
+
+## Build & Test
+
+- Build: `swift build` (use `-c release` for optimized builds)
+- Test: `swift test`
+  - Filter: `swift test --filter ImageProcessorTests`
+- Xcode project (optional): `swift package generate-xcodeproj`
+- Example local demo: open `Playground.swiftpm` in Xcode and run.
+
+## Coding Style
+
+- Indentation: 4 spaces; line length: 100; ordered imports. See `.swift-format`.
+- Format: `swift format --configuration .swift-format --in-place Sources Tests`
+- Naming: Types/protocols UpperCamelCase; methods/vars lowerCamelCase.
+
+## Testing
+
+- Framework: Swift Testing (`import Testing`, `@Suite`, `@Test`).
+- Scope: Focus on core processing (timing, decimation, image ops). Add mocks for images where needed.
+- CI: GitHub Actions runs on macOS 15 with Xcode 16.4; ensure tests pass there.
 
 ## License
 
