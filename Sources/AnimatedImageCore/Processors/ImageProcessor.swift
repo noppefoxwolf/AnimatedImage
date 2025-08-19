@@ -29,7 +29,7 @@ struct ImageProcessor: Sendable {
         image: any AnimatedImage
     ) async -> ProcessingResult? {
         let imageCount = autoreleasepool { image.imageCount }
-        guard imageCount > 1 else { return nil }
+        guard imageCount > 0 else { return nil }
         guard !Task.isCancelled else { return nil }
 
         guard let firstImage = image.image(at: 0) else { return nil }
