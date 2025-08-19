@@ -1,4 +1,4 @@
-import QuartzCore
+public import QuartzCore
 
 public actor CGImageProcessor: Sendable {
 

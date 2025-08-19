@@ -1,5 +1,5 @@
 import Foundation
-import QuartzCore
+public import QuartzCore
 
 /// アニメーション画像の最適なサイズを計算するクラス
 /// レンダリングサイズ、メモリ制約、アスペクト比を考慮してサイズを決定

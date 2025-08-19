@@ -1,5 +1,5 @@
-import UIKit
-import UpdateLink
+public import UIKit
+public import UpdateLink
 
 @available(iOS 18.0, visionOS 2.0, *)
 extension UIUpdateInfo: UpdateInfo {}

@@ -1,4 +1,4 @@
-import AnimatedImageCore
+public import AnimatedImageCore
 public import UIKit
 
 open class AnimatedImageView: AnimatableCGImageView {

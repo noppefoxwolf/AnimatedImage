@@ -1,4 +1,4 @@
-import QuartzCore
+public import QuartzCore
 import os
 
 private let logger = Logger(

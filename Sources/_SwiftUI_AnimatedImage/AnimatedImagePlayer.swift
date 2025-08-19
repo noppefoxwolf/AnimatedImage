@@ -1,7 +1,7 @@
 #if canImport(_UIKit_AnimatedImage)
 public import SwiftUI
 public import AnimatedImageCore
-import _UIKit_AnimatedImage
+public import _UIKit_AnimatedImage
 import UIKit
 
 public struct AnimatedImagePlayer: UIViewRepresentable {

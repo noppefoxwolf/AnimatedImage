@@ -1,4 +1,4 @@
-import QuartzCore
+public import QuartzCore
 
 public protocol DisplayLinkTarget: AnyObject {
     @MainActor

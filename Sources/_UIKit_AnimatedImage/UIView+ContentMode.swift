@@ -1,4 +1,4 @@
-import UIKit
+public import UIKit
 
 extension UIView.ContentMode {
     /// UIView.ContentModeをCALayerContentsGravityに変換する

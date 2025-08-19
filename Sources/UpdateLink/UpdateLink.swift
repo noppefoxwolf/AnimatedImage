@@ -1,4 +1,4 @@
-import QuartzCore
+public import QuartzCore
 
 @MainActor
 public protocol UpdateLink: AnyObject {
