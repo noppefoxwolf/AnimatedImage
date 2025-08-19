@@ -28,6 +28,7 @@ public actor CGImageProcessor: Sendable {
 
         guard width > 0 && height > 0 else { return nil }
 
+        // TOOD: image.colorSpaceがグレーの場合はCGColorSpaceCreateDeviceGray()を使いたい
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo: CGBitmapInfo = [.byteOrder32Little, CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)]
 
