@@ -18,18 +18,18 @@ public actor CGImageProcessor: Sendable {
         )
         
         let newSize = aspectFitSize(
-            for: originalSize,
-            maxSize: constrainedSize
+            of: originalSize,
+            in: constrainedSize
         )
         .applying(CGAffineTransform(scaleX: scale, y: scale))
         
-        if originalSize.isLessThanOrEqualTo(newSize) && usePreparingForDisplay {
+        if originalSize.isLessThanOrEqual(to: newSize) && usePreparingForDisplay {
             return image
         }
         return resize(image: image, newSize: newSize, interpolationQuality: interpolationQuality)
     }
     
-    func aspectFitSize(for currentSize: Size, maxSize: Size) -> Size {
+    func aspectFitSize(of currentSize: Size, in maxSize: Size) -> Size {
         let aspectWidth = CGFloat(maxSize.width) / CGFloat(currentSize.width)
         let aspectHeight = CGFloat(maxSize.height) / CGFloat(currentSize.height)
         let scalingFactor = min(aspectWidth, aspectHeight)

@@ -14,7 +14,7 @@ struct CGImageProcessorTests {
         // 元サイズより小さくフィット
         let currentSize = Size(width: 200, height: 100)
         let maxSize = Size(width: 100, height: 100)
-        let fitSize = await processor.aspectFitSize(for: currentSize, maxSize: maxSize)
+        let fitSize = await processor.aspectFitSize(of: currentSize, in: maxSize)
         
         #expect(fitSize.width == 100)
         #expect(fitSize.height == 50)
@@ -22,7 +22,7 @@ struct CGImageProcessorTests {
         // 正方形の画像を長方形にフィット
         let squareSize = Size(width: 100, height: 100)
         let rectMaxSize = Size(width: 200, height: 100)
-        let squareFitSize = await processor.aspectFitSize(for: squareSize, maxSize: rectMaxSize)
+        let squareFitSize = await processor.aspectFitSize(of: squareSize, in: rectMaxSize)
         
         #expect(squareFitSize.width == 100)
         #expect(squareFitSize.height == 100)

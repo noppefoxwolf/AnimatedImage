@@ -11,7 +11,7 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 対応するフレームインデックス（存在しない場合はnil）
-    public func calculateFrameIndex(
+    public func frameIndex(
         for targetTimestamp: TimeInterval,
         indices: [Int],
         delayTime: Double
@@ -35,7 +35,7 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 総継続時間（秒）
-    public func calculateTotalDuration(
+    public func totalDuration(
         indices: [Int],
         delayTime: Double
     ) -> TimeInterval {
@@ -49,12 +49,12 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 進行率（0.0〜1.0）
-    public func calculateAnimationProgress(
+    public func animationProgress(
         at currentTime: TimeInterval,
         indices: [Int],
         delayTime: Double
     ) -> Double {
-        let totalDuration = calculateTotalDuration(indices: indices, delayTime: delayTime)
+        let totalDuration = totalDuration(indices: indices, delayTime: delayTime)
         guard totalDuration > 0 else { return 0 }
 
         let normalizedTime = currentTime.truncatingRemainder(dividingBy: totalDuration)

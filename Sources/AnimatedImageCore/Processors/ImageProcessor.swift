@@ -57,9 +57,9 @@ public struct ImageProcessor: Sendable {
         let imageCount = autoreleasepool { image.imageCount }
         guard !Task.isCancelled else { return nil }
 
-        let optimizedSize = calculateOptimizedSize(renderSize: renderSize)
-        let frameConfiguration = calculateFrameConfiguration(
-            imageSize: optimizedSize,
+        let optimizedSize = optimizedSize(for: renderSize)
+        let frameConfiguration = frameConfiguration(
+            for: optimizedSize,
             imageCount: imageCount,
             scale: scale,
             image: image
@@ -79,13 +79,13 @@ public struct ImageProcessor: Sendable {
     }
 
     /// 最適化されたサイズを計算
-    public func calculateOptimizedSize(renderSize: Size) -> Size {
+    public func optimizedSize(for renderSize: Size) -> Size {
         min(configuration.maxSize, renderSize)
     }
 
     /// フレーム設定を計算
-    public func calculateFrameConfiguration(
-        imageSize: Size,
+    public func frameConfiguration(
+        for imageSize: Size,
         imageCount: Int,
         scale: CGFloat,
         image: any AnimatedImage

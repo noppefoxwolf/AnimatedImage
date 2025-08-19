@@ -1,6 +1,6 @@
 import Testing
 
-@testable import AnimatedImage
+@testable import AnimatedImageCore
 
 @Suite("AnimationTimingCalculator テスト")
 struct AnimationTimingCalculatorTests {
@@ -12,7 +12,7 @@ struct AnimationTimingCalculatorTests {
         let delayTime = 0.1
 
         // 最初のフレーム
-        let firstIndex = calculator.calculateFrameIndex(
+        let firstIndex = calculator.frameIndex(
             for: 0.0,
             indices: indices,
             delayTime: delayTime
@@ -20,7 +20,7 @@ struct AnimationTimingCalculatorTests {
         #expect(firstIndex == 0)
 
         // 中間のフレーム
-        let middleIndex = calculator.calculateFrameIndex(
+        let middleIndex = calculator.frameIndex(
             for: 0.25,
             indices: indices,
             delayTime: delayTime
@@ -28,7 +28,7 @@ struct AnimationTimingCalculatorTests {
         #expect(middleIndex != nil)
 
         // 最後のフレーム付近
-        let lastIndex = calculator.calculateFrameIndex(
+        let lastIndex = calculator.frameIndex(
             for: 0.45,
             indices: indices,
             delayTime: delayTime
@@ -42,7 +42,7 @@ struct AnimationTimingCalculatorTests {
 
         let indices = [0, 1, 2, 3, 4]
         let delayTime = 0.1
-        let duration = calculator.calculateTotalDuration(indices: indices, delayTime: delayTime)
+        let duration = calculator.totalDuration(indices: indices, delayTime: delayTime)
 
         #expect(duration == 0.5)  // 5フレーム × 0.1秒
     }
@@ -54,7 +54,7 @@ struct AnimationTimingCalculatorTests {
         let delayTime = 0.25
 
         // 開始時点
-        let startProgress = calculator.calculateAnimationProgress(
+        let startProgress = calculator.animationProgress(
             at: 0.0,
             indices: indices,
             delayTime: delayTime
@@ -62,7 +62,7 @@ struct AnimationTimingCalculatorTests {
         #expect(startProgress == 0.0)
 
         // 中間時点
-        let middleProgress = calculator.calculateAnimationProgress(
+        let middleProgress = calculator.animationProgress(
             at: 0.5,
             indices: indices,
             delayTime: delayTime
@@ -70,7 +70,7 @@ struct AnimationTimingCalculatorTests {
         #expect(middleProgress == 0.5)
 
         // 終了時点
-        let endProgress = calculator.calculateAnimationProgress(
+        let endProgress = calculator.animationProgress(
             at: 1.0,
             indices: indices,
             delayTime: delayTime
@@ -83,7 +83,7 @@ struct AnimationTimingCalculatorTests {
         let calculator = AnimationTimingCalculator()
 
         // 空のインデックス配列
-        let emptyIndex = calculator.calculateFrameIndex(
+        let emptyIndex = calculator.frameIndex(
             for: 1.0,
             indices: [],
             delayTime: 0.1
@@ -91,7 +91,7 @@ struct AnimationTimingCalculatorTests {
         #expect(emptyIndex == nil)
 
         // delayTimeが0
-        let zeroDelayIndex = calculator.calculateFrameIndex(
+        let zeroDelayIndex = calculator.frameIndex(
             for: 1.0,
             indices: [0, 1],
             delayTime: 0.0
@@ -99,7 +99,7 @@ struct AnimationTimingCalculatorTests {
         #expect(zeroDelayIndex == nil)
 
         // 空配列での継続時間
-        let emptyDuration = calculator.calculateTotalDuration(indices: [], delayTime: 0.1)
+        let emptyDuration = calculator.totalDuration(indices: [], delayTime: 0.1)
         #expect(emptyDuration == 0.0)
     }
 
@@ -110,7 +110,7 @@ struct AnimationTimingCalculatorTests {
         let delayTime = 0.01
 
         // 複数周期後の計算
-        let longTimeIndex = calculator.calculateFrameIndex(
+        let longTimeIndex = calculator.frameIndex(
             for: 5.5,  // 5.5秒後
             indices: indices,
             delayTime: delayTime
