@@ -142,7 +142,7 @@ public struct FrameDecimator: Sendable {
 
         return displayIndices
     }
-    
+
     /// 累積和を計算
     private func calculateRunningSum(_ values: [Double]) -> [Double] {
         var result: [Double] = []

@@ -5,7 +5,7 @@ enum ImageFormat: String, CaseIterable {
     case gif = "GIF"
     case apng = "APNG"
     case webp = "WEBP"
-    
+
     var fileName: String {
         switch self {
         case .gif:
@@ -16,7 +16,7 @@ enum ImageFormat: String, CaseIterable {
             return "animated-webp-supported"
         }
     }
-    
+
     var fileExtension: String {
         switch self {
         case .gif:
@@ -35,10 +35,10 @@ struct QualityDemoView: View {
 
     @State
     var width: Double = 100
-    
+
     @State
     var maxWidth: Double = 128
-    
+
     @State
     var selectedFormat: ImageFormat = .apng
 
@@ -80,7 +80,10 @@ struct QualityDemoView: View {
                             }
                             Slider(value: $maxWidth, in: 1...128)
                                 .onChange(of: maxWidth) { oldValue, newValue in
-                                    configuration.maxSize = Size(width: Int(newValue), height: configuration.maxSize.height)
+                                    configuration.maxSize = Size(
+                                        width: Int(newValue),
+                                        height: configuration.maxSize.height
+                                    )
                                 }
                         }
                     }
@@ -91,9 +94,15 @@ struct QualityDemoView: View {
                                 Text("Max Cache size")
                                     .font(.headline)
                                 Spacer()
-                                Text(String(format: "%.2f MB", configuration.maxMemoryUsage.converted(to: .bytes).value / (1 * 1024 * 1024)))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                Text(
+                                    String(
+                                        format: "%.2f MB",
+                                        configuration.maxMemoryUsage.converted(to: .bytes).value
+                                            / (1 * 1024 * 1024)
+                                    )
+                                )
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                             }
                             Slider(
                                 value: Binding<Double>(
@@ -119,9 +128,14 @@ struct QualityDemoView: View {
                                 Text("Max Integrity")
                                     .font(.headline)
                                 Spacer()
-                                Text(String(format: "%.1f%%", configuration.maxLevelOfIntegrity * 100))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                Text(
+                                    String(
+                                        format: "%.1f%%",
+                                        configuration.maxLevelOfIntegrity * 100
+                                    )
+                                )
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                             }
                             Slider(value: $configuration.maxLevelOfIntegrity, in: 0.1...1)
                         }
@@ -145,11 +159,14 @@ struct QualityDemoView: View {
             maxWidth = Double(configuration.maxSize.width)
         }
     }
-    
+
     private var currentImage: any AnimatedImage {
-        let url = Bundle.main.url(forResource: selectedFormat.fileName, withExtension: selectedFormat.fileExtension)!
+        let url = Bundle.main.url(
+            forResource: selectedFormat.fileName,
+            withExtension: selectedFormat.fileExtension
+        )!
         let data = try! Data(contentsOf: url)
-        
+
         switch selectedFormat {
         case .gif:
             return GifImage(name: selectedFormat.fileName, data: data)

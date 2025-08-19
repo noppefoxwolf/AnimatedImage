@@ -5,9 +5,9 @@ import QuartzCore
 /// レンダリングサイズ、メモリ制約、アスペクト比を考慮してサイズを決定
 public struct SizeOptimizer: Sendable {
     public init() {}
-    
+
     /// レンダリングに最適なサイズを計算
-    /// 
+    ///
     /// 処理の流れ:
     /// 1. maxSizeとrenderSizeの小さい方を有効サイズとして決定
     /// 2. 元画像サイズを超えないよう制約を適用
@@ -17,8 +17,8 @@ public struct SizeOptimizer: Sendable {
     public func optimizedSize(
         for renderSize: Size,
         maxSize: Size,
-        scale: CGFloat, 
-        imageSize: Size, 
+        scale: CGFloat,
+        imageSize: Size,
         imageCount: Int = 1,
         maxMemoryUsage: Double,
         targetMemoryRatio: Double = 0.8
@@ -38,21 +38,21 @@ public struct SizeOptimizer: Sendable {
         )
         // 5. メモリ制約に基づいて最終調整
         let memoryAdjustedSize = adjustSizeForMemoryConstraints(
-            scaledSize, 
+            scaledSize,
             imageCount: imageCount,
             maxMemoryUsage: maxMemoryUsage,
             targetMemoryRatio: targetMemoryRatio
         )
-        
+
         return memoryAdjustedSize
     }
-    
+
     /// レンダリングサイズが有効かどうかを判定
     /// 幅と高さが両方とも0より大きい場合に有効とする
     public func isValidRenderSize(_ renderSize: Size) -> Bool {
         !renderSize.isEmpty
     }
-    
+
     /// アスペクト比を維持して指定された最大サイズ内に収まるようにサイズを調整
     private func aspectFitSize(of currentSize: Size, in maxSize: Size) -> Size {
         let aspectWidth = CGFloat(maxSize.width) / CGFloat(currentSize.width)
@@ -61,11 +61,11 @@ public struct SizeOptimizer: Sendable {
         let transform = CGAffineTransform(scaleX: scalingFactor, y: scalingFactor)
         return currentSize.applying(transform)
     }
-    
+
     /// メモリ制約に基づいてサイズを調整
     /// メモリ使用量が制限を超える場合、平方根で縮小率を計算して調整
     private func adjustSizeForMemoryConstraints(
-        _ size: Size, 
+        _ size: Size,
         imageCount: Int,
         maxMemoryUsage: Double,
         targetMemoryRatio: Double
@@ -74,7 +74,7 @@ public struct SizeOptimizer: Sendable {
         let imageByteCount = size.width * size.height * 4
         let totalMemoryUsage = Double(imageByteCount * imageCount)
         let targetMemoryUsage = maxMemoryUsage * targetMemoryRatio
-        
+
         if totalMemoryUsage <= targetMemoryUsage {
             return size
         }
@@ -83,12 +83,12 @@ public struct SizeOptimizer: Sendable {
         let transform = CGAffineTransform(scaleX: reductionFactor, y: reductionFactor)
         return size.applying(transform)
     }
-    
+
     /// 品質レベル（完全性レベル）を計算
     /// メモリ圧力に基づいて0.0-1.0の範囲で品質を決定
     /// 値が高いほど高品質（フレーム数が多い）
     public func integrityLevel(
-        for imageSize: Size, 
+        for imageSize: Size,
         imageCount: Int,
         maxMemoryUsage: Double,
         maxLevelOfIntegrity: Double

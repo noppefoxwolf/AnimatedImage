@@ -11,7 +11,7 @@ struct SizeOptimizerTests {
     func basicSizeOptimization() {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 128, height: 128)
-        let maxMemoryUsage: Double = 1024 * 1024 // 1MB
+        let maxMemoryUsage: Double = 1024 * 1024  // 1MB
 
         let renderSize = Size(width: 100, height: 100)
         let imageSize = Size(width: 200, height: 200)
@@ -35,7 +35,7 @@ struct SizeOptimizerTests {
     func aspectRatioMaintenance() {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 1000, height: 1000)
-        let maxMemoryUsage: Double = 10 * 1024 * 1024 // 10MB
+        let maxMemoryUsage: Double = 10 * 1024 * 1024  // 10MB
 
         // 横長の画像を正方形にフィット
         let renderSize = Size(width: 100, height: 100)
@@ -52,7 +52,7 @@ struct SizeOptimizerTests {
 
         let originalAspect = Double(imageSize.width) / Double(imageSize.height)
         let optimizedAspect = Double(optimizedSize.width) / Double(optimizedSize.height)
-        
+
         #expect(abs(originalAspect - optimizedAspect) < 0.01)
     }
 
@@ -60,7 +60,7 @@ struct SizeOptimizerTests {
     func scaleApplication() {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 1000, height: 1000)
-        let maxMemoryUsage: Double = 10 * 1024 * 1024 // 10MB
+        let maxMemoryUsage: Double = 10 * 1024 * 1024  // 10MB
 
         let renderSize = Size(width: 100, height: 100)
         let imageSize = Size(width: 50, height: 50)
@@ -83,7 +83,7 @@ struct SizeOptimizerTests {
     func memoryConstraintAdjustment() {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 1000, height: 1000)
-        let maxMemoryUsage: Double = 1024 // 1KB
+        let maxMemoryUsage: Double = 1024  // 1KB
 
         let renderSize = Size(width: 500, height: 500)
         let imageSize = Size(width: 500, height: 500)
@@ -105,7 +105,7 @@ struct SizeOptimizerTests {
     @Test("品質レベル計算")
     func integrityLevelCalculation() {
         let optimizer = SizeOptimizer()
-        let maxMemoryUsage: Double = 1024 * 1024 // 1MB
+        let maxMemoryUsage: Double = 1024 * 1024  // 1MB
         let maxLevelOfIntegrity: Double = 0.8
 
         let imageSize = Size(width: 100, height: 100)

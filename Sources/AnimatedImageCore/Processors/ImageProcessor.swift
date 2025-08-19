@@ -50,7 +50,7 @@ struct ImageProcessor: Sendable {
         let imageCount = autoreleasepool { image.imageCount }
         guard imageCount > 1 else { return nil }
         guard !Task.isCancelled else { return nil }
-        
+
         guard let firstImage = image.image(at: 0) else { return nil }
         let optimizedSize = optimizedSize(
             for: renderSize,
@@ -66,7 +66,7 @@ struct ImageProcessor: Sendable {
             imageCount: imageCount,
             image: image
         )
-        
+
         let frameConfiguration = FrameConfiguration(
             optimizedSize: optimizedSize,
             indices: frameInfo.displayIndices,
@@ -86,7 +86,9 @@ struct ImageProcessor: Sendable {
         sizeOptimizer.isValidRenderSize(renderSize)
     }
 
-    func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1) -> Size {
+    func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1)
+        -> Size
+    {
         sizeOptimizer.optimizedSize(
             for: renderSize,
             maxSize: configuration.maxSize,
@@ -96,7 +98,7 @@ struct ImageProcessor: Sendable {
             maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value
         )
     }
-    
+
     func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
         sizeOptimizer.integrityLevel(
             for: imageSize,
@@ -124,7 +126,9 @@ struct ImageProcessor: Sendable {
             levelOfIntegrity: levelOfIntegrity
         )
 
-        return (displayIndices: decimationResult.displayIndices, delayTime: decimationResult.delayTime)
+        return (
+            displayIndices: decimationResult.displayIndices, delayTime: decimationResult.delayTime
+        )
     }
 
     func prewarmFrameImages(
@@ -166,7 +170,7 @@ struct ImageProcessor: Sendable {
 
         guard !Task.isCancelled else { return nil }
         guard let cgImage = cgImage else { return nil }
-        
+
         let processor = CGImageProcessor()
         let decodedImage = await processor.decoded(
             image: cgImage,

@@ -35,7 +35,7 @@ struct AnimationTimingCalculatorTests {
         )
         #expect(lastIndex != nil)
     }
-    
+
     @Test("エッジケース処理")
     func edgeCaseHandling() {
         let calculator = AnimationTimingCalculator()

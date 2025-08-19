@@ -1,9 +1,9 @@
 import QuartzCore
 
 public actor CGImageProcessor: Sendable {
-    
+
     public init() {}
-    
+
     public func decoded(
         image: CGImage,
         for size: Size,
@@ -11,13 +11,13 @@ public actor CGImageProcessor: Sendable {
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let originalSize = Size(width: image.width, height: image.height)
-        
+
         if originalSize.isLessThanOrEqual(to: size) && usePreparingForDisplay {
             return image
         }
         return resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
-    
+
     func resize(
         image: CGImage,
         newSize: Size,
