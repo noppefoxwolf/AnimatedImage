@@ -35,17 +35,6 @@ struct AnimationTimingCalculatorTests {
         )
         #expect(lastIndex != nil)
     }
-
-    @Test("総継続時間計算")
-    func totalDurationCalculation() {
-        let calculator = AnimationTimingCalculator()
-
-        let indices = [0, 1, 2, 3, 4]
-        let delayTime = 0.1
-        let duration = calculator.totalDuration(indices: indices, delayTime: delayTime)
-
-        #expect(duration == 0.5)  // 5フレーム × 0.1秒
-    }
     
     @Test("エッジケース処理")
     func edgeCaseHandling() {
@@ -66,10 +55,6 @@ struct AnimationTimingCalculatorTests {
             delayTime: 0.0
         )
         #expect(zeroDelayIndex == nil)
-
-        // 空配列での継続時間
-        let emptyDuration = calculator.totalDuration(indices: [], delayTime: 0.1)
-        #expect(emptyDuration == 0.0)
     }
 
     @Test("長時間での計算精度")

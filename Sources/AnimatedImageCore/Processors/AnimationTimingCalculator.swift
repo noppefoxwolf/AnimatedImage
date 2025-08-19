@@ -29,17 +29,4 @@ struct AnimationTimingCalculator: Sendable {
 
         return indices[index]
     }
-
-    /// アニメーションの総継続時間を計算
-    /// - Parameters:
-    ///   - indices: 表示フレームのインデックス配列
-    ///   - delayTime: フレーム間の時間間隔
-    /// - Returns: 総継続時間（秒）
-    func totalDuration(
-        indices: [Int],
-        delayTime: Double
-    ) -> TimeInterval {
-        guard !indices.isEmpty else { return 0 }
-        return delayTime * Double(indices.count)
-    }
 }
