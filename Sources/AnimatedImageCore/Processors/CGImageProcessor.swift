@@ -9,8 +9,7 @@ public actor CGImageProcessor: Sendable {
         for size: Size,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
-        let originalSize = Size(width: image.width, height: image.height)
-        return resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
+        resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
 
     func resize(
