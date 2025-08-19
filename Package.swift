@@ -67,27 +67,15 @@ let package = Package(
     ]
 )
 
-let warnConcurrency = "-warn-concurrency"
-let enableActorDataRaceChecks = "-enable-actor-data-race-checks"
 let swiftSettings: [SwiftSetting] = [
-    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0335-existential-any.md
-    .enableUpcomingFeature("ExistentialAny"), // 5.8
-    // resource_bundle_accessor.swiftなどが対応するまでは保留
-    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md
-//    .enableExperimentalFeature("AccessLevelOnImport"), // 5.9
-    .enableUpcomingFeature("InternalImportsByDefault"), // 6.0
-    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0440-debug-description-macro.md
-    .enableExperimentalFeature("DebugDescriptionMacro"),
-    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0436-objc-implementation.md
-    .enableExperimentalFeature("ObjCImplementation"),
-    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0432-noncopyable-switch.md
-    .enableExperimentalFeature("BorrowingSwitch"),
-    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0427-noncopyable-generics.md
-    .enableExperimentalFeature("NoncopyableGenerics"),
-    .unsafeFlags([
-        warnConcurrency,
-        enableActorDataRaceChecks,
-    ]),
+    // https://github.com/swiftlang/swift/blob/3d3331f1c625fb22c60f361ac06caf06138efc69/include/swift/Basic/Features.def#L278
+    // Swift 7
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("InternalImportsByDefault"),
+    .enableUpcomingFeature("MemberImportVisibility"),
+    .enableUpcomingFeature("InferIsolatedConformances"),
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+    .enableUpcomingFeature("ImmutableWeakCaptures"),
 ]
 
 package.targets.forEach { target in
