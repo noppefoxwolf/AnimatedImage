@@ -12,17 +12,20 @@ public final class GifImage: AnimatedImage, Sendable {
     }
 
     public nonisolated var imageCount: Int {
-        let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.makeImageCount() ?? 0
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0 }
+        return CGImageSourceGetCount(source)
     }
 
     public nonisolated func delayTime(at index: Int) -> Double {
-        let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.makeGIFDelayTime(at: index) ?? 0.1
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0.1 }
+        let imageProperty = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+        let frameProperty = imageProperty?[kCGImagePropertyGIFDictionary] as? [CFString: Any]
+        let delayTime = frameProperty?[kCGImagePropertyGIFDelayTime] as? Double
+        return delayTime ?? 0.1
     }
 
     public nonisolated func image(at index: Int) -> CGImage? {
-        let source = CGImageSourceCreateWithData(data as CFData, nil)
-        return source?.makeImage(at: index)
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        return CGImageSourceCreateImageAtIndex(source, index, nil)
     }
 }

@@ -48,7 +48,7 @@ public struct FrameDecimator: Sendable {
         let levelOfIntegrity = max(0.0, min(1.0, levelOfIntegrity))
 
         // 各フレームが表示されるはずのタイムスタンプを計算
-        let timestamps = Array(delays.runningSum)
+        let timestamps = calculateRunningSum(delays)
 
         // デフォルト値を設定
         var resultDelayTime: Double = 0.1
@@ -141,5 +141,16 @@ public struct FrameDecimator: Sendable {
         }
 
         return displayIndices
+    }
+    
+    /// 累積和を計算
+    private func calculateRunningSum(_ values: [Double]) -> [Double] {
+        var result: [Double] = []
+        var sum: Double = 0
+        for value in values {
+            sum += value
+            result.append(sum)
+        }
+        return result
     }
 }
