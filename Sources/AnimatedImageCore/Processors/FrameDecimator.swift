@@ -52,7 +52,7 @@ public struct FrameDecimator: Sendable {
 
         // デフォルト値を設定
         var resultDelayTime: Double = 0.1
-        var displayIndices: [Int] = Array(0..<delays.count)
+        var displayIndices: [Int] = Array(delays.indices)
 
         // 2フレーム未満は間引きしない
         if delays.count <= 2 {
