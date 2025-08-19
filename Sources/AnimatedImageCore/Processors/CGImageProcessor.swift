@@ -11,7 +11,7 @@ public actor CGImageProcessor: Sendable {
         scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
-        let originalSize = image.size
+        let originalSize = Size(width: image.width, height: image.height)
         let constrainedSize = Size(
             width: min(size.width, originalSize.width),
             height: min(size.height, originalSize.height)

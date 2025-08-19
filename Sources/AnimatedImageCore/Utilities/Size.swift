@@ -36,29 +36,6 @@ extension Size {
     }
 }
 
-// MARK: - SIMD演算
-extension Size {
-    public static func + (lhs: Size, rhs: Size) -> Size {
-        Size(lhs.vector &+ rhs.vector)
-    }
-    
-    public static func - (lhs: Size, rhs: Size) -> Size {
-        Size(lhs.vector &- rhs.vector)
-    }
-    
-    public static func * (lhs: Size, rhs: Int) -> Size {
-        Size(lhs.vector &* rhs)
-    }
-    
-    public static func * (lhs: Int, rhs: Size) -> Size {
-        Size(lhs &* rhs.vector)
-    }
-    
-    public static func / (lhs: Size, rhs: Int) -> Size {
-        Size(lhs.vector / rhs)
-    }
-}
-
 // MARK: - 比較演算
 extension Size {
     public func isLessThanOrEqualTo(_ size: Size) -> Bool {
