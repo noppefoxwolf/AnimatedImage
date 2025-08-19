@@ -54,7 +54,7 @@ public final class AnimatedImageProvider: Sendable {
         image: any AnimatedImage
     ) async {
         let processingResult = await imageProcessor.processAnimatedImage(
-            renderSize: renderSize,
+            renderSize: Size(renderSize),
             scale: scale,
             image: image
         )

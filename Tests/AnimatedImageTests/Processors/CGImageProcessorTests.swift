@@ -12,16 +12,16 @@ struct CGImageProcessorTests {
     @Test("アスペクト比フィット計算")
     func aspectFitSizeCalculation() async {
         // 元サイズより小さくフィット
-        let currentSize = CGSize(width: 200, height: 100)
-        let maxSize = CGSize(width: 100, height: 100)
+        let currentSize = Size(width: 200, height: 100)
+        let maxSize = Size(width: 100, height: 100)
         let fitSize = await processor.aspectFitSize(for: currentSize, maxSize: maxSize)
         
         #expect(fitSize.width == 100)
         #expect(fitSize.height == 50)
         
         // 正方形の画像を長方形にフィット
-        let squareSize = CGSize(width: 100, height: 100)
-        let rectMaxSize = CGSize(width: 200, height: 100)
+        let squareSize = Size(width: 100, height: 100)
+        let rectMaxSize = Size(width: 200, height: 100)
         let squareFitSize = await processor.aspectFitSize(for: squareSize, maxSize: rectMaxSize)
         
         #expect(squareFitSize.width == 100)
@@ -31,7 +31,7 @@ struct CGImageProcessorTests {
     @Test("画像リサイズ")
     func imageResize() async {
         let originalImage = createTestImage(width: 100, height: 100)
-        let newSize = CGSize(width: 50, height: 50)
+        let newSize = Size(width: 50, height: 50)
         
         let resizedImage = await processor.resize(
             image: originalImage,
@@ -59,7 +59,7 @@ struct CGImageProcessorTests {
         // 負のサイズでのリサイズ
         let negativeSizeResult = await processor.resize(
             image: originalImage,
-            newSize: CGSize(width: -10, height: 50),
+            newSize: Size(width: -10, height: 50),
             interpolationQuality: .default
         )
         #expect(negativeSizeResult == nil)
@@ -68,7 +68,7 @@ struct CGImageProcessorTests {
     @Test("画像デコード処理")
     func imageDecoding() async {
         let originalImage = createTestImage(width: 200, height: 200)
-        let targetSize = CGSize(width: 100, height: 100)
+        let targetSize = Size(width: 100, height: 100)
         
         let decodedImage = await processor.decoded(
             image: originalImage,
@@ -85,7 +85,7 @@ struct CGImageProcessorTests {
     @Test("スケール適用でのデコード")
     func decodingWithScale() async {
         let originalImage = createTestImage(width: 100, height: 100)
-        let targetSize = CGSize(width: 50, height: 50)
+        let targetSize = Size(width: 50, height: 50)
         let scale: CGFloat = 2.0
         
         let decodedImage = await processor.decoded(
@@ -103,7 +103,7 @@ struct CGImageProcessorTests {
     @Test("既に適切なサイズの画像処理")
     func decodingAlreadyCorrectSize() async {
         let originalImage = createTestImage(width: 50, height: 50)
-        let targetSize = CGSize(width: 100, height: 100)
+        let targetSize = Size(width: 100, height: 100)
         
         // usePreparingForDisplay = true の場合、元画像がそのまま返される
         let decodedImage = await processor.decoded(
@@ -120,7 +120,7 @@ struct CGImageProcessorTests {
     @Test("強制リサイズ")
     func forcedResize() async {
         let originalImage = createTestImage(width: 50, height: 50)
-        let targetSize = CGSize(width: 100, height: 100)
+        let targetSize = Size(width: 100, height: 100)
         
         // usePreparingForDisplay = false の場合、必ずリサイズされる
         // ただし、元サイズより大きくはならない
@@ -140,7 +140,7 @@ struct CGImageProcessorTests {
     @Test("元サイズより大きくリサイズしない")
     func noUpscaling() async {
         let originalImage = createTestImage(width: 100, height: 100)
-        let targetSize = CGSize(width: 200, height: 200)
+        let targetSize = Size(width: 200, height: 200)
         
         let decodedImage = await processor.decoded(
             image: originalImage,
@@ -157,7 +157,7 @@ struct CGImageProcessorTests {
     @Test("片方の軸のみ大きい場合の処理")
     func partialUpscalingPrevention() async {
         let originalImage = createTestImage(width: 100, height: 50)
-        let targetSize = CGSize(width: 200, height: 25) // 幅は大きく、高さは小さく
+        let targetSize = Size(width: 200, height: 25) // 幅は大きく、高さは小さく
         
         let decodedImage = await processor.decoded(
             image: originalImage,

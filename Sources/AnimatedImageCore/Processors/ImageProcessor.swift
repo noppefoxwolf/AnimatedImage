@@ -7,14 +7,14 @@ public struct ImageProcessor: Sendable {
 
     /// フレーム設定情報
     public struct FrameConfiguration: Sendable {
-        public let optimizedSize: CGSize
+        public let optimizedSize: Size
         public let indices: [Int]
         public let delayTime: Double
         public let scale: CGFloat
         public let interpolationQuality: CGInterpolationQuality
 
         public init(
-            optimizedSize: CGSize,
+            optimizedSize: Size,
             indices: [Int],
             delayTime: Double,
             scale: CGFloat,
@@ -47,7 +47,7 @@ public struct ImageProcessor: Sendable {
 
     /// アニメーション画像を処理する
     public func processAnimatedImage(
-        renderSize: CGSize,
+        renderSize: Size,
         scale: CGFloat,
         image: any AnimatedImage
     ) async -> ProcessingResult? {
@@ -74,18 +74,18 @@ public struct ImageProcessor: Sendable {
     }
 
     /// レンダリングサイズの検証
-    public func isValidRenderSize(_ renderSize: CGSize) -> Bool {
-        !CGRect(origin: .zero, size: renderSize).isEmpty
+    public func isValidRenderSize(_ renderSize: Size) -> Bool {
+        !CGRect(origin: .zero, size: renderSize.cgSize).isEmpty
     }
 
     /// 最適化されたサイズを計算
-    public func calculateOptimizedSize(renderSize: CGSize) -> CGSize {
+    public func calculateOptimizedSize(renderSize: Size) -> Size {
         min(configuration.maxSize, renderSize)
     }
 
     /// フレーム設定を計算
     public func calculateFrameConfiguration(
-        imageSize: CGSize,
+        imageSize: Size,
         imageCount: Int,
         scale: CGFloat,
         image: any AnimatedImage
@@ -150,7 +150,7 @@ public struct ImageProcessor: Sendable {
     /// 個別画像を作成
     public func createAndCacheImage(
         image: any AnimatedImage,
-        size: CGSize,
+        size: Size,
         index: Int,
         scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
