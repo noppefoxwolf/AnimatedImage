@@ -27,22 +27,20 @@ struct ImageProcessorTests {
         #expect(optimizedSize.height <= configuration.maxSize.height)
     }
 
-    @Test("フレーム設定計算")
-    func frameConfigurationCalculation() {
+    @Test("フレーム選択最適化")
+    func frameSelectionOptimization() {
         let configuration = AnimatedImageProviderConfiguration.default
         let processor = ImageProcessor(configuration: configuration)
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
-        let frameConfig = processor.frameConfiguration(
+        let frameInfo = processor.optimizeFrameSelection(
             for: Size(width: 100, height: 100),
             imageCount: 10,
             image: mockImage
         )
 
-        #expect(!frameConfig.indices.isEmpty)
-        #expect(frameConfig.delayTime > 0)
-        #expect(frameConfig.optimizedSize.width == 100)
-        #expect(frameConfig.optimizedSize.height == 100)
+        #expect(!frameInfo.displayIndices.isEmpty)
+        #expect(frameInfo.delayTime > 0)
     }
 
     @Test("個別画像作成")

@@ -59,10 +59,17 @@ public struct ImageProcessor: Sendable {
         guard isValidRenderSize(optimizedSize) else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        let frameConfiguration = frameConfiguration(
+        let frameInfo = optimizeFrameSelection(
             for: optimizedSize,
             imageCount: imageCount,
             image: image
+        )
+        
+        let frameConfiguration = FrameConfiguration(
+            optimizedSize: optimizedSize,
+            indices: frameInfo.displayIndices,
+            delayTime: frameInfo.delayTime,
+            interpolationQuality: configuration.interpolationQuality
         )
 
         let generatedImages = await generateFrameImages(frameConfiguration, image: image)
@@ -97,11 +104,11 @@ public struct ImageProcessor: Sendable {
         )
     }
 
-    public func frameConfiguration(
+    public func optimizeFrameSelection(
         for imageSize: Size,
         imageCount: Int,
         image: any AnimatedImage
-    ) -> FrameConfiguration {
+    ) -> (displayIndices: [Int], delayTime: Double) {
         let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount)
 
         let delayTimes = (0..<imageCount)
@@ -115,12 +122,7 @@ public struct ImageProcessor: Sendable {
             levelOfIntegrity: levelOfIntegrity
         )
 
-        return FrameConfiguration(
-            optimizedSize: imageSize,
-            indices: decimationResult.displayIndices,
-            delayTime: decimationResult.delayTime,
-            interpolationQuality: configuration.interpolationQuality
-        )
+        return (displayIndices: decimationResult.displayIndices, delayTime: decimationResult.delayTime)
     }
 
     public func generateFrameImages(
