@@ -6,12 +6,10 @@ struct ImageProcessor: Sendable {
     struct ProcessingResult: Sendable {
         let indices: [Int]
         let delayTime: Double
-        let generatedImages: [Int: CGImage]
 
-        init(indices: [Int], delayTime: Double, generatedImages: [Int: CGImage]) {
+        init(indices: [Int], delayTime: Double) {
             self.indices = indices
             self.delayTime = delayTime
-            self.generatedImages = generatedImages
         }
     }
 
@@ -44,24 +42,20 @@ struct ImageProcessor: Sendable {
         guard isValidRenderSize(optimizedSize) else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        let frameInfo = optimizeFrameSelection(
+        let result = optimizeFrameSelection(
             for: optimizedSize,
             imageCount: imageCount,
             image: image
         )
 
-        let generatedImages = await prewarmFrameImages(
-            indices: frameInfo.displayIndices,
+        await prewarmFrameImages(
+            indices: result.indices,
             optimizedSize: optimizedSize,
             interpolationQuality: configuration.interpolationQuality,
             image: image
         )
-
-        return ProcessingResult(
-            indices: frameInfo.displayIndices,
-            delayTime: frameInfo.delayTime,
-            generatedImages: generatedImages
-        )
+        
+        return result
     }
 
     func isValidRenderSize(_ renderSize: Size) -> Bool {
@@ -94,7 +88,7 @@ struct ImageProcessor: Sendable {
         for imageSize: Size,
         imageCount: Int,
         image: any AnimatedImage
-    ) -> (displayIndices: [Int], delayTime: Double) {
+    ) -> ProcessingResult {
         let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount)
 
         let delayTimes = (0..<imageCount)
@@ -107,9 +101,9 @@ struct ImageProcessor: Sendable {
             delays: delayTimes,
             levelOfIntegrity: levelOfIntegrity
         )
-
-        return (
-            displayIndices: decimationResult.displayIndices, delayTime: decimationResult.delayTime
+        
+        return ProcessingResult(
+            indices: decimationResult.displayIndices, delayTime: decimationResult.delayTime
         )
     }
 
@@ -118,10 +112,8 @@ struct ImageProcessor: Sendable {
         optimizedSize: Size,
         interpolationQuality: CGInterpolationQuality,
         image: any AnimatedImage
-    ) async -> [Int: CGImage] {
-        var generatedImages: [Int: CGImage] = [:]
-
-        await withTaskGroup(of: (Int, CGImage?).self) { taskGroup in
+    ) async {
+        await withTaskGroup { taskGroup in
             for index in Set(indices) {
                 taskGroup.addTask {
                     let processedImage = await createAndCacheImage(
@@ -134,14 +126,8 @@ struct ImageProcessor: Sendable {
                 }
             }
 
-            for await (index, processedImage) in taskGroup {
-                if let processedImage {
-                    generatedImages[index] = processedImage
-                }
-            }
+            await taskGroup.waitForAll()
         }
-
-        return generatedImages
     }
 
     func createAndCacheImage(
