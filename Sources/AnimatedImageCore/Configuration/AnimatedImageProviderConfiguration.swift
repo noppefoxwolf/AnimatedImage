@@ -9,7 +9,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     public static var unlimited: Self {
         Self(
             maxMemoryUsage: .init(value: 1, unit: .gigabytes),
-            maxSize: Size(width: Int.max, height: Int.max),
+            maxSize: Size(width: .max, height: .max),
             maxLevelOfIntegrity: 1,
             interpolationQuality: .high,
             contentsFilter: .trilinear,

@@ -43,7 +43,9 @@ extension Size {
     }
     
     public var area: Int {
-        width * height
+        guard width > 0 && height > 0 else { return 0 }
+        let result = width.multipliedReportingOverflow(by: height)
+        return result.overflow ? Int.max : result.partialValue
     }
     
     public var isEmpty: Bool {
@@ -59,7 +61,7 @@ extension Size {
 }
 
 func min(_ x: Size, _ y: Size) -> Size {
-    let areaX = x.width * x.height
-    let areaY = y.width * y.height
+    let areaX = x.area
+    let areaY = y.area
     return areaX < areaY ? x : y
 }

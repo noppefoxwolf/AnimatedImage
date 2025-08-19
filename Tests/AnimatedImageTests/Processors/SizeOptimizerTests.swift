@@ -136,7 +136,7 @@ struct SizeOptimizerTests {
     @Test("元画像サイズを超えない制約")
     func noUpscalingConstraint() {
         let optimizer = SizeOptimizer()
-        let maxSize = Size(width: Int.max, height: Int.max)
+        let maxSize = Size(width: .max, height: .max)
         let maxMemoryUsage: Double = 1024 * 1024 * 1024
 
         let renderSize = Size(width: 200, height: 200)
@@ -159,7 +159,7 @@ struct SizeOptimizerTests {
     @Test("高品質設定での処理")
     func unlimitedConfigurationTest() {
         let optimizer = SizeOptimizer()
-        let maxSize = Size(width: Int.max, height: Int.max)
+        let maxSize = Size(width: .max, height: .max)
         let maxMemoryUsage: Double = 1024 * 1024 * 1024
         let maxLevelOfIntegrity: Double = 1.0
 
