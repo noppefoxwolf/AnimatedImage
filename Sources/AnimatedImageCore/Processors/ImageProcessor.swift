@@ -158,12 +158,15 @@ public struct ImageProcessor: Sendable {
         let cgImage = autoreleasepool { image.image(at: index) }
 
         guard !Task.isCancelled else { return nil }
-        let decodedImage = await cgImage?
-            .decoded(
-                for: size,
-                scale: scale,
-                interpolationQuality: interpolationQuality
-            )
+        guard let cgImage = cgImage else { return nil }
+        
+        let processor = CGImageProcessor()
+        let decodedImage = await processor.decoded(
+            image: cgImage,
+            for: size,
+            scale: scale,
+            interpolationQuality: interpolationQuality
+        )
 
         guard !Task.isCancelled else { return nil }
         return decodedImage
