@@ -35,14 +35,14 @@ struct ImageProcessorTests {
         let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
-        let frameInfo = processor.optimizeFrameSelection(
+        let result = processor.optimizeFrameSelection(
             for: Size(width: 100, height: 100),
             imageCount: 10,
             image: mockImage
         )
 
-        #expect(!frameInfo.displayIndices.isEmpty)
-        #expect(frameInfo.delayTime > 0)
+        #expect(!result.indices.isEmpty)
+        #expect(result.delayTime > 0)
     }
 
     @Test("個別画像作成")
