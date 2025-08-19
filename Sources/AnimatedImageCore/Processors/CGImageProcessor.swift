@@ -7,14 +7,9 @@ public actor CGImageProcessor: Sendable {
     public func decoded(
         image: CGImage,
         for size: Size,
-        usePreparingForDisplay: Bool = true,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let originalSize = Size(width: image.width, height: image.height)
-
-        if originalSize.isLessThanOrEqual(to: size) && usePreparingForDisplay {
-            return image
-        }
         return resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
 
