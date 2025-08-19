@@ -19,18 +19,18 @@ public struct FrameDecimator: Sendable {
 
     /// VSync候補フレームレート（1/秒）
     private static let vsyncIntervals: [Double] = [
-        1.0 / 1.0,  // 1 FPS
-        1.0 / 2.0,  // 2 FPS
-        1.0 / 3.0,  // 3 FPS
-        1.0 / 4.0,  // 4 FPS
-        1.0 / 5.0,  // 5 FPS
-        1.0 / 6.0,  // 6 FPS
-        1.0 / 10.0,  // 10 FPS
-        1.0 / 12.0,  // 12 FPS
-        1.0 / 15.0,  // 15 FPS
-        1.0 / 20.0,  // 20 FPS
-        1.0 / 30.0,  // 30 FPS
-        1.0 / 60.0,  // 60 FPS
+        1.000,  // 1 FPS
+        0.500,  // 2 FPS
+        0.333,  // 3 FPS
+        0.250,  // 4 FPS
+        0.200,  // 5 FPS
+        0.166,  // 6 FPS
+        0.100,  // 10 FPS
+        0.083,  // 12 FPS
+        0.066,  // 15 FPS
+        0.050,  // 20 FPS
+        0.033,  // 30 FPS
+        0.016,  // 60 FPS
     ]
 
     public init() {}
@@ -52,7 +52,7 @@ public struct FrameDecimator: Sendable {
 
         // デフォルト値を設定
         var resultDelayTime: Double = 0.1
-        var displayIndices: [Int] = Array(0..<delays.count)
+        var displayIndices: [Int] = Array(delays.indices)
 
         // 2フレーム未満は間引きしない
         if delays.count <= 2 {
@@ -142,7 +142,7 @@ public struct FrameDecimator: Sendable {
 
         return displayIndices
     }
-    
+
     /// 累積和を計算
     private func calculateRunningSum(_ values: [Double]) -> [Double] {
         var result: [Double] = []

@@ -2,99 +2,94 @@ import Foundation
 import QuartzCore
 import os
 
-/// アニメーション画像の処理パイプライン
-public struct ImageProcessor: Sendable {
+struct ImageProcessor: Sendable {
+    struct ProcessingResult: Sendable {
+        let indices: [Int]
+        let delayTime: Double
 
-    /// フレーム設定情報
-    public struct FrameConfiguration: Sendable {
-        public let optimizedSize: Size
-        public let indices: [Int]
-        public let delayTime: Double
-        public let scale: CGFloat
-        public let interpolationQuality: CGInterpolationQuality
-
-        public init(
-            optimizedSize: Size,
-            indices: [Int],
-            delayTime: Double,
-            scale: CGFloat,
-            interpolationQuality: CGInterpolationQuality
-        ) {
-            self.optimizedSize = optimizedSize
+        init(indices: [Int], delayTime: Double) {
             self.indices = indices
             self.delayTime = delayTime
-            self.scale = scale
-            self.interpolationQuality = interpolationQuality
-        }
-    }
-
-    /// 処理結果
-    public struct ProcessingResult: Sendable {
-        public let frameConfiguration: FrameConfiguration
-        public let generatedImages: [Int: CGImage]
-
-        public init(frameConfiguration: FrameConfiguration, generatedImages: [Int: CGImage]) {
-            self.frameConfiguration = frameConfiguration
-            self.generatedImages = generatedImages
         }
     }
 
     private let configuration: AnimatedImageProviderConfiguration
+    private let cache: Cache<Int, CGImage>
+    private let sizeOptimizer: SizeOptimizer
 
-    public init(configuration: AnimatedImageProviderConfiguration) {
+    init(configuration: AnimatedImageProviderConfiguration, cache: Cache<Int, CGImage>) {
         self.configuration = configuration
+        self.cache = cache
+        self.sizeOptimizer = SizeOptimizer()
     }
 
-    /// アニメーション画像を処理する
-    public func processAnimatedImage(
+    func processAnimatedImage(
         renderSize: Size,
         scale: CGFloat,
         image: any AnimatedImage
     ) async -> ProcessingResult? {
-        guard isValidRenderSize(renderSize) else { return nil }
-        guard !Task.isCancelled else { return nil }
-
         let imageCount = autoreleasepool { image.imageCount }
+        guard imageCount > 1 else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        let optimizedSize = optimizedSize(for: renderSize)
-        let frameConfiguration = frameConfiguration(
+        guard let firstImage = image.image(at: 0) else { return nil }
+        let optimizedSize = optimizedSize(
+            for: renderSize,
+            scale: scale,
+            imageSize: Size(width: firstImage.width, height: firstImage.height),
+            imageCount: imageCount
+        )
+        guard isValidRenderSize(optimizedSize) else { return nil }
+        guard !Task.isCancelled else { return nil }
+
+        let result = optimizeFrameSelection(
             for: optimizedSize,
             imageCount: imageCount,
-            scale: scale,
             image: image
         )
 
-        let generatedImages = await generateFrameImages(frameConfiguration, image: image)
+        await prewarmFrameImages(
+            indices: result.indices,
+            optimizedSize: optimizedSize,
+            interpolationQuality: configuration.interpolationQuality,
+            image: image
+        )
 
-        return ProcessingResult(
-            frameConfiguration: frameConfiguration,
-            generatedImages: generatedImages
+        return result
+    }
+
+    func isValidRenderSize(_ renderSize: Size) -> Bool {
+        sizeOptimizer.isValidRenderSize(renderSize)
+    }
+
+    func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1)
+        -> Size
+    {
+        sizeOptimizer.optimizedSize(
+            for: renderSize,
+            maxSize: configuration.maxSize,
+            scale: scale,
+            imageSize: imageSize,
+            imageCount: imageCount,
+            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value
         )
     }
 
-    /// レンダリングサイズの検証
-    public func isValidRenderSize(_ renderSize: Size) -> Bool {
-        !CGRect(origin: .zero, size: renderSize.cgSize).isEmpty
+    func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
+        sizeOptimizer.integrityLevel(
+            for: imageSize,
+            imageCount: imageCount,
+            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value,
+            maxLevelOfIntegrity: configuration.maxLevelOfIntegrity
+        )
     }
 
-    /// 最適化されたサイズを計算
-    public func optimizedSize(for renderSize: Size) -> Size {
-        min(configuration.maxSize, renderSize)
-    }
-
-    /// フレーム設定を計算
-    public func frameConfiguration(
+    func optimizeFrameSelection(
         for imageSize: Size,
         imageCount: Int,
-        scale: CGFloat,
         image: any AnimatedImage
-    ) -> FrameConfiguration {
-        let imageByteCount = Int(imageSize.width) * Int(imageSize.height) * 4
-        let memoryPressure =
-            Double(imageByteCount * imageCount)
-            / configuration.maxMemoryUsage.converted(to: .bytes).value
-        let levelOfIntegrity = min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
+    ) -> ProcessingResult {
+        let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount)
 
         let delayTimes = (0..<imageCount)
             .map { index in
@@ -107,68 +102,57 @@ public struct ImageProcessor: Sendable {
             levelOfIntegrity: levelOfIntegrity
         )
 
-        return FrameConfiguration(
-            optimizedSize: imageSize,
+        return ProcessingResult(
             indices: decimationResult.displayIndices,
-            delayTime: decimationResult.delayTime,
-            scale: scale,
-            interpolationQuality: configuration.interpolationQuality
+            delayTime: decimationResult.delayTime
         )
     }
 
-    /// フレーム画像を生成
-    public func generateFrameImages(
-        _ frameConfiguration: FrameConfiguration,
+    func prewarmFrameImages(
+        indices: [Int],
+        optimizedSize: Size,
+        interpolationQuality: CGInterpolationQuality,
         image: any AnimatedImage
-    ) async -> [Int: CGImage] {
-        var generatedImages: [Int: CGImage] = [:]
-
-        await withTaskGroup(of: (Int, CGImage?).self) { taskGroup in
-            for index in Set(frameConfiguration.indices) {
+    ) async {
+        await withTaskGroup { taskGroup in
+            for index in Set(indices) {
                 taskGroup.addTask {
                     let processedImage = await createAndCacheImage(
                         image: image,
-                        size: frameConfiguration.optimizedSize,
+                        size: optimizedSize,
                         index: index,
-                        scale: frameConfiguration.scale,
-                        interpolationQuality: frameConfiguration.interpolationQuality
+                        interpolationQuality: interpolationQuality
                     )
                     return (index, processedImage)
                 }
             }
 
-            for await (index, processedImage) in taskGroup {
-                if let processedImage {
-                    generatedImages[index] = processedImage
-                }
-            }
+            await taskGroup.waitForAll()
         }
-
-        return generatedImages
     }
 
-    /// 個別画像を作成
-    public func createAndCacheImage(
+    func createAndCacheImage(
         image: any AnimatedImage,
         size: Size,
         index: Int,
-        scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let cgImage = autoreleasepool { image.image(at: index) }
 
         guard !Task.isCancelled else { return nil }
         guard let cgImage = cgImage else { return nil }
-        
+
         let processor = CGImageProcessor()
         let decodedImage = await processor.decoded(
             image: cgImage,
             for: size,
-            scale: scale,
             interpolationQuality: interpolationQuality
         )
 
         guard !Task.isCancelled else { return nil }
+        if let decodedImage {
+            cache.insert(decodedImage, forKey: index)
+        }
         return decodedImage
     }
 }

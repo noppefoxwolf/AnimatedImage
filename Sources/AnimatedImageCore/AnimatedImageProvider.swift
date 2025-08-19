@@ -8,11 +8,7 @@ private let logger = Logger(
 
 @MainActor
 public final class AnimatedImageProvider: Sendable {
-    enum CacheKey: Hashable {
-        case index(Int)
-    }
-
-    private let cache: Cache<CacheKey, CGImage>
+    private let cache: Cache<Int, CGImage>
     private let configuration: AnimatedImageProviderConfiguration
     private let imageProcessor: ImageProcessor
     private let timingCalculator: AnimationTimingCalculator
@@ -20,7 +16,7 @@ public final class AnimatedImageProvider: Sendable {
     public init(name: String, configuration: AnimatedImageProviderConfiguration) {
         self.cache = Cache(name: name)
         self.configuration = configuration
-        self.imageProcessor = ImageProcessor(configuration: configuration)
+        self.imageProcessor = ImageProcessor(configuration: configuration, cache: cache)
         self.timingCalculator = AnimationTimingCalculator()
     }
 
@@ -60,24 +56,19 @@ public final class AnimatedImageProvider: Sendable {
         )
         guard let processingResult else { return }
 
-        await updateFrameIndices(processingResult.frameConfiguration)
-        await cacheGeneratedImages(processingResult.generatedImages)
+        await updateFrameState(
+            indices: processingResult.indices,
+            delayTime: processingResult.delayTime
+        )
     }
 
-    func updateFrameIndices(_ frameConfiguration: ImageProcessor.FrameConfiguration) {
-        self.indices = frameConfiguration.indices
-        self.delayTime = frameConfiguration.delayTime
-    }
-
-    nonisolated func cacheGeneratedImages(_ generatedImages: [Int: CGImage]) async {
-        for (index, image) in generatedImages {
-            guard !Task.isCancelled else { return }
-            cache.insert(image, forKey: .index(index))
-        }
+    func updateFrameState(indices: [Int], delayTime: Double) {
+        self.indices = indices
+        self.delayTime = delayTime
     }
 
     nonisolated func image(at index: Int) -> CGImage? {
-        cache.value(forKey: .index(index))
+        cache.value(forKey: index)
     }
 
     func index(for targetTimestamp: TimeInterval) -> Int? {

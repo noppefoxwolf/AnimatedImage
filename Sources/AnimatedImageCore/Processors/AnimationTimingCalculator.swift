@@ -1,9 +1,9 @@
 import Foundation
 
 /// アニメーションのタイミング計算を行うクラス
-public struct AnimationTimingCalculator: Sendable {
+struct AnimationTimingCalculator: Sendable {
 
-    public init() {}
+    init() {}
 
     /// 指定されたタイムスタンプに対応するフレームインデックスを計算
     /// - Parameters:
@@ -11,7 +11,7 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 対応するフレームインデックス（存在しない場合はnil）
-    public func frameIndex(
+    func frameIndex(
         for targetTimestamp: TimeInterval,
         indices: [Int],
         delayTime: Double
@@ -28,36 +28,5 @@ public struct AnimationTimingCalculator: Sendable {
         guard index >= 0 && index < indices.count else { return nil }
 
         return indices[index]
-    }
-
-    /// アニメーションの総継続時間を計算
-    /// - Parameters:
-    ///   - indices: 表示フレームのインデックス配列
-    ///   - delayTime: フレーム間の時間間隔
-    /// - Returns: 総継続時間（秒）
-    public func totalDuration(
-        indices: [Int],
-        delayTime: Double
-    ) -> TimeInterval {
-        guard !indices.isEmpty else { return 0 }
-        return delayTime * Double(indices.count)
-    }
-
-    /// 指定された時間でのアニメーション進行率を計算
-    /// - Parameters:
-    ///   - currentTime: 現在時刻
-    ///   - indices: 表示フレームのインデックス配列
-    ///   - delayTime: フレーム間の時間間隔
-    /// - Returns: 進行率（0.0〜1.0）
-    public func animationProgress(
-        at currentTime: TimeInterval,
-        indices: [Int],
-        delayTime: Double
-    ) -> Double {
-        let totalDuration = totalDuration(indices: indices, delayTime: delayTime)
-        guard totalDuration > 0 else { return 0 }
-
-        let normalizedTime = currentTime.truncatingRemainder(dividingBy: totalDuration)
-        return normalizedTime / totalDuration
     }
 }

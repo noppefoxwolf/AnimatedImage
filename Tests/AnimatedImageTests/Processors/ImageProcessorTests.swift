@@ -10,48 +10,52 @@ struct ImageProcessorTests {
     @Test("基本的な画像処理")
     func basicImageProcessing() async {
         let configuration = AnimatedImageProviderConfiguration.default
-        let processor = ImageProcessor(configuration: configuration)
+        let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
+        let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let renderSize = Size(width: 100, height: 100)
 
         #expect(processor.isValidRenderSize(renderSize))
         #expect(!processor.isValidRenderSize(.zero))
 
-        let optimizedSize = processor.optimizedSize(for: renderSize)
+        let optimizedSize = processor.optimizedSize(
+            for: renderSize,
+            scale: 1.0,
+            imageSize: Size(width: 200, height: 200),
+            imageCount: 1
+        )
         #expect(optimizedSize.width <= configuration.maxSize.width)
         #expect(optimizedSize.height <= configuration.maxSize.height)
     }
 
-    @Test("フレーム設定計算")
-    func frameConfigurationCalculation() {
+    @Test("フレーム選択最適化")
+    func frameSelectionOptimization() {
         let configuration = AnimatedImageProviderConfiguration.default
-        let processor = ImageProcessor(configuration: configuration)
+        let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
+        let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
-        let frameConfig = processor.frameConfiguration(
+        let result = processor.optimizeFrameSelection(
             for: Size(width: 100, height: 100),
             imageCount: 10,
-            scale: 1,
             image: mockImage
         )
 
-        #expect(!frameConfig.indices.isEmpty)
-        #expect(frameConfig.delayTime > 0)
-        #expect(frameConfig.optimizedSize.width == 100)
-        #expect(frameConfig.optimizedSize.height == 100)
+        #expect(!result.indices.isEmpty)
+        #expect(result.delayTime > 0)
     }
 
     @Test("個別画像作成")
     func individualImageCreation() async {
         let configuration = AnimatedImageProviderConfiguration.default
-        let processor = ImageProcessor(configuration: configuration)
+        let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
+        let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 5, delayTime: 0.1)
         let image = await processor.createAndCacheImage(
             image: mockImage,
             size: Size(width: 50, height: 50),
             index: 0,
-            scale: 1,
             interpolationQuality: .default
         )
 
