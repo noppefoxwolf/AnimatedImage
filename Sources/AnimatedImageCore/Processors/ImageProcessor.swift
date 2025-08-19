@@ -72,7 +72,7 @@ public struct ImageProcessor: Sendable {
             interpolationQuality: configuration.interpolationQuality
         )
 
-        let generatedImages = await generateFrameImages(frameConfiguration, image: image)
+        let generatedImages = await prewarmFrameImages(frameConfiguration, image: image)
 
         return ProcessingResult(
             frameConfiguration: frameConfiguration,
@@ -125,7 +125,7 @@ public struct ImageProcessor: Sendable {
         return (displayIndices: decimationResult.displayIndices, delayTime: decimationResult.delayTime)
     }
 
-    public func generateFrameImages(
+    public func prewarmFrameImages(
         _ frameConfiguration: FrameConfiguration,
         image: any AnimatedImage
     ) async -> [Int: CGImage] {
