@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 import Testing
 
-@testable import AnimatedImage
+@testable import AnimatedImageCore
 
 @Suite("CGImageProcessor テスト")
 struct CGImageProcessorTests {
