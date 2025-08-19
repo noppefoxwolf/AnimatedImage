@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 import simd
 
 /// SIMD2<Int>をラップしたサイズ構造体

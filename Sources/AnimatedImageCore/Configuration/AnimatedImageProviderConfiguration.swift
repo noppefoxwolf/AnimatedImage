@@ -1,6 +1,6 @@
 import CoreGraphics
 import Foundation
-import QuartzCore
+public import QuartzCore
 
 /// アニメーション画像プロバイダーの設定を管理する構造体
 /// メモリ使用量、画像サイズ、品質設定などを制御します

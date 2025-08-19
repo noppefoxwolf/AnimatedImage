@@ -1,5 +1,5 @@
-import UIKit
-import UpdateLink
+public import UIKit
+public import UpdateLink
 
 public final class BackportUpdateLink: UpdateLink, DisplayLinkTarget {
     private var displayLink: CADisplayLink!

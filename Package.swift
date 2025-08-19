@@ -67,7 +67,6 @@ let package = Package(
     ]
 )
 
-/*
 let warnConcurrency = "-warn-concurrency"
 let enableActorDataRaceChecks = "-enable-actor-data-race-checks"
 let swiftSettings: [SwiftSetting] = [
@@ -95,4 +94,4 @@ package.targets.forEach { target in
     target.swiftSettings = target.swiftSettings ?? []
     target.swiftSettings?.append(contentsOf: swiftSettings)
 }
-*/
+

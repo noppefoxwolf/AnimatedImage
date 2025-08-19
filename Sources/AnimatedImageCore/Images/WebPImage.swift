@@ -1,4 +1,4 @@
-import CoreGraphics
+public import CoreGraphics
 public import Foundation
 import ImageIO
 
