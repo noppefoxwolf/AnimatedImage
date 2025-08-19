@@ -38,7 +38,7 @@ extension Size {
 
 // MARK: - 比較演算
 extension Size {
-    public func isLessThanOrEqualTo(_ size: Size) -> Bool {
+    public func isLessThanOrEqual(to size: Size) -> Bool {
         width <= size.width && height <= size.height
     }
     

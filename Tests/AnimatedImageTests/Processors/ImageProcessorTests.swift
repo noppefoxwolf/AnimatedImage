@@ -17,7 +17,7 @@ struct ImageProcessorTests {
         #expect(processor.isValidRenderSize(renderSize))
         #expect(!processor.isValidRenderSize(.zero))
 
-        let optimizedSize = processor.calculateOptimizedSize(renderSize: renderSize)
+        let optimizedSize = processor.optimizedSize(for: renderSize)
         #expect(optimizedSize.width <= configuration.maxSize.width)
         #expect(optimizedSize.height <= configuration.maxSize.height)
     }
@@ -28,8 +28,8 @@ struct ImageProcessorTests {
         let processor = ImageProcessor(configuration: configuration)
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
-        let frameConfig = processor.calculateFrameConfiguration(
-            imageSize: Size(width: 100, height: 100),
+        let frameConfig = processor.frameConfiguration(
+            for: Size(width: 100, height: 100),
             imageCount: 10,
             scale: 1,
             image: mockImage

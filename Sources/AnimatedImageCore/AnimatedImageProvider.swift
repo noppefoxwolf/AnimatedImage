@@ -81,7 +81,7 @@ public final class AnimatedImageProvider: Sendable {
     }
 
     func index(for targetTimestamp: TimeInterval) -> Int? {
-        timingCalculator.calculateFrameIndex(
+        timingCalculator.frameIndex(
             for: targetTimestamp,
             indices: indices,
             delayTime: delayTime
