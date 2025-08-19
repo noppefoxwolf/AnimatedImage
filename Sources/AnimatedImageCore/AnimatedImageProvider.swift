@@ -56,7 +56,10 @@ public final class AnimatedImageProvider: Sendable {
         )
         guard let processingResult else { return }
 
-        await updateFrameState(indices: processingResult.indices, delayTime: processingResult.delayTime)
+        await updateFrameState(
+            indices: processingResult.indices,
+            delayTime: processingResult.delayTime
+        )
     }
 
     func updateFrameState(indices: [Int], delayTime: Double) {

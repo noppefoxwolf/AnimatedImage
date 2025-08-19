@@ -54,7 +54,7 @@ struct ImageProcessor: Sendable {
             interpolationQuality: configuration.interpolationQuality,
             image: image
         )
-        
+
         return result
     }
 
@@ -101,9 +101,10 @@ struct ImageProcessor: Sendable {
             delays: delayTimes,
             levelOfIntegrity: levelOfIntegrity
         )
-        
+
         return ProcessingResult(
-            indices: decimationResult.displayIndices, delayTime: decimationResult.delayTime
+            indices: decimationResult.displayIndices,
+            delayTime: decimationResult.delayTime
         )
     }
 
