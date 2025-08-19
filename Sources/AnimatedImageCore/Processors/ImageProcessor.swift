@@ -75,7 +75,7 @@ public struct ImageProcessor: Sendable {
 
     /// レンダリングサイズの検証
     public func isValidRenderSize(_ renderSize: Size) -> Bool {
-        !CGRect(origin: .zero, size: renderSize.cgSize).isEmpty
+        !renderSize.isEmpty
     }
 
     /// 最適化されたサイズを計算

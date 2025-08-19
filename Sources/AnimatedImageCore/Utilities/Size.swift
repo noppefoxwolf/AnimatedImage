@@ -45,6 +45,10 @@ extension Size {
     public var area: Int {
         width * height
     }
+    
+    public var isEmpty: Bool {
+        width == 0 || height == 0
+    }
 }
 
 // MARK: - Core Graphics変換
