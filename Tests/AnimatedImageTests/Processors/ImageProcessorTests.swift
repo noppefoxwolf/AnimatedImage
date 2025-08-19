@@ -10,7 +10,8 @@ struct ImageProcessorTests {
     @Test("基本的な画像処理")
     func basicImageProcessing() async {
         let configuration = AnimatedImageProviderConfiguration.default
-        let processor = ImageProcessor(configuration: configuration)
+        let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
+        let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let renderSize = Size(width: 100, height: 100)
 
@@ -30,7 +31,8 @@ struct ImageProcessorTests {
     @Test("フレーム選択最適化")
     func frameSelectionOptimization() {
         let configuration = AnimatedImageProviderConfiguration.default
-        let processor = ImageProcessor(configuration: configuration)
+        let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
+        let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
         let frameInfo = processor.optimizeFrameSelection(
@@ -46,7 +48,8 @@ struct ImageProcessorTests {
     @Test("個別画像作成")
     func individualImageCreation() async {
         let configuration = AnimatedImageProviderConfiguration.default
-        let processor = ImageProcessor(configuration: configuration)
+        let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
+        let processor = ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 5, delayTime: 0.1)
         let image = await processor.createAndCacheImage(

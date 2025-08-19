@@ -2,14 +2,14 @@ import Foundation
 import QuartzCore
 import os
 
-public struct ImageProcessor: Sendable {
-    public struct FrameConfiguration: Sendable {
-        public let optimizedSize: Size
-        public let indices: [Int]
-        public let delayTime: Double
-        public let interpolationQuality: CGInterpolationQuality
+struct ImageProcessor: Sendable {
+    struct FrameConfiguration: Sendable {
+        let optimizedSize: Size
+        let indices: [Int]
+        let delayTime: Double
+        let interpolationQuality: CGInterpolationQuality
 
-        public init(
+        init(
             optimizedSize: Size,
             indices: [Int],
             delayTime: Double,
@@ -22,25 +22,27 @@ public struct ImageProcessor: Sendable {
         }
     }
 
-    public struct ProcessingResult: Sendable {
-        public let frameConfiguration: FrameConfiguration
-        public let generatedImages: [Int: CGImage]
+    struct ProcessingResult: Sendable {
+        let frameConfiguration: FrameConfiguration
+        let generatedImages: [Int: CGImage]
 
-        public init(frameConfiguration: FrameConfiguration, generatedImages: [Int: CGImage]) {
+        init(frameConfiguration: FrameConfiguration, generatedImages: [Int: CGImage]) {
             self.frameConfiguration = frameConfiguration
             self.generatedImages = generatedImages
         }
     }
 
     private let configuration: AnimatedImageProviderConfiguration
+    private let cache: Cache<Int, CGImage>
     private let sizeOptimizer: SizeOptimizer
 
-    public init(configuration: AnimatedImageProviderConfiguration) {
+    init(configuration: AnimatedImageProviderConfiguration, cache: Cache<Int, CGImage>) {
         self.configuration = configuration
+        self.cache = cache
         self.sizeOptimizer = SizeOptimizer()
     }
 
-    public func processAnimatedImage(
+    func processAnimatedImage(
         renderSize: Size,
         scale: CGFloat,
         image: any AnimatedImage
@@ -80,11 +82,11 @@ public struct ImageProcessor: Sendable {
         )
     }
 
-    public func isValidRenderSize(_ renderSize: Size) -> Bool {
+    func isValidRenderSize(_ renderSize: Size) -> Bool {
         sizeOptimizer.isValidRenderSize(renderSize)
     }
 
-    public func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1) -> Size {
+    func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1) -> Size {
         sizeOptimizer.optimizedSize(
             for: renderSize,
             maxSize: configuration.maxSize,
@@ -95,7 +97,7 @@ public struct ImageProcessor: Sendable {
         )
     }
     
-    public func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
+    func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
         sizeOptimizer.integrityLevel(
             for: imageSize,
             imageCount: imageCount,
@@ -104,7 +106,7 @@ public struct ImageProcessor: Sendable {
         )
     }
 
-    public func optimizeFrameSelection(
+    func optimizeFrameSelection(
         for imageSize: Size,
         imageCount: Int,
         image: any AnimatedImage
@@ -125,7 +127,7 @@ public struct ImageProcessor: Sendable {
         return (displayIndices: decimationResult.displayIndices, delayTime: decimationResult.delayTime)
     }
 
-    public func prewarmFrameImages(
+    func prewarmFrameImages(
         _ frameConfiguration: FrameConfiguration,
         image: any AnimatedImage
     ) async -> [Int: CGImage] {
@@ -154,7 +156,7 @@ public struct ImageProcessor: Sendable {
         return generatedImages
     }
 
-    public func createAndCacheImage(
+    func createAndCacheImage(
         image: any AnimatedImage,
         size: Size,
         index: Int,
@@ -173,6 +175,9 @@ public struct ImageProcessor: Sendable {
         )
 
         guard !Task.isCancelled else { return nil }
+        if let decodedImage {
+            cache.insert(decodedImage, forKey: index)
+        }
         return decodedImage
     }
 }
