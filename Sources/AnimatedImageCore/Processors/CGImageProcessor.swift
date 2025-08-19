@@ -12,30 +12,15 @@ public actor CGImageProcessor: Sendable {
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let originalSize = Size(width: image.width, height: image.height)
-        let constrainedSize = Size(
-            width: min(size.width, originalSize.width),
-            height: min(size.height, originalSize.height)
-        )
         
-        let newSize = aspectFitSize(
-            of: originalSize,
-            in: constrainedSize
-        )
-        .applying(CGAffineTransform(scaleX: scale, y: scale))
-        
-        if originalSize.isLessThanOrEqual(to: newSize) && usePreparingForDisplay {
+        // optimizedSizeで既にサイズ計算が完了しているため、簡単なチェックのみ
+        if originalSize.isLessThanOrEqual(to: size) && usePreparingForDisplay {
             return image
         }
-        return resize(image: image, newSize: newSize, interpolationQuality: interpolationQuality)
+        return resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
     
-    func aspectFitSize(of currentSize: Size, in maxSize: Size) -> Size {
-        let aspectWidth = CGFloat(maxSize.width) / CGFloat(currentSize.width)
-        let aspectHeight = CGFloat(maxSize.height) / CGFloat(currentSize.height)
-        let scalingFactor = min(aspectWidth, aspectHeight)
-        let transform = CGAffineTransform(scaleX: scalingFactor, y: scalingFactor)
-        return currentSize.applying(transform)
-    }
+    // この関数はImageProcessor.aspectFitSize()に移動されたため削除
     
     func resize(
         image: CGImage,

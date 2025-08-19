@@ -17,7 +17,12 @@ struct ImageProcessorTests {
         #expect(processor.isValidRenderSize(renderSize))
         #expect(!processor.isValidRenderSize(.zero))
 
-        let optimizedSize = processor.optimizedSize(for: renderSize)
+        let optimizedSize = processor.optimizedSize(
+            for: renderSize,
+            scale: 1.0,
+            imageSize: Size(width: 200, height: 200),
+            imageCount: 1
+        )
         #expect(optimizedSize.width <= configuration.maxSize.width)
         #expect(optimizedSize.height <= configuration.maxSize.height)
     }

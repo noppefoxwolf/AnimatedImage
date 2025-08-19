@@ -51,13 +51,20 @@ public struct ImageProcessor: Sendable {
         scale: CGFloat,
         image: any AnimatedImage
     ) async -> ProcessingResult? {
-        guard isValidRenderSize(renderSize) else { return nil }
-        guard !Task.isCancelled else { return nil }
-
         let imageCount = autoreleasepool { image.imageCount }
+        guard imageCount > 1 else { return nil }
+        guard !Task.isCancelled else { return nil }
+        
+        guard let firstImage = image.image(at: 0) else { return nil }
+        let optimizedSize = optimizedSize(
+            for: renderSize,
+            scale: scale,
+            imageSize: Size(width: firstImage.width, height: firstImage.height),
+            imageCount: imageCount
+        )
+        guard isValidRenderSize(optimizedSize) else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        let optimizedSize = optimizedSize(for: renderSize)
         let frameConfiguration = frameConfiguration(
             for: optimizedSize,
             imageCount: imageCount,
@@ -79,8 +86,60 @@ public struct ImageProcessor: Sendable {
     }
 
     /// 最適化されたサイズを計算
-    public func optimizedSize(for renderSize: Size) -> Size {
-        min(configuration.maxSize, renderSize)
+    /// アスペクト比、メモリ制約、スケールを考慮した包括的なサイズ最適化
+    public func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1) -> Size {
+        // 設定された最大サイズとレンダリングサイズの制約を適用
+        let maxSize = min(configuration.maxSize, renderSize)
+        
+        // 元画像サイズを超えないよう制約
+        let constrainedSize = Size(
+            width: min(maxSize.width, imageSize.width),
+            height: min(maxSize.height, imageSize.height)
+        )
+        
+        // アスペクト比を維持した最適サイズを計算
+        let aspectOptimizedSize = aspectFitSize(of: imageSize, in: constrainedSize)
+        
+        // スケールを適用
+        let scaledSize = aspectOptimizedSize.applying(
+            CGAffineTransform(scaleX: scale, y: scale)
+        )
+        
+        // メモリ制約を考慮したサイズ調整
+        let memoryAdjustedSize = adjustSizeForMemoryConstraints(scaledSize, imageCount: imageCount)
+        
+        return memoryAdjustedSize
+    }
+    
+    /// アスペクト比を維持したサイズ計算
+    private func aspectFitSize(of currentSize: Size, in maxSize: Size) -> Size {
+        let aspectWidth = CGFloat(maxSize.width) / CGFloat(currentSize.width)
+        let aspectHeight = CGFloat(maxSize.height) / CGFloat(currentSize.height)
+        let scalingFactor = min(aspectWidth, aspectHeight)
+        let transform = CGAffineTransform(scaleX: scalingFactor, y: scalingFactor)
+        return currentSize.applying(transform)
+    }
+    
+    /// メモリ制約を考慮したサイズ調整
+    /// メモリ使用量が制限を超える場合、サイズを縮小して調整します
+    private func adjustSizeForMemoryConstraints(
+        _ size: Size, 
+        imageCount: Int, 
+        targetMemoryRatio: Double = 0.8
+    ) -> Size {
+        let imageByteCount = size.width * size.height * 4
+        let totalMemoryUsage = Double(imageByteCount * imageCount)
+        let maxMemoryUsage = configuration.maxMemoryUsage.converted(to: .bytes).value
+        let targetMemoryUsage = maxMemoryUsage * targetMemoryRatio
+        
+        if totalMemoryUsage <= targetMemoryUsage {
+            return size
+        }
+        
+        // メモリ制限を超える場合、サイズを縮小
+        let reductionFactor = sqrt(targetMemoryUsage / totalMemoryUsage)
+        let transform = CGAffineTransform(scaleX: reductionFactor, y: reductionFactor)
+        return size.applying(transform)
     }
 
     /// 品質レベルを計算
@@ -91,16 +150,13 @@ public struct ImageProcessor: Sendable {
     /// - メモリ圧迫度が2.0（設定値の2倍）→ 0.5（半分のフレームを間引き）
     /// 
     /// - Parameters:
-    ///   - imageSize: 画像サイズ
+    ///   - imageSize: 画像サイズ（optimizedSizeで既に調整済み）
     ///   - imageCount: フレーム数
-    ///   - scale: 画像スケール
+    ///   - scale: 画像スケール（既に適用済み）
     /// - Returns: 品質レベル（0.0〜1.0）
-    public func integrityLevel(for imageSize: Size, imageCount: Int, scale: CGFloat) -> Double {
-        let scaledSize = Size(
-            width: Int(Double(imageSize.width) * scale),
-            height: Int(Double(imageSize.height) * scale)
-        )
-        let imageByteCount = scaledSize.width * scaledSize.height * 4
+    public func integrityLevel(for imageSize: Size, imageCount: Int, scale: CGFloat = 1.0) -> Double {
+        // optimizedSizeで既にスケールが適用済みのため、再度適用しない
+        let imageByteCount = imageSize.width * imageSize.height * 4
         let maxMemoryUsage = configuration.maxMemoryUsage.converted(to: .bytes).value
         let memoryPressure = Double(imageByteCount * imageCount) / maxMemoryUsage
         return min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
@@ -113,7 +169,7 @@ public struct ImageProcessor: Sendable {
         scale: CGFloat,
         image: any AnimatedImage
     ) -> FrameConfiguration {
-        let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount, scale: scale)
+        let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount)
 
         let delayTimes = (0..<imageCount)
             .map { index in
