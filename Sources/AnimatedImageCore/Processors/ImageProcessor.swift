@@ -84,11 +84,20 @@ public struct ImageProcessor: Sendable {
     }
 
     /// 品質レベルを計算
+    /// 
+    /// メモリ使用量に基づいて品質レベルを決定します：
+    /// - メモリ圧迫度が低い（設定値の半分以下）→ 上限値で制限
+    /// - メモリ圧迫度が1.0（設定値と同じ）→ 1.0（全フレーム表示）
+    /// - メモリ圧迫度が2.0（設定値の2倍）→ 0.5（半分のフレームを間引き）
+    /// 
+    /// - Parameters:
+    ///   - imageSize: 画像サイズ
+    ///   - imageCount: フレーム数
+    /// - Returns: 品質レベル（0.0〜1.0）
     public func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
         let imageByteCount = imageSize.width * imageSize.height * 4
-        let memoryPressure =
-            Double(imageByteCount * imageCount)
-            / configuration.maxMemoryUsage.converted(to: .bytes).value
+        let maxMemoryUsage = configuration.maxMemoryUsage.converted(to: .bytes).value
+        let memoryPressure = Double(imageByteCount * imageCount) / maxMemoryUsage
         return min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
     }
 
