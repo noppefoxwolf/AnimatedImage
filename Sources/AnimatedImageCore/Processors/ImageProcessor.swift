@@ -90,7 +90,7 @@ public struct ImageProcessor: Sendable {
         scale: CGFloat,
         image: any AnimatedImage
     ) -> FrameConfiguration {
-        let imageByteCount = Int(imageSize.width) * Int(imageSize.height) * 4
+        let imageByteCount = imageSize.width * imageSize.height * 4
         let memoryPressure =
             Double(imageByteCount * imageCount)
             / configuration.maxMemoryUsage.converted(to: .bytes).value
