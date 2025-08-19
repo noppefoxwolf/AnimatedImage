@@ -14,7 +14,6 @@ struct SwiftUIDemoView: View {
                 }
             )
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
-        print(self.items.count)
     }
 
     let animatedImageConfiguration: AnimatedImageProviderConfiguration = .performance
