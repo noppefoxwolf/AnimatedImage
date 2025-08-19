@@ -46,38 +46,7 @@ struct AnimationTimingCalculatorTests {
 
         #expect(duration == 0.5)  // 5フレーム × 0.1秒
     }
-
-    @Test("アニメーション進行率計算")
-    func animationProgressCalculation() {
-        let calculator = AnimationTimingCalculator()
-        let indices = [0, 1, 2, 3]
-        let delayTime = 0.25
-
-        // 開始時点
-        let startProgress = calculator.animationProgress(
-            at: 0.0,
-            indices: indices,
-            delayTime: delayTime
-        )
-        #expect(startProgress == 0.0)
-
-        // 中間時点
-        let middleProgress = calculator.animationProgress(
-            at: 0.5,
-            indices: indices,
-            delayTime: delayTime
-        )
-        #expect(middleProgress == 0.5)
-
-        // 終了時点
-        let endProgress = calculator.animationProgress(
-            at: 1.0,
-            indices: indices,
-            delayTime: delayTime
-        )
-        #expect(endProgress == 0.0)  // 1周期完了して再開
-    }
-
+    
     @Test("エッジケース処理")
     func edgeCaseHandling() {
         let calculator = AnimationTimingCalculator()

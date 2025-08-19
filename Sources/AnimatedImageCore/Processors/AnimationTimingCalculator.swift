@@ -42,22 +42,4 @@ struct AnimationTimingCalculator: Sendable {
         guard !indices.isEmpty else { return 0 }
         return delayTime * Double(indices.count)
     }
-
-    /// 指定された時間でのアニメーション進行率を計算
-    /// - Parameters:
-    ///   - currentTime: 現在時刻
-    ///   - indices: 表示フレームのインデックス配列
-    ///   - delayTime: フレーム間の時間間隔
-    /// - Returns: 進行率（0.0〜1.0）
-    func animationProgress(
-        at currentTime: TimeInterval,
-        indices: [Int],
-        delayTime: Double
-    ) -> Double {
-        let totalDuration = totalDuration(indices: indices, delayTime: delayTime)
-        guard totalDuration > 0 else { return 0 }
-
-        let normalizedTime = currentTime.truncatingRemainder(dividingBy: totalDuration)
-        return normalizedTime / totalDuration
-    }
 }
