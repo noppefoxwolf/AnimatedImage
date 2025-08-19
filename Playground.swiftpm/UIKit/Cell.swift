@@ -1,14 +1,16 @@
 import AnimatedImage
 import UIKit
 
-final class Cell: UITableViewCell {
+final class CollectionViewCell: UICollectionViewCell {
 
     let animatedImageView = AnimatedImageView(frame: .null)
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        animatedImageView.configuration = .performance
         animatedImageView.contentMode = .scaleAspectFit
         animatedImageView.translatesAutoresizingMaskIntoConstraints = false
+        animatedImageView.backgroundColor = .systemGray4
         contentView.addSubview(animatedImageView)
         NSLayoutConstraint.activate([
             animatedImageView.topAnchor.constraint(
