@@ -1,9 +1,9 @@
 import Foundation
 
 /// アニメーションのタイミング計算を行うクラス
-public struct AnimationTimingCalculator: Sendable {
+struct AnimationTimingCalculator: Sendable {
 
-    public init() {}
+    init() {}
 
     /// 指定されたタイムスタンプに対応するフレームインデックスを計算
     /// - Parameters:
@@ -11,7 +11,7 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 対応するフレームインデックス（存在しない場合はnil）
-    public func frameIndex(
+    func frameIndex(
         for targetTimestamp: TimeInterval,
         indices: [Int],
         delayTime: Double
@@ -35,7 +35,7 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 総継続時間（秒）
-    public func totalDuration(
+    func totalDuration(
         indices: [Int],
         delayTime: Double
     ) -> TimeInterval {
@@ -49,7 +49,7 @@ public struct AnimationTimingCalculator: Sendable {
     ///   - indices: 表示フレームのインデックス配列
     ///   - delayTime: フレーム間の時間間隔
     /// - Returns: 進行率（0.0〜1.0）
-    public func animationProgress(
+    func animationProgress(
         at currentTime: TimeInterval,
         indices: [Int],
         delayTime: Double
