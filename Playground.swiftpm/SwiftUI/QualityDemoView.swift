@@ -37,7 +37,7 @@ struct QualityDemoView: View {
     var width: Double = 100
     
     @State
-    var maxWidth: Double = 32
+    var maxWidth: Double = 128
     
     @State
     var selectedFormat: ImageFormat = .apng
@@ -78,7 +78,7 @@ struct QualityDemoView: View {
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
-                            Slider(value: $maxWidth, in: 1...32)
+                            Slider(value: $maxWidth, in: 1...128)
                                 .onChange(of: maxWidth) { oldValue, newValue in
                                     configuration.maxSize = Size(width: Int(newValue), height: configuration.maxSize.height)
                                 }
