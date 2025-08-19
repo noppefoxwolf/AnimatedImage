@@ -10,11 +10,11 @@ struct CGImageProcessorTests {
     let processor = CGImageProcessor()
     
     @Test("アスペクト比フィット計算")
-    func aspectFitSizeCalculation() {
+    func aspectFitSizeCalculation() async {
         // 元サイズより小さくフィット
         let currentSize = CGSize(width: 200, height: 100)
         let maxSize = CGSize(width: 100, height: 100)
-        let fitSize = processor.aspectFitSize(for: currentSize, maxSize: maxSize)
+        let fitSize = await processor.aspectFitSize(for: currentSize, maxSize: maxSize)
         
         #expect(fitSize.width == 100)
         #expect(fitSize.height == 50)
@@ -22,18 +22,18 @@ struct CGImageProcessorTests {
         // 正方形の画像を長方形にフィット
         let squareSize = CGSize(width: 100, height: 100)
         let rectMaxSize = CGSize(width: 200, height: 100)
-        let squareFitSize = processor.aspectFitSize(for: squareSize, maxSize: rectMaxSize)
+        let squareFitSize = await processor.aspectFitSize(for: squareSize, maxSize: rectMaxSize)
         
         #expect(squareFitSize.width == 100)
         #expect(squareFitSize.height == 100)
     }
     
     @Test("画像リサイズ")
-    func imageResize() {
+    func imageResize() async {
         let originalImage = createTestImage(width: 100, height: 100)
         let newSize = CGSize(width: 50, height: 50)
         
-        let resizedImage = processor.resize(
+        let resizedImage = await processor.resize(
             image: originalImage,
             newSize: newSize,
             interpolationQuality: .default
@@ -45,11 +45,11 @@ struct CGImageProcessorTests {
     }
     
     @Test("無効なサイズでのリサイズ")
-    func resizeWithInvalidSize() {
+    func resizeWithInvalidSize() async {
         let originalImage = createTestImage(width: 100, height: 100)
         
         // ゼロサイズでのリサイズ
-        let zeroSizeResult = processor.resize(
+        let zeroSizeResult = await processor.resize(
             image: originalImage,
             newSize: .zero,
             interpolationQuality: .default
@@ -57,7 +57,7 @@ struct CGImageProcessorTests {
         #expect(zeroSizeResult == nil)
         
         // 負のサイズでのリサイズ
-        let negativeSizeResult = processor.resize(
+        let negativeSizeResult = await processor.resize(
             image: originalImage,
             newSize: CGSize(width: -10, height: 50),
             interpolationQuality: .default
