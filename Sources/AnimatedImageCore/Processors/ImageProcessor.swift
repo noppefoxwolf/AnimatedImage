@@ -10,20 +10,17 @@ public struct ImageProcessor: Sendable {
         public let optimizedSize: Size
         public let indices: [Int]
         public let delayTime: Double
-        public let scale: CGFloat
         public let interpolationQuality: CGInterpolationQuality
 
         public init(
             optimizedSize: Size,
             indices: [Int],
             delayTime: Double,
-            scale: CGFloat,
             interpolationQuality: CGInterpolationQuality
         ) {
             self.optimizedSize = optimizedSize
             self.indices = indices
             self.delayTime = delayTime
-            self.scale = scale
             self.interpolationQuality = interpolationQuality
         }
     }
@@ -68,7 +65,6 @@ public struct ImageProcessor: Sendable {
         let frameConfiguration = frameConfiguration(
             for: optimizedSize,
             imageCount: imageCount,
-            scale: scale,
             image: image
         )
 
@@ -166,7 +162,6 @@ public struct ImageProcessor: Sendable {
     public func frameConfiguration(
         for imageSize: Size,
         imageCount: Int,
-        scale: CGFloat,
         image: any AnimatedImage
     ) -> FrameConfiguration {
         let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount)
@@ -186,7 +181,6 @@ public struct ImageProcessor: Sendable {
             optimizedSize: imageSize,
             indices: decimationResult.displayIndices,
             delayTime: decimationResult.delayTime,
-            scale: scale,
             interpolationQuality: configuration.interpolationQuality
         )
     }
@@ -205,7 +199,6 @@ public struct ImageProcessor: Sendable {
                         image: image,
                         size: frameConfiguration.optimizedSize,
                         index: index,
-                        scale: frameConfiguration.scale,
                         interpolationQuality: frameConfiguration.interpolationQuality
                     )
                     return (index, processedImage)
@@ -227,7 +220,6 @@ public struct ImageProcessor: Sendable {
         image: any AnimatedImage,
         size: Size,
         index: Int,
-        scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let cgImage = autoreleasepool { image.image(at: index) }
@@ -239,7 +231,6 @@ public struct ImageProcessor: Sendable {
         let decodedImage = await processor.decoded(
             image: cgImage,
             for: size,
-            scale: scale,
             interpolationQuality: interpolationQuality
         )
 

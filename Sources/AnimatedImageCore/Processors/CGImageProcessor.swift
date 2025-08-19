@@ -8,7 +8,6 @@ public actor CGImageProcessor: Sendable {
         image: CGImage,
         for size: Size,
         usePreparingForDisplay: Bool = true,
-        scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let originalSize = Size(width: image.width, height: image.height)

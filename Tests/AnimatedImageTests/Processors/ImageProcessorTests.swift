@@ -36,7 +36,6 @@ struct ImageProcessorTests {
         let frameConfig = processor.frameConfiguration(
             for: Size(width: 100, height: 100),
             imageCount: 10,
-            scale: 1,
             image: mockImage
         )
 
@@ -56,7 +55,6 @@ struct ImageProcessorTests {
             image: mockImage,
             size: Size(width: 50, height: 50),
             index: 0,
-            scale: 1,
             interpolationQuality: .default
         )
 
