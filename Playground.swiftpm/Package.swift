@@ -10,7 +10,7 @@ import AppleProductTypes
 let package = Package(
     name: "AnimatedImage Playground",
     platforms: [
-        .iOS("16.0")
+        .iOS("17.0")
     ],
     products: [
         .iOSApplication(

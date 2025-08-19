@@ -6,13 +6,13 @@ public actor CGImageProcessor: Sendable {
     
     public func decoded(
         image: CGImage,
-        for size: CGSize,
+        for size: Size,
         usePreparingForDisplay: Bool = true,
         scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
         let originalSize = image.size
-        let constrainedSize = CGSize(
+        let constrainedSize = Size(
             width: min(size.width, originalSize.width),
             height: min(size.height, originalSize.height)
         )
@@ -29,9 +29,9 @@ public actor CGImageProcessor: Sendable {
         return resize(image: image, newSize: newSize, interpolationQuality: interpolationQuality)
     }
     
-    func aspectFitSize(for currentSize: CGSize, maxSize: CGSize) -> CGSize {
-        let aspectWidth = maxSize.width / currentSize.width
-        let aspectHeight = maxSize.height / currentSize.height
+    func aspectFitSize(for currentSize: Size, maxSize: Size) -> Size {
+        let aspectWidth = CGFloat(maxSize.width) / CGFloat(currentSize.width)
+        let aspectHeight = CGFloat(maxSize.height) / CGFloat(currentSize.height)
         let scalingFactor = min(aspectWidth, aspectHeight)
         let transform = CGAffineTransform(scaleX: scalingFactor, y: scalingFactor)
         return currentSize.applying(transform)
@@ -39,11 +39,11 @@ public actor CGImageProcessor: Sendable {
     
     func resize(
         image: CGImage,
-        newSize: CGSize,
+        newSize: Size,
         interpolationQuality: CGInterpolationQuality
     ) -> CGImage? {
-        let width = Int(newSize.width)
-        let height = Int(newSize.height)
+        let width = newSize.width
+        let height = newSize.height
 
         guard width > 0 && height > 0 else { return nil }
 
@@ -64,7 +64,7 @@ public actor CGImageProcessor: Sendable {
         else { return nil }
 
         context.interpolationQuality = interpolationQuality
-        context.draw(image, in: CGRect(origin: .zero, size: newSize))
+        context.draw(image, in: CGRect(origin: .zero, size: newSize.cgSize))
 
         return context.makeImage()
     }

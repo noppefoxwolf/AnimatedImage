@@ -37,6 +37,9 @@ struct QualityDemoView: View {
     var width: Double = 100
     
     @State
+    var maxWidth: Double = 32
+    
+    @State
     var selectedFormat: ImageFormat = .apng
 
     var body: some View {
@@ -71,11 +74,14 @@ struct QualityDemoView: View {
                                 Text("Max Width")
                                     .font(.headline)
                                 Spacer()
-                                Text("\(Int(configuration.maxSize.width))pt")
+                                Text("\(Int(maxWidth))pt")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
-                            Slider(value: $configuration.maxSize.width, in: 1...32)
+                            Slider(value: $maxWidth, in: 1...32)
+                                .onChange(of: maxWidth) { oldValue, newValue in
+                                    configuration.maxSize = Size(width: Int(newValue), height: configuration.maxSize.height)
+                                }
                         }
                     }
 
@@ -134,6 +140,9 @@ struct QualityDemoView: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            maxWidth = Double(configuration.maxSize.width)
         }
     }
     

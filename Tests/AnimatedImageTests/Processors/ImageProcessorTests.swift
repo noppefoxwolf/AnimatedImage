@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 import Testing
 
-@testable import AnimatedImage
+@testable import AnimatedImageCore
 
 @Suite("ImageProcessor テスト")
 struct ImageProcessorTests {
@@ -12,7 +12,7 @@ struct ImageProcessorTests {
         let configuration = AnimatedImageProviderConfiguration.default
         let processor = ImageProcessor(configuration: configuration)
 
-        let renderSize = CGSize(width: 100, height: 100)
+        let renderSize = Size(width: 100, height: 100)
 
         #expect(processor.isValidRenderSize(renderSize))
         #expect(!processor.isValidRenderSize(.zero))
@@ -29,7 +29,7 @@ struct ImageProcessorTests {
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
         let frameConfig = processor.calculateFrameConfiguration(
-            imageSize: CGSize(width: 100, height: 100),
+            imageSize: Size(width: 100, height: 100),
             imageCount: 10,
             scale: 1,
             image: mockImage
@@ -49,7 +49,7 @@ struct ImageProcessorTests {
         let mockImage = MockAnimatedImage(frameCount: 5, delayTime: 0.1)
         let image = await processor.createAndCacheImage(
             image: mockImage,
-            size: CGSize(width: 50, height: 50),
+            size: Size(width: 50, height: 50),
             index: 0,
             scale: 1,
             interpolationQuality: .default

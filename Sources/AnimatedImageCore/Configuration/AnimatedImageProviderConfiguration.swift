@@ -6,7 +6,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     public static var unlimited: Self {
         Self(
             maxMemoryUsage: .init(value: 1, unit: .gigabytes),
-            maxSize: CGSize(width: Double.infinity, height: Double.infinity),
+            maxSize: Size(width: Int.max, height: Int.max),
             maxLevelOfIntegrity: 1,
             interpolationQuality: .high,
             contentsFilter: .trilinear,
@@ -17,7 +17,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     public static var `default`: Self {
         Self(
             maxMemoryUsage: .init(value: 1, unit: .megabytes),
-            maxSize: CGSize(width: 128, height: 128),
+            maxSize: Size(width: 128, height: 128),
             maxLevelOfIntegrity: 0.8,
             interpolationQuality: .default,
             contentsFilter: .linear,
@@ -28,7 +28,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     public static var performance: Self {
         Self(
             maxMemoryUsage: .init(value: 20, unit: .kilobytes),
-            maxSize: CGSize(width: 32, height: 32),
+            maxSize: Size(width: 32, height: 32),
             maxLevelOfIntegrity: 0.25,
             interpolationQuality: .none,
             contentsFilter: .nearest,
@@ -37,7 +37,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     }
 
     public var maxMemoryUsage: Measurement<UnitInformationStorage>
-    public var maxSize: CGSize
+    public var maxSize: Size
     public var maxLevelOfIntegrity: Double
     public var interpolationQuality: CGInterpolationQuality
     public var contentsFilter: CALayerContentsFilter

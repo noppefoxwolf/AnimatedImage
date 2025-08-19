@@ -1,7 +1,7 @@
 import QuartzCore
 
 extension CGImage {
-    var size: CGSize {
-        CGSize(width: width, height: height)
+    var size: Size {
+        Size(width: width, height: height)
     }
 }
