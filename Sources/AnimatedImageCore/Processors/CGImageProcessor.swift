@@ -1,6 +1,6 @@
 import QuartzCore
 
-public struct CGImageProcessor: Sendable {
+public actor CGImageProcessor: Sendable {
     
     public init() {}
     
@@ -29,7 +29,7 @@ public struct CGImageProcessor: Sendable {
         return resize(image: image, newSize: newSize, interpolationQuality: interpolationQuality)
     }
     
-    public func aspectFitSize(for currentSize: CGSize, maxSize: CGSize) -> CGSize {
+    func aspectFitSize(for currentSize: CGSize, maxSize: CGSize) -> CGSize {
         let aspectWidth = maxSize.width / currentSize.width
         let aspectHeight = maxSize.height / currentSize.height
         let scalingFactor = min(aspectWidth, aspectHeight)
@@ -37,7 +37,7 @@ public struct CGImageProcessor: Sendable {
         return currentSize.applying(transform)
     }
     
-    public func resize(
+    func resize(
         image: CGImage,
         newSize: CGSize,
         interpolationQuality: CGInterpolationQuality
