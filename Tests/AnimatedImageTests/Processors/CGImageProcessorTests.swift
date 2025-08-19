@@ -123,6 +123,7 @@ struct CGImageProcessorTests {
         let targetSize = CGSize(width: 100, height: 100)
         
         // usePreparingForDisplay = false の場合、必ずリサイズされる
+        // ただし、元サイズより大きくはならない
         let decodedImage = await processor.decoded(
             image: originalImage,
             for: targetSize,
@@ -132,8 +133,43 @@ struct CGImageProcessorTests {
         )
         
         #expect(decodedImage !== originalImage)
-        #expect(decodedImage?.width == 50) // アスペクト比維持で50x50のまま
+        #expect(decodedImage?.width == 50) // 元サイズのまま
         #expect(decodedImage?.height == 50)
+    }
+    
+    @Test("元サイズより大きくリサイズしない")
+    func noUpscaling() async {
+        let originalImage = createTestImage(width: 100, height: 100)
+        let targetSize = CGSize(width: 200, height: 200)
+        
+        let decodedImage = await processor.decoded(
+            image: originalImage,
+            for: targetSize,
+            usePreparingForDisplay: false,
+            scale: 1.0,
+            interpolationQuality: .default
+        )
+        
+        #expect(decodedImage?.width == 100) // 元サイズより大きくならない
+        #expect(decodedImage?.height == 100)
+    }
+    
+    @Test("片方の軸のみ大きい場合の処理")
+    func partialUpscalingPrevention() async {
+        let originalImage = createTestImage(width: 100, height: 50)
+        let targetSize = CGSize(width: 200, height: 25) // 幅は大きく、高さは小さく
+        
+        let decodedImage = await processor.decoded(
+            image: originalImage,
+            for: targetSize,
+            usePreparingForDisplay: false,
+            scale: 1.0,
+            interpolationQuality: .default
+        )
+        
+        // 制約されたサイズ: (100, 25) でアスペクト比維持すると (50, 25)
+        #expect(decodedImage?.width == 50)
+        #expect(decodedImage?.height == 25)
     }
     
     // テスト用のCGImageを作成

@@ -11,12 +11,19 @@ public struct CGImageProcessor: Sendable {
         scale: CGFloat,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
+        let originalSize = image.size
+        let constrainedSize = CGSize(
+            width: min(size.width, originalSize.width),
+            height: min(size.height, originalSize.height)
+        )
+        
         let newSize = aspectFitSize(
-            for: image.size,
-            maxSize: size
+            for: originalSize,
+            maxSize: constrainedSize
         )
         .applying(CGAffineTransform(scaleX: scale, y: scale))
-        if image.size.isLessThanOrEqualTo(newSize) && usePreparingForDisplay {
+        
+        if originalSize.isLessThanOrEqualTo(newSize) && usePreparingForDisplay {
             return image
         }
         return resize(image: image, newSize: newSize, interpolationQuality: interpolationQuality)
