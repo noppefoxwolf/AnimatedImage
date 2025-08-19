@@ -57,7 +57,6 @@ struct CGImageProcessorTests {
         let decodedImage = await processor.decoded(
             image: originalImage,
             for: targetSize,
-            scale: 1.0,
             interpolationQuality: .default
         )
         
@@ -70,12 +69,11 @@ struct CGImageProcessorTests {
     func decodingWithScale() async {
         let originalImage = createTestImage(width: 100, height: 100)
         let targetSize = Size(width: 50, height: 50)
-        let scale: CGFloat = 2.0
+        // scaleはもうCGImageProcessorでは使用されない
         
         let decodedImage = await processor.decoded(
             image: originalImage,
             for: targetSize,
-            scale: scale,
             interpolationQuality: .default
         )
         
@@ -95,7 +93,6 @@ struct CGImageProcessorTests {
             image: originalImage,
             for: targetSize,
             usePreparingForDisplay: true,
-            scale: 1.0,
             interpolationQuality: .default
         )
         
@@ -112,7 +109,6 @@ struct CGImageProcessorTests {
             image: originalImage,
             for: targetSize,
             usePreparingForDisplay: false,
-            scale: 1.0,
             interpolationQuality: .default
         )
         
@@ -130,7 +126,6 @@ struct CGImageProcessorTests {
             image: originalImage,
             for: targetSize,
             usePreparingForDisplay: false,
-            scale: 1.0,
             interpolationQuality: .default
         )
         
@@ -147,7 +142,6 @@ struct CGImageProcessorTests {
             image: originalImage,
             for: targetSize,
             usePreparingForDisplay: false,
-            scale: 1.0,
             interpolationQuality: .default
         )
         
