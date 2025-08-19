@@ -93,9 +93,14 @@ public struct ImageProcessor: Sendable {
     /// - Parameters:
     ///   - imageSize: 画像サイズ
     ///   - imageCount: フレーム数
+    ///   - scale: 画像スケール
     /// - Returns: 品質レベル（0.0〜1.0）
-    public func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
-        let imageByteCount = imageSize.width * imageSize.height * 4
+    public func integrityLevel(for imageSize: Size, imageCount: Int, scale: CGFloat) -> Double {
+        let scaledSize = Size(
+            width: Int(Double(imageSize.width) * scale),
+            height: Int(Double(imageSize.height) * scale)
+        )
+        let imageByteCount = scaledSize.width * scaledSize.height * 4
         let maxMemoryUsage = configuration.maxMemoryUsage.converted(to: .bytes).value
         let memoryPressure = Double(imageByteCount * imageCount) / maxMemoryUsage
         return min(1.0 / memoryPressure, configuration.maxLevelOfIntegrity)
@@ -108,7 +113,7 @@ public struct ImageProcessor: Sendable {
         scale: CGFloat,
         image: any AnimatedImage
     ) -> FrameConfiguration {
-        let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount)
+        let levelOfIntegrity = integrityLevel(for: imageSize, imageCount: imageCount, scale: scale)
 
         let delayTimes = (0..<imageCount)
             .map { index in

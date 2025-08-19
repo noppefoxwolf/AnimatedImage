@@ -99,11 +99,11 @@ struct QualityDemoView: View {
                                 value: Binding<Double>(
                                     get: {
                                         configuration.maxMemoryUsage.converted(to: .bytes).value
-                                            / (1 * 1024 * 1024)
+                                            / (3 * 1024 * 1024)
                                     },
                                     set: { newValue in
                                         configuration.maxMemoryUsage = .init(
-                                            value: (1 * 1024 * 1024) * newValue,
+                                            value: (3 * 1024 * 1024) * newValue,
                                             unit: .bytes
                                         )
                                     }
