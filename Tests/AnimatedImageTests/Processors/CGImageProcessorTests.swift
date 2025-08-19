@@ -9,9 +9,6 @@ struct CGImageProcessorTests {
     
     let processor = CGImageProcessor()
     
-    // aspectFitSizeはImageProcessorに移動したため、このテストは削除
-    // 代わりに統合テストである decoded テストでアスペクト比をチェック
-    
     @Test("画像リサイズ")
     func imageResize() async {
         let originalImage = createTestImage(width: 100, height: 100)
@@ -69,7 +66,6 @@ struct CGImageProcessorTests {
     func decodingWithScale() async {
         let originalImage = createTestImage(width: 100, height: 100)
         let targetSize = Size(width: 50, height: 50)
-        // scaleはもうCGImageProcessorでは使用されない
         
         let decodedImage = await processor.decoded(
             image: originalImage,
@@ -78,7 +74,6 @@ struct CGImageProcessorTests {
         )
         
         #expect(decodedImage != nil)
-        // CGImageProcessorの修正でscaleは適用されないため、targetSizeのまま
         #expect(decodedImage?.width == 50)
         #expect(decodedImage?.height == 50)
     }
@@ -88,7 +83,6 @@ struct CGImageProcessorTests {
         let originalImage = createTestImage(width: 50, height: 50)
         let targetSize = Size(width: 100, height: 100)
         
-        // usePreparingForDisplay = true の場合、元画像がそのまま返される
         let decodedImage = await processor.decoded(
             image: originalImage,
             for: targetSize,
@@ -104,7 +98,6 @@ struct CGImageProcessorTests {
         let originalImage = createTestImage(width: 50, height: 50)
         let targetSize = Size(width: 100, height: 100)
         
-        // usePreparingForDisplay = false の場合、リサイズが必要
         let decodedImage = await processor.decoded(
             image: originalImage,
             for: targetSize,
@@ -113,7 +106,7 @@ struct CGImageProcessorTests {
         )
         
         #expect(decodedImage !== originalImage)
-        #expect(decodedImage?.width == 100) // targetSizeにリサイズ
+        #expect(decodedImage?.width == 100)
         #expect(decodedImage?.height == 100)
     }
     
@@ -129,14 +122,14 @@ struct CGImageProcessorTests {
             interpolationQuality: .default
         )
         
-        #expect(decodedImage?.width == 200) // targetSizeにリサイズ
+        #expect(decodedImage?.width == 200)
         #expect(decodedImage?.height == 200)
     }
     
     @Test("片方の軸のみ大きい場合の処理")
     func partialUpscalingPrevention() async {
         let originalImage = createTestImage(width: 100, height: 50)
-        let targetSize = Size(width: 200, height: 25) // 幅は大きく、高さは小さく
+        let targetSize = Size(width: 200, height: 25)
         
         let decodedImage = await processor.decoded(
             image: originalImage,
@@ -145,12 +138,10 @@ struct CGImageProcessorTests {
             interpolationQuality: .default
         )
         
-        // targetSizeにリサイズ
         #expect(decodedImage?.width == 200)
         #expect(decodedImage?.height == 25)
     }
     
-    // テスト用のCGImageを作成
     private func createTestImage(width: Int, height: Int) -> CGImage {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let context = CGContext(
@@ -163,7 +154,6 @@ struct CGImageProcessorTests {
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         )!
         
-        // 白で塗りつぶし
         context.setFillColor(CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0))
         context.fill(CGRect(x: 0, y: 0, width: width, height: height))
         

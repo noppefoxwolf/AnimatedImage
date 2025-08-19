@@ -2,10 +2,7 @@ import Foundation
 import QuartzCore
 import os
 
-/// アニメーション画像の処理パイプライン
 public struct ImageProcessor: Sendable {
-
-    /// フレーム設定情報
     public struct FrameConfiguration: Sendable {
         public let optimizedSize: Size
         public let indices: [Int]
@@ -25,7 +22,6 @@ public struct ImageProcessor: Sendable {
         }
     }
 
-    /// 処理結果
     public struct ProcessingResult: Sendable {
         public let frameConfiguration: FrameConfiguration
         public let generatedImages: [Int: CGImage]
@@ -44,7 +40,6 @@ public struct ImageProcessor: Sendable {
         self.sizeOptimizer = SizeOptimizer()
     }
 
-    /// アニメーション画像を処理する
     public func processAnimatedImage(
         renderSize: Size,
         scale: CGFloat,
@@ -78,12 +73,10 @@ public struct ImageProcessor: Sendable {
         )
     }
 
-    /// レンダリングサイズの検証
     public func isValidRenderSize(_ renderSize: Size) -> Bool {
         sizeOptimizer.isValidRenderSize(renderSize)
     }
 
-    /// 最適化されたサイズを計算
     public func optimizedSize(for renderSize: Size, scale: CGFloat, imageSize: Size, imageCount: Int = 1) -> Size {
         sizeOptimizer.optimizedSize(
             for: renderSize,
@@ -95,9 +88,6 @@ public struct ImageProcessor: Sendable {
         )
     }
     
-    // サイズ最適化関連のメソッドはSizeOptimizerに移動しました
-
-    /// 品質レベルを計算
     public func integrityLevel(for imageSize: Size, imageCount: Int) -> Double {
         sizeOptimizer.integrityLevel(
             for: imageSize,
@@ -107,7 +97,6 @@ public struct ImageProcessor: Sendable {
         )
     }
 
-    /// フレーム設定を計算
     public func frameConfiguration(
         for imageSize: Size,
         imageCount: Int,
@@ -134,7 +123,6 @@ public struct ImageProcessor: Sendable {
         )
     }
 
-    /// フレーム画像を生成
     public func generateFrameImages(
         _ frameConfiguration: FrameConfiguration,
         image: any AnimatedImage
@@ -164,7 +152,6 @@ public struct ImageProcessor: Sendable {
         return generatedImages
     }
 
-    /// 個別画像を作成
     public func createAndCacheImage(
         image: any AnimatedImage,
         size: Size,

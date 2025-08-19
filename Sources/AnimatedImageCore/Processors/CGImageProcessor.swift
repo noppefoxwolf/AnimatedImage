@@ -12,14 +12,11 @@ public actor CGImageProcessor: Sendable {
     ) async -> CGImage? {
         let originalSize = Size(width: image.width, height: image.height)
         
-        // optimizedSizeで既にサイズ計算が完了しているため、簡単なチェックのみ
         if originalSize.isLessThanOrEqual(to: size) && usePreparingForDisplay {
             return image
         }
         return resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
-    
-    // この関数はImageProcessor.aspectFitSize()に移動されたため削除
     
     func resize(
         image: CGImage,
