@@ -3,31 +3,14 @@ import QuartzCore
 import os
 
 struct ImageProcessor: Sendable {
-    struct FrameConfiguration: Sendable {
-        let optimizedSize: Size
+    struct ProcessingResult: Sendable {
         let indices: [Int]
         let delayTime: Double
-        let interpolationQuality: CGInterpolationQuality
-
-        init(
-            optimizedSize: Size,
-            indices: [Int],
-            delayTime: Double,
-            interpolationQuality: CGInterpolationQuality
-        ) {
-            self.optimizedSize = optimizedSize
-            self.indices = indices
-            self.delayTime = delayTime
-            self.interpolationQuality = interpolationQuality
-        }
-    }
-
-    struct ProcessingResult: Sendable {
-        let frameConfiguration: FrameConfiguration
         let generatedImages: [Int: CGImage]
 
-        init(frameConfiguration: FrameConfiguration, generatedImages: [Int: CGImage]) {
-            self.frameConfiguration = frameConfiguration
+        init(indices: [Int], delayTime: Double, generatedImages: [Int: CGImage]) {
+            self.indices = indices
+            self.delayTime = delayTime
             self.generatedImages = generatedImages
         }
     }
@@ -67,17 +50,16 @@ struct ImageProcessor: Sendable {
             image: image
         )
 
-        let frameConfiguration = FrameConfiguration(
-            optimizedSize: optimizedSize,
+        let generatedImages = await prewarmFrameImages(
             indices: frameInfo.displayIndices,
-            delayTime: frameInfo.delayTime,
-            interpolationQuality: configuration.interpolationQuality
+            optimizedSize: optimizedSize,
+            interpolationQuality: configuration.interpolationQuality,
+            image: image
         )
 
-        let generatedImages = await prewarmFrameImages(frameConfiguration, image: image)
-
         return ProcessingResult(
-            frameConfiguration: frameConfiguration,
+            indices: frameInfo.displayIndices,
+            delayTime: frameInfo.delayTime,
             generatedImages: generatedImages
         )
     }
@@ -132,19 +114,21 @@ struct ImageProcessor: Sendable {
     }
 
     func prewarmFrameImages(
-        _ frameConfiguration: FrameConfiguration,
+        indices: [Int],
+        optimizedSize: Size,
+        interpolationQuality: CGInterpolationQuality,
         image: any AnimatedImage
     ) async -> [Int: CGImage] {
         var generatedImages: [Int: CGImage] = [:]
 
         await withTaskGroup(of: (Int, CGImage?).self) { taskGroup in
-            for index in Set(frameConfiguration.indices) {
+            for index in Set(indices) {
                 taskGroup.addTask {
                     let processedImage = await createAndCacheImage(
                         image: image,
-                        size: frameConfiguration.optimizedSize,
+                        size: optimizedSize,
                         index: index,
-                        interpolationQuality: frameConfiguration.interpolationQuality
+                        interpolationQuality: interpolationQuality
                     )
                     return (index, processedImage)
                 }

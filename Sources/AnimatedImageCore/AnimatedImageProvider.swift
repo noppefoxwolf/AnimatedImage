@@ -56,12 +56,12 @@ public final class AnimatedImageProvider: Sendable {
         )
         guard let processingResult else { return }
 
-        await updateFrameIndices(processingResult.frameConfiguration)
+        await updateFrameState(indices: processingResult.indices, delayTime: processingResult.delayTime)
     }
 
-    func updateFrameIndices(_ frameConfiguration: ImageProcessor.FrameConfiguration) {
-        self.indices = frameConfiguration.indices
-        self.delayTime = frameConfiguration.delayTime
+    func updateFrameState(indices: [Int], delayTime: Double) {
+        self.indices = indices
+        self.delayTime = delayTime
     }
 
     nonisolated func image(at index: Int) -> CGImage? {
