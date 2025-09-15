@@ -43,7 +43,10 @@ struct FormatDemoView: View {
                     Text("PNG")
                 }
                 VStack {
-                    let url = Bundle.main.url(forResource: "b848520ba07a354c", withExtension: "png")!
+                    let url = Bundle.main.url(
+                        forResource: "b848520ba07a354c",
+                        withExtension: "png"
+                    )!
                     let data = try! Data(contentsOf: url)
                     let image = APNGImage(data: data)
                     AnimatedImagePlayer(image: image)

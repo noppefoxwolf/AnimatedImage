@@ -15,7 +15,7 @@ struct FrameDecimatorTests {
         #expect(!result.displayIndices.isEmpty)
         #expect(result.displayIndices.count <= delays.count)
         #expect(result.delayTime > 0)
-        #expect(result.displayIndices == [0,2,4])
+        #expect(result.displayIndices == [0, 2, 4])
     }
 
     @Test("品質レベル1.0で全フレーム表示")

@@ -1,6 +1,6 @@
+import CoreGraphics
 public import Foundation
 import simd
-import CoreGraphics
 
 /// SIMD2<Int>をラップしたサイズ構造体
 public struct Size: Sendable, Hashable {

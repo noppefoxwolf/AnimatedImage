@@ -24,7 +24,10 @@ public actor CGImageProcessor: Sendable {
 
         // TOOD: image.colorSpaceがグレーの場合はCGColorSpaceCreateDeviceGray()を使いたい
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo: CGBitmapInfo = [.byteOrder32Little, CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)]
+        let bitmapInfo: CGBitmapInfo = [
+            .byteOrder32Little,
+            CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue),
+        ]
 
         let context = CGContext(
             data: nil,
@@ -35,7 +38,7 @@ public actor CGImageProcessor: Sendable {
             space: colorSpace,
             bitmapInfo: bitmapInfo.rawValue
         )
-        
+
         guard let context else { fatalError() }
 
         context.interpolationQuality = interpolationQuality

@@ -82,4 +82,3 @@ package.targets.forEach { target in
     target.swiftSettings = target.swiftSettings ?? []
     target.swiftSettings?.append(contentsOf: swiftSettings)
 }
-
