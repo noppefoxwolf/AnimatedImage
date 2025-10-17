@@ -18,11 +18,14 @@ public final class GifImage: AnimatedImage, Sendable {
 
     public nonisolated func delayTime(at index: Int) -> Double {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0.1 }
-        let imageProperty =
-            CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+        let imageProperty = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
         let frameProperty = imageProperty?[kCGImagePropertyGIFDictionary] as? [CFString: Any]
-        let delayTime = frameProperty?[kCGImagePropertyGIFDelayTime] as? Double
-        return delayTime ?? 0.1
+        let frameDurationProcessor = FrameDurationProcessor()
+        let delayTime = frameDurationProcessor.process(
+            unclampedDelayTime: { frameProperty?[kCGImagePropertyGIFUnclampedDelayTime] as? Double },
+            delayTime: { frameProperty?[kCGImagePropertyGIFDelayTime] as? Double }
+        )
+        return delayTime
     }
 
     public nonisolated func image(at index: Int) -> CGImage? {
