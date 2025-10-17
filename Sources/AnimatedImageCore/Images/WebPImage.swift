@@ -21,8 +21,17 @@ public final class WebPImage: AnimatedImage, Sendable {
         let imageProperty =
             CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
         let frameProperty = imageProperty?[kCGImagePropertyWebPDictionary] as? [CFString: Any]
-        let delayTime = frameProperty?[kCGImagePropertyWebPDelayTime] as? Double
-        return delayTime ?? 0.1
+        let frameDuration = if let unclampedDelayTime = frameProperty?[kCGImagePropertyWebPUnclampedDelayTime] as? Double {
+            unclampedDelayTime
+        } else if let delayTime = frameProperty?[kCGImagePropertyWebPDelayTime] as? Double {
+            delayTime
+        } else {
+            0.1
+        }
+        if frameDuration < 0.011 {
+            return 0.1
+        }
+        return frameDuration
     }
 
     public nonisolated func image(at index: Int) -> CGImage? {
