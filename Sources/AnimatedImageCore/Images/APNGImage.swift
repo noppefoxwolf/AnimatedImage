@@ -21,8 +21,12 @@ public final class APNGImage: AnimatedImage, Sendable {
         let imageProperty =
             CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
         let frameProperty = imageProperty?[kCGImagePropertyPNGDictionary] as? [CFString: Any]
-        let delayTime = frameProperty?[kCGImagePropertyAPNGDelayTime] as? Double
-        return delayTime ?? 0.1
+        let frameDurationProcessor = FrameDurationProcessor()
+        let delayTime = frameDurationProcessor.process(
+            unclampedDelayTime: { frameProperty?[kCGImagePropertyAPNGUnclampedDelayTime] as? Double },
+            delayTime: { frameProperty?[kCGImagePropertyAPNGDelayTime] as? Double }
+        )
+        return delayTime
     }
 
     public nonisolated func image(at index: Int) -> CGImage? {
