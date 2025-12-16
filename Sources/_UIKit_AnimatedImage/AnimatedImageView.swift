@@ -4,9 +4,15 @@ public import UIKit
 open class AnimatedImageView: AnimatableCGImageView {
     public var image: (any AnimatedImage)? = nil {
         didSet {
-            if let image {
-                provider = AnimatedImageProvider(name: image.name, configuration: configuration)
+            if oldValue?.name != image?.name {
+                onImageChanged()
             }
+        }
+    }
+    
+    private func onImageChanged() {
+        if let image {
+            provider = AnimatedImageProvider(name: image.name, configuration: configuration)
         }
     }
 
