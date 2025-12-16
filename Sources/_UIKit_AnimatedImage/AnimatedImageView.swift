@@ -21,8 +21,6 @@ open class AnimatedImageView: AnimatableCGImageView {
 
     private var provider: AnimatedImageProvider? = nil {
         didSet {
-            contents = nil
-
             if let image {
                 provider?
                     .update(for: bounds.size, scale: traitCollection.displayScale, image: image)
