@@ -8,14 +8,16 @@ on:
 
 jobs:
   test:
-    runs-on: macos-15
+    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+    runs-on: macos-26
+    
     
     steps:
     - name: ⬇️ Checkout repository
       uses: actions/checkout@v4
 
     - name: ⚙️ Set Xcode version
-      run: sudo xcode-select -s /Applications/Xcode_16.4.app
+      run: sudo xcode-select -s /Applications/Xcode_26.2.app
     
     - name: ✅ Run Tests
       run: swift test
