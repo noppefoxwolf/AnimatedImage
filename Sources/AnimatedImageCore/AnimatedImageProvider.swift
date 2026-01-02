@@ -6,7 +6,6 @@ private let logger = Logger(
     category: #file
 )
 
-@MainActor
 public final class AnimatedImageProvider: Sendable {
     private let cache: Cache<Int, CGImage>
     private let configuration: AnimatedImageProviderConfiguration
