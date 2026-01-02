@@ -2,10 +2,10 @@ import Foundation
 
 /// アニメーションフレームの間引き処理を行うクラス
 /// VSync同期とメモリ使用量を考慮してフレーム数を最適化する
-public struct FrameDecimator: Sendable {
+public actor FrameDecimator: Sendable {
 
     /// フレーム間引きの結果
-    public nonisolated struct Result: Sendable {
+    public actor Result: Sendable {
         /// 表示するフレームのインデックス配列
         public let displayIndices: [Int]
         /// 最適化されたフレーム間隔（秒）

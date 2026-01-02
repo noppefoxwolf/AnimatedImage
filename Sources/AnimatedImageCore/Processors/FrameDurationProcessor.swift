@@ -1,5 +1,5 @@
 
-struct FrameDurationProcessor: Sendable {
+actor FrameDurationProcessor: Sendable {
     
     let defaultDelayTime: Double = 0.1
     let minimumDelayTime: Double = 0.011 // 10ms

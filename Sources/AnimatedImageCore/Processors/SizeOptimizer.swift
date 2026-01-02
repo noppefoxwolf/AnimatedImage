@@ -3,7 +3,7 @@ import QuartzCore
 
 /// アニメーション画像の最適なサイズを計算するクラス
 /// レンダリングサイズ、メモリ制約、アスペクト比を考慮してサイズを決定
-public struct SizeOptimizer: Sendable {
+public actor SizeOptimizer: Sendable {
     public init() {}
 
     /// レンダリングに最適なサイズを計算
