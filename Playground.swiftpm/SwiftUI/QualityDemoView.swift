@@ -179,10 +179,11 @@ struct QualityDemoView: View {
 }
 
 extension AnimatedImageProviderConfiguration {
+    @MainActor
     public static var qualityDemo: Self {
-        var configuation = Self.default
-        configuation.maxMemoryUsage = .init(value: 1, unit: .megabits)
-        configuation.taskPriority = .userInitiated
-        return configuation
+        var configuration = Self.default
+        configuration.maxMemoryUsage = .init(value: 1, unit: .megabits)
+        configuration.taskPriority = .userInitiated
+        return configuration
     }
 }

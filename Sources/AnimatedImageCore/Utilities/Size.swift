@@ -3,7 +3,7 @@ import simd
 import CoreGraphics
 
 /// SIMD2<Int>をラップしたサイズ構造体
-public struct Size: Sendable, Hashable {
+public nonisolated struct Size: Sendable, Hashable {
     private var vector: SIMD2<Int>
 
     public var width: Int {
@@ -49,7 +49,7 @@ extension Size {
         return result.overflow ? Int.max : result.partialValue
     }
 
-    public var isEmpty: Bool {
+    public nonisolated var isEmpty: Bool {
         width == 0 || height == 0
     }
 }

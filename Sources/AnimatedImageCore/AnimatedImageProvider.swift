@@ -6,7 +6,6 @@ private let logger = Logger(
     category: #file
 )
 
-@MainActor
 public final class AnimatedImageProvider: Sendable {
     private let cache: Cache<Int, CGImage>
     private let configuration: AnimatedImageProviderConfiguration
@@ -35,16 +34,20 @@ public final class AnimatedImageProvider: Sendable {
     }
 
     func startImageProcessingTask(renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
-        task = Task.detached(priority: configuration.taskPriority) { [image, cache] in
-            await withTaskCancellationHandler {
-                await self.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
-            } onCancel: { [cache] in
-                cache.removeAllObjects()
-            }
+        task = Task.detached(priority: configuration.taskPriority) { [weak self] in
+            await withTaskCancellationHandler(
+                operation: {
+                    await self?.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
+                },
+                onCancel: {
+                    self?.cache.removeAllObjects()
+                }
+            )
         }
     }
 
-    nonisolated func processAnimatedImage(
+    @concurrent
+    func processAnimatedImage(
         renderSize: CGSize,
         scale: CGFloat,
         image: any AnimatedImage
@@ -61,13 +64,13 @@ public final class AnimatedImageProvider: Sendable {
             delayTime: processingResult.delayTime
         )
     }
-
+    
     func updateFrameState(indices: [Int], delayTime: Double) {
         self.indices = indices
         self.delayTime = delayTime
     }
 
-    nonisolated func image(at index: Int) -> CGImage? {
+    func image(at index: Int) -> CGImage? {
         cache.value(forKey: index)
     }
 

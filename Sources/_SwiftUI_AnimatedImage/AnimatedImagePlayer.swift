@@ -31,7 +31,7 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
 }
 
 private struct AnimatedImageConfigurationKey: EnvironmentKey {
-    static let defaultValue: AnimatedImageProviderConfiguration = .default
+    static var defaultValue: AnimatedImageProviderConfiguration { .default }
 }
 
 extension EnvironmentValues {

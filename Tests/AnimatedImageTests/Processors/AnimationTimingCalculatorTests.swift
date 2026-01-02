@@ -5,6 +5,7 @@ import Testing
 @Suite("AnimationTimingCalculator テスト")
 struct AnimationTimingCalculatorTests {
 
+    @MainActor
     @Test("基本的なフレームインデックス計算")
     func basicFrameIndexCalculation() {
         let calculator = AnimationTimingCalculator()
@@ -36,6 +37,7 @@ struct AnimationTimingCalculatorTests {
         #expect(lastIndex != nil)
     }
 
+    @MainActor
     @Test("エッジケース処理")
     func edgeCaseHandling() {
         let calculator = AnimationTimingCalculator()
@@ -57,6 +59,7 @@ struct AnimationTimingCalculatorTests {
         #expect(zeroDelayIndex == nil)
     }
 
+    @MainActor
     @Test("長時間での計算精度")
     func longDurationAccuracy() {
         let calculator = AnimationTimingCalculator()

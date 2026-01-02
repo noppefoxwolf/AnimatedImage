@@ -1,6 +1,6 @@
 import Foundation
 
-final class Cache<Key: Hashable, Value>: @unchecked Sendable {
+nonisolated final class Cache<Key: Hashable, Value>: @unchecked Sendable {
     private let wrapped = NSCache<WrappedKey, Entry>()
 
     public init(name: String) {
@@ -18,12 +18,12 @@ final class Cache<Key: Hashable, Value>: @unchecked Sendable {
     }
 
     func insert(_ value: Value, forKey key: Key) {
-        let entry = Entry(value: value)
+        let entry = Entry(value)
         wrapped.setObject(entry, forKey: WrappedKey(key))
     }
 
     func insert(_ value: Value, forKey key: Key, cost: Int) {
-        let entry = Entry(value: value)
+        let entry = Entry(value)
         wrapped.setObject(entry, forKey: WrappedKey(key), cost: cost)
     }
 
@@ -43,26 +43,26 @@ final class Cache<Key: Hashable, Value>: @unchecked Sendable {
 
 //Our WrappedKey type will, wrap our Key values in order to make them NSCache compatible
 extension Cache {
-    fileprivate final class WrappedKey: NSObject {
+    fileprivate nonisolated final class WrappedKey: Hashable {
         let key: Key
-
-        init(_ key: Key) { self.key = key }
-
-        override var hash: Int { return key.hashValue }
-
-        override func isEqual(_ object: Any?) -> Bool {
-            guard let value = object as? WrappedKey else {
-                return false
-            }
-
-            return value.key == key
+        
+        init(_ key: Key) {
+            self.key = key
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(key)
+        }
+        
+        static func == (lhs: Cache<Key, Value>.WrappedKey, rhs: Cache<Key, Value>.WrappedKey) -> Bool {
+            lhs.key == rhs.key
         }
     }
 
-    fileprivate final class Entry {
+    fileprivate nonisolated final class Entry {
         let value: Value
 
-        init(value: Value) {
+        init(_ value: Value) {
             self.value = value
         }
     }

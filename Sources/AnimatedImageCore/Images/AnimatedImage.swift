@@ -3,7 +3,7 @@ import Foundation
 
 public protocol AnimatedImage: Sendable {
     var name: String { get }
-    var imageCount: Int { get }
-    func delayTime(at index: Int) -> Double
-    func image(at index: Int) -> CGImage?
+    var imageCount: Int { get async }
+    func delayTime(at index: Int) async -> Double
+    func image(at index: Int) async -> CGImage?
 }

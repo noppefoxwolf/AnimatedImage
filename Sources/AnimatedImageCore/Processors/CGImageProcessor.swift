@@ -4,19 +4,21 @@ public actor CGImageProcessor: Sendable {
 
     public init() {}
 
+    @concurrent
     public func decoded(
         image: CGImage,
         for size: Size,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
-        resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
+        await resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
 
+    @concurrent
     func resize(
         image: CGImage,
         newSize: Size,
         interpolationQuality: CGInterpolationQuality
-    ) -> CGImage? {
+    ) async -> CGImage? {
         let width = newSize.width
         let height = newSize.height
 
@@ -39,7 +41,8 @@ public actor CGImageProcessor: Sendable {
         guard let context else { fatalError() }
 
         context.interpolationQuality = interpolationQuality
-        context.draw(image, in: CGRect(origin: .zero, size: newSize.cgSize))
+        let drawSize = await newSize.cgSize
+        context.draw(image, in: CGRect(origin: .zero, size: drawSize))
 
         return context.makeImage()
     }

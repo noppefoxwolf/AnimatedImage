@@ -11,14 +11,14 @@ struct ImageProcessorTests {
     func basicImageProcessing() async {
         let configuration = AnimatedImageProviderConfiguration.default
         let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
-        let processor = ImageProcessor(configuration: configuration, cache: cache)
+        let processor = await ImageProcessor(configuration: configuration, cache: cache)
 
         let renderSize = Size(width: 100, height: 100)
 
-        #expect(processor.isValidRenderSize(renderSize))
-        #expect(!processor.isValidRenderSize(.zero))
+        #expect(await processor.isValidRenderSize(renderSize))
+        #expect(await !processor.isValidRenderSize(.zero))
 
-        let optimizedSize = processor.optimizedSize(
+        let optimizedSize = await processor.optimizedSize(
             for: renderSize,
             scale: 1.0,
             imageSize: Size(width: 200, height: 200),
@@ -29,13 +29,13 @@ struct ImageProcessorTests {
     }
 
     @Test("フレーム選択最適化")
-    func frameSelectionOptimization() {
+    func frameSelectionOptimization() async {
         let configuration = AnimatedImageProviderConfiguration.default
         let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
-        let processor = ImageProcessor(configuration: configuration, cache: cache)
+        let processor = await ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
-        let result = processor.optimizeFrameSelection(
+        let result = await processor.optimizeFrameSelection(
             for: Size(width: 100, height: 100),
             imageCount: 10,
             image: mockImage
@@ -49,7 +49,7 @@ struct ImageProcessorTests {
     func individualImageCreation() async {
         let configuration = AnimatedImageProviderConfiguration.default
         let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
-        let processor = ImageProcessor(configuration: configuration, cache: cache)
+        let processor = await ImageProcessor(configuration: configuration, cache: cache)
 
         let mockImage = MockAnimatedImage(frameCount: 5, delayTime: 0.1)
         let image = await processor.createAndCacheImage(

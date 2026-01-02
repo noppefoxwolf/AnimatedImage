@@ -8,7 +8,7 @@ import Testing
 struct SizeOptimizerTests {
 
     @Test("基本的なサイズ最適化")
-    func basicSizeOptimization() {
+    func basicSizeOptimization() async {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 128, height: 128)
         let maxMemoryUsage: Double = 1024 * 1024  // 1MB
@@ -16,7 +16,7 @@ struct SizeOptimizerTests {
         let renderSize = Size(width: 100, height: 100)
         let imageSize = Size(width: 200, height: 200)
 
-        let optimizedSize = optimizer.optimizedSize(
+        let optimizedSize = await optimizer.optimizedSize(
             for: renderSize,
             maxSize: maxSize,
             scale: 1.0,
@@ -32,7 +32,7 @@ struct SizeOptimizerTests {
     }
 
     @Test("アスペクト比維持のテスト")
-    func aspectRatioMaintenance() {
+    func aspectRatioMaintenance() async {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 1000, height: 1000)
         let maxMemoryUsage: Double = 10 * 1024 * 1024  // 10MB
@@ -41,7 +41,7 @@ struct SizeOptimizerTests {
         let renderSize = Size(width: 100, height: 100)
         let imageSize = Size(width: 200, height: 100)
 
-        let optimizedSize = optimizer.optimizedSize(
+        let optimizedSize = await optimizer.optimizedSize(
             for: renderSize,
             maxSize: maxSize,
             scale: 1.0,
@@ -57,7 +57,7 @@ struct SizeOptimizerTests {
     }
 
     @Test("スケール適用のテスト")
-    func scaleApplication() {
+    func scaleApplication() async {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 1000, height: 1000)
         let maxMemoryUsage: Double = 10 * 1024 * 1024  // 10MB
@@ -66,7 +66,7 @@ struct SizeOptimizerTests {
         let imageSize = Size(width: 50, height: 50)
         let scale: CGFloat = 2.0
 
-        let optimizedSize = optimizer.optimizedSize(
+        let optimizedSize = await optimizer.optimizedSize(
             for: renderSize,
             maxSize: maxSize,
             scale: scale,
@@ -80,7 +80,7 @@ struct SizeOptimizerTests {
     }
 
     @Test("メモリ制約による調整")
-    func memoryConstraintAdjustment() {
+    func memoryConstraintAdjustment() async {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: 1000, height: 1000)
         let maxMemoryUsage: Double = 1024  // 1KB
@@ -89,7 +89,7 @@ struct SizeOptimizerTests {
         let imageSize = Size(width: 500, height: 500)
         let imageCount = 100
 
-        let optimizedSize = optimizer.optimizedSize(
+        let optimizedSize = await optimizer.optimizedSize(
             for: renderSize,
             maxSize: maxSize,
             scale: 1.0,
@@ -103,7 +103,7 @@ struct SizeOptimizerTests {
     }
 
     @Test("品質レベル計算")
-    func integrityLevelCalculation() {
+    func integrityLevelCalculation() async {
         let optimizer = SizeOptimizer()
         let maxMemoryUsage: Double = 1024 * 1024  // 1MB
         let maxLevelOfIntegrity: Double = 0.8
@@ -111,7 +111,7 @@ struct SizeOptimizerTests {
         let imageSize = Size(width: 100, height: 100)
         let imageCount = 10
 
-        let integrityLevel = optimizer.integrityLevel(
+        let integrityLevel = await optimizer.integrityLevel(
             for: imageSize,
             imageCount: imageCount,
             maxMemoryUsage: maxMemoryUsage,
@@ -124,17 +124,17 @@ struct SizeOptimizerTests {
     }
 
     @Test("レンダリングサイズの検証")
-    func renderSizeValidation() {
+    func renderSizeValidation() async {
         let optimizer = SizeOptimizer()
 
-        #expect(optimizer.isValidRenderSize(Size(width: 100, height: 100)))
-        #expect(!optimizer.isValidRenderSize(Size.zero))
-        #expect(!optimizer.isValidRenderSize(Size(width: 0, height: 100)))
-        #expect(!optimizer.isValidRenderSize(Size(width: 100, height: 0)))
+        #expect(await optimizer.isValidRenderSize(Size(width: 100, height: 100)))
+        #expect(await !optimizer.isValidRenderSize(Size.zero))
+        #expect(await !optimizer.isValidRenderSize(Size(width: 0, height: 100)))
+        #expect(await !optimizer.isValidRenderSize(Size(width: 100, height: 0)))
     }
 
     @Test("元画像サイズを超えない制約")
-    func noUpscalingConstraint() {
+    func noUpscalingConstraint() async {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: .max, height: .max)
         let maxMemoryUsage: Double = 1024 * 1024 * 1024
@@ -143,7 +143,7 @@ struct SizeOptimizerTests {
         let imageSize = Size(width: 100, height: 100)
         let scale: CGFloat = 1.0
 
-        let optimizedSize = optimizer.optimizedSize(
+        let optimizedSize = await optimizer.optimizedSize(
             for: renderSize,
             maxSize: maxSize,
             scale: scale,
@@ -157,7 +157,7 @@ struct SizeOptimizerTests {
     }
 
     @Test("高品質設定での処理")
-    func unlimitedConfigurationTest() {
+    func unlimitedConfigurationTest() async {
         let optimizer = SizeOptimizer()
         let maxSize = Size(width: .max, height: .max)
         let maxMemoryUsage: Double = 1024 * 1024 * 1024
@@ -167,7 +167,7 @@ struct SizeOptimizerTests {
         let imageSize = Size(width: 500, height: 500)
         let imageCount = 50
 
-        let optimizedSize = optimizer.optimizedSize(
+        let optimizedSize = await optimizer.optimizedSize(
             for: renderSize,
             maxSize: maxSize,
             scale: 1.0,
@@ -176,7 +176,7 @@ struct SizeOptimizerTests {
             maxMemoryUsage: maxMemoryUsage
         )
 
-        let integrityLevel = optimizer.integrityLevel(
+        let integrityLevel = await optimizer.integrityLevel(
             for: optimizedSize,
             imageCount: imageCount,
             maxMemoryUsage: maxMemoryUsage,
