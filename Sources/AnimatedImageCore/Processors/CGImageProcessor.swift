@@ -4,6 +4,7 @@ public actor CGImageProcessor: Sendable {
 
     public init() {}
 
+    @concurrent
     public func decoded(
         image: CGImage,
         for size: Size,
@@ -12,6 +13,7 @@ public actor CGImageProcessor: Sendable {
         await resize(image: image, newSize: size, interpolationQuality: interpolationQuality)
     }
 
+    @concurrent
     func resize(
         image: CGImage,
         newSize: Size,
