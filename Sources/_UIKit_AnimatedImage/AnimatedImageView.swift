@@ -4,9 +4,8 @@ public import UIKit
 open class AnimatedImageView: AnimatableCGImageView {
     public var image: (any AnimatedImage)? = nil {
         didSet {
-            if let image {
-                provider = AnimatedImageProvider(name: image.name, configuration: configuration)
-            }
+            guard let image else { return }
+            provider = AnimatedImageProvider(name: image.name, configuration: configuration)
         }
     }
 

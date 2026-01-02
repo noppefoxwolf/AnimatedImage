@@ -43,11 +43,19 @@ final class Cache<Key: Hashable, Value>: @unchecked Sendable {
 
 //Our WrappedKey type will, wrap our Key values in order to make them NSCache compatible
 extension Cache {
-    fileprivate final class WrappedKey {
+    fileprivate final class WrappedKey: Hashable {
         let key: Key
         
         init(_ key: Key) {
             self.key = key
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(key)
+        }
+        
+        static func == (lhs: Cache<Key, Value>.WrappedKey, rhs: Cache<Key, Value>.WrappedKey) -> Bool {
+            lhs.key == rhs.key
         }
     }
 
