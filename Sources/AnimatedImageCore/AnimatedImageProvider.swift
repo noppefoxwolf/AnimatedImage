@@ -46,7 +46,8 @@ public final class AnimatedImageProvider: Sendable {
         }
     }
 
-    nonisolated func processAnimatedImage(
+    @concurrent
+    func processAnimatedImage(
         renderSize: CGSize,
         scale: CGFloat,
         image: any AnimatedImage
@@ -63,7 +64,7 @@ public final class AnimatedImageProvider: Sendable {
             delayTime: processingResult.delayTime
         )
     }
-
+    
     func updateFrameState(indices: [Int], delayTime: Double) {
         self.indices = indices
         self.delayTime = delayTime

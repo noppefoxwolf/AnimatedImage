@@ -4,10 +4,11 @@ struct FrameDurationProcessor: Sendable {
     let defaultDelayTime: Double = 0.1
     let minimumDelayTime: Double = 0.011 // 10ms
     
+    @concurrent
     func process(
         unclampedDelayTime: () -> Double?,
         delayTime: () -> Double?
-    ) -> Double {
+    ) async -> Double {
         let result: Double
         if let unclampedDelayTime = unclampedDelayTime() {
             result = unclampedDelayTime

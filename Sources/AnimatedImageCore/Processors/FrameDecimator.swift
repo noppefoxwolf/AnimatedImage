@@ -5,7 +5,7 @@ import Foundation
 public struct FrameDecimator: Sendable {
 
     /// フレーム間引きの結果
-    public struct Result: Sendable {
+    public nonisolated struct Result: Sendable {
         /// 表示するフレームのインデックス配列
         public let displayIndices: [Int]
         /// 最適化されたフレーム間隔（秒）
@@ -18,7 +18,7 @@ public struct FrameDecimator: Sendable {
     }
 
     /// VSync候補フレームレート（1/秒）
-    private static let vsyncIntervals: [Double] = [
+    private nonisolated static let vsyncIntervals: [Double] = [
         1.000,  // 1 FPS
         0.500,  // 2 FPS
         0.333,  // 3 FPS
@@ -40,15 +40,16 @@ public struct FrameDecimator: Sendable {
     ///   - delays: 各フレームの表示時間（秒）
     ///   - levelOfIntegrity: 品質レベル（0.0〜1.0）。1.0で全フレーム表示、0.0で最小フレーム
     /// - Returns: 間引き結果
+    @concurrent
     public func optimizeFrameSelection(
         delays: [Double],
         levelOfIntegrity: Double
-    ) -> Result {
+    ) async -> Result {
         // 品質レベルを0.0〜1.0に制限
         let levelOfIntegrity = max(0.0, min(1.0, levelOfIntegrity))
 
         // 各フレームが表示されるはずのタイムスタンプを計算
-        let timestamps = calculateRunningSum(delays)
+        let timestamps = await calculateRunningSum(delays)
 
         // デフォルト値を設定
         var resultDelayTime: Double = 0.1
@@ -72,7 +73,7 @@ public struct FrameDecimator: Sendable {
 
         // 各VSync候補について最適解を探す
         for candidateDelayTime in Self.vsyncIntervals {
-            let decimationResult = calculateDecimationForInterval(
+            let decimationResult = await calculateDecimationForInterval(
                 timestamps: timestamps,
                 delayTime: candidateDelayTime,
                 levelOfIntegrity: levelOfIntegrity
@@ -92,11 +93,12 @@ public struct FrameDecimator: Sendable {
     }
 
     /// 指定されたフレーム間隔での間引き計算を実行
+    @concurrent
     private func calculateDecimationForInterval(
         timestamps: [Double],
         delayTime: Double,
         levelOfIntegrity: Double
-    ) -> (indices: [Int], isValid: Bool) {
+    ) async -> (indices: [Int], isValid: Bool) {
         // 候補フレーム時間での各フレームのVSync位置を計算
         let vsyncIndices = timestamps.map { Int($0 / delayTime) }
         let uniqueVsyncIndices = Set(vsyncIndices).sorted()
@@ -114,7 +116,7 @@ public struct FrameDecimator: Sendable {
         }
 
         // 表示するフレームインデックスを選択
-        let selectedIndices = selectDisplayIndices(
+        let selectedIndices = await selectDisplayIndices(
             vsyncIndices: vsyncIndices,
             uniqueVsyncCount: uniqueVsyncIndices.count
         )
@@ -123,10 +125,11 @@ public struct FrameDecimator: Sendable {
     }
 
     /// 表示するフレームインデックスを選択
+    @concurrent
     private func selectDisplayIndices(
         vsyncIndices: [Int],
         uniqueVsyncCount: Int
-    ) -> [Int] {
+    ) async -> [Int] {
         var displayIndices: [Int] = []
         var oldIndex = 0
         var newIndex = 0
@@ -144,7 +147,8 @@ public struct FrameDecimator: Sendable {
     }
 
     /// 累積和を計算
-    private func calculateRunningSum(_ values: [Double]) -> [Double] {
+    @concurrent
+    private func calculateRunningSum(_ values: [Double]) async -> [Double] {
         var result: [Double] = []
         var sum: Double = 0
         for value in values {

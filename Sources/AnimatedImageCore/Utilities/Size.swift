@@ -49,7 +49,7 @@ extension Size {
         return result.overflow ? Int.max : result.partialValue
     }
 
-    public var isEmpty: Bool {
+    public nonisolated var isEmpty: Bool {
         width == 0 || height == 0
     }
 }
