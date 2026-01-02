@@ -23,7 +23,7 @@ public nonisolated struct Size: Sendable, Hashable {
         self.vector = vector
     }
 
-    public static let zero = Size(width: 0, height: 0)
+    public static var zero: Size { Size(width: 0, height: 0) }
 }
 
 // MARK: - CGSize変換
