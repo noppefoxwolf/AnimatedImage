@@ -44,6 +44,9 @@ let package = Package(
             dependencies: [
                 "UpdateLink",
                 "AnimatedImageCore",
+            ],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self),
             ]
         ),
         .target(
@@ -51,6 +54,9 @@ let package = Package(
             dependencies: [
                 "UpdateLink",
                 "AnimatedImageCore",
+            ],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self),
             ]
         ),
         .target(
@@ -61,6 +67,9 @@ let package = Package(
                     condition: .when(platforms: [.iOS, .visionOS, .macCatalyst])
                 ),
                 .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
+            ],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self),
             ]
         ),
         .testTarget(
