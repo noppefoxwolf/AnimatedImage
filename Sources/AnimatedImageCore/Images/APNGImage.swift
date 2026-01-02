@@ -11,12 +11,12 @@ public final class APNGImage: AnimatedImage, Sendable {
         self.data = data
     }
 
-    public nonisolated var imageCount: Int {
+    public var imageCount: Int {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0 }
         return CGImageSourceGetCount(source)
     }
 
-    public nonisolated func delayTime(at index: Int) -> Double {
+    public func delayTime(at index: Int) -> Double {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0.1 }
         let imageProperty =
             CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
@@ -29,7 +29,7 @@ public final class APNGImage: AnimatedImage, Sendable {
         return delayTime
     }
 
-    public nonisolated func image(at index: Int) -> CGImage? {
+    public func image(at index: Int) -> CGImage? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         return CGImageSourceCreateImageAtIndex(source, index, nil)
     }

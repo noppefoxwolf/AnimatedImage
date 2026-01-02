@@ -3,7 +3,7 @@ import simd
 import CoreGraphics
 
 /// SIMD2<Int>をラップしたサイズ構造体
-public struct Size: Sendable, Hashable {
+public nonisolated struct Size: Sendable, Hashable {
     private var vector: SIMD2<Int>
 
     public var width: Int {

@@ -39,7 +39,9 @@ public final class AnimatedImageProvider: Sendable {
             await withTaskCancellationHandler {
                 await self.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
             } onCancel: { [cache] in
-                cache.removeAllObjects()
+                Task {
+                    await cache.removeAllObjects()
+                }
             }
         }
     }
@@ -67,7 +69,7 @@ public final class AnimatedImageProvider: Sendable {
         self.delayTime = delayTime
     }
 
-    nonisolated func image(at index: Int) -> CGImage? {
+    func image(at index: Int) -> CGImage? {
         cache.value(forKey: index)
     }
 

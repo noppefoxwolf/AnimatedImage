@@ -18,12 +18,12 @@ final class Cache<Key: Hashable, Value>: @unchecked Sendable {
     }
 
     func insert(_ value: Value, forKey key: Key) {
-        let entry = Entry(value: value)
+        let entry = Entry(value)
         wrapped.setObject(entry, forKey: WrappedKey(key))
     }
 
     func insert(_ value: Value, forKey key: Key, cost: Int) {
-        let entry = Entry(value: value)
+        let entry = Entry(value)
         wrapped.setObject(entry, forKey: WrappedKey(key), cost: cost)
     }
 
@@ -43,26 +43,18 @@ final class Cache<Key: Hashable, Value>: @unchecked Sendable {
 
 //Our WrappedKey type will, wrap our Key values in order to make them NSCache compatible
 extension Cache {
-    fileprivate final class WrappedKey: NSObject {
+    fileprivate final class WrappedKey {
         let key: Key
-
-        init(_ key: Key) { self.key = key }
-
-        override var hash: Int { return key.hashValue }
-
-        override func isEqual(_ object: Any?) -> Bool {
-            guard let value = object as? WrappedKey else {
-                return false
-            }
-
-            return value.key == key
+        
+        init(_ key: Key) {
+            self.key = key
         }
     }
 
     fileprivate final class Entry {
         let value: Value
 
-        init(value: Value) {
+        init(_ value: Value) {
             self.value = value
         }
     }

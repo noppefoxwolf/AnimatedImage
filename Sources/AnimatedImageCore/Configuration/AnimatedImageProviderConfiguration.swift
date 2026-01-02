@@ -18,7 +18,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     }
 
     /// デフォルト設定：バランスの取れたメモリ使用量と品質設定
-    public static var `default`: Self {
+    public nonisolated static var `default`: Self {
         Self(
             maxMemoryUsage: .init(value: 1, unit: .megabytes),
             maxSize: Size(width: 128, height: 128),
