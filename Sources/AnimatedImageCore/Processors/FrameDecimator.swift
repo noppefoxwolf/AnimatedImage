@@ -7,9 +7,9 @@ public actor FrameDecimator: Sendable {
     /// フレーム間引きの結果
     public struct Result: Sendable {
         /// 表示するフレームのインデックス配列
-        public nonisolated let displayIndices: [Int]
+        public let displayIndices: [Int]
         /// 最適化されたフレーム間隔（秒）
-        public nonisolated let delayTime: Double
+        public let delayTime: Double
 
         public init(displayIndices: [Int], delayTime: Double) {
             self.displayIndices = displayIndices

@@ -25,7 +25,7 @@ public actor SizeOptimizer: Sendable {
         targetMemoryRatio: Double = 0.8
     ) async -> Size {
         // 1. 実際の最大サイズを決定（maxSizeとrenderSizeの小さい方）
-        let effectiveMaxSize = await min(maxSize, renderSize)
+        let effectiveMaxSize = min(maxSize, renderSize)
         // 2. 元画像サイズを超えないよう制約を適用
         let constrainedSize = Size(
             width: min(effectiveMaxSize.width, imageSize.width),
