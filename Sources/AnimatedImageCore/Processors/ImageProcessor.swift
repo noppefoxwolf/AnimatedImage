@@ -126,6 +126,7 @@ struct ImageProcessor: Sendable {
         )
     }
 
+    @concurrent
     func prewarmFrameImages(
         indices: [Int],
         optimizedSize: Size,
@@ -149,6 +150,7 @@ struct ImageProcessor: Sendable {
         }
     }
 
+    @concurrent
     func createAndCacheImage(
         image: any AnimatedImage,
         size: Size,
