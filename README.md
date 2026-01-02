@@ -138,7 +138,7 @@ public final class ManualAnimatedImage: AnimatedImage, @unchecked Sendable {
 
 ## Requirements
 
-- Swift 6.1+
+- Swift 6.2+
 - iOS 16.0+
 - macOS 14.0+
 - visionOS 1.0+
