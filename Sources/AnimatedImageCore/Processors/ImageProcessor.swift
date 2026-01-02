@@ -114,7 +114,7 @@ struct ImageProcessor: Sendable {
             return results
         }
 
-        let decimator = await FrameDecimator()
+        let decimator = FrameDecimator()
         let decimationResult = await decimator.optimizeFrameSelection(
             delays: delayTimes,
             levelOfIntegrity: levelOfIntegrity
