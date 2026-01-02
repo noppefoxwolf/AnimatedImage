@@ -1,8 +1,8 @@
 
 actor FrameDurationProcessor: Sendable {
     
-    let defaultDelayTime: Double = 0.1
-    let minimumDelayTime: Double = 0.011 // 10ms
+    nonisolated let defaultDelayTime: Double = 0.1
+    nonisolated let minimumDelayTime: Double = 0.011 // 10ms
     
     @concurrent
     func process(

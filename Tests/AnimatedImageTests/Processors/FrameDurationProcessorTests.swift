@@ -6,10 +6,10 @@ import Testing
 struct FrameDurationProcessorTests {
 
     @Test("unclampedDelayTime を優先して利用する")
-    func usesUnclampedDelayWhenAvailable() {
+    func usesUnclampedDelayWhenAvailable() async {
         let processor = FrameDurationProcessor()
 
-        let result = processor.process(
+        let result = await processor.process(
             unclampedDelayTime: { 0.2 },
             delayTime: { 0.05 }
         )
@@ -18,10 +18,10 @@ struct FrameDurationProcessorTests {
     }
 
     @Test("delayTime は unclampedDelayTime が nil のときに使用される")
-    func fallsBackToDelayTime() {
+    func fallsBackToDelayTime() async {
         let processor = FrameDurationProcessor()
 
-        let result = processor.process(
+        let result = await processor.process(
             unclampedDelayTime: { nil },
             delayTime: { 0.15 }
         )
@@ -30,10 +30,10 @@ struct FrameDurationProcessorTests {
     }
 
     @Test("両方の遅延が nil のときにデフォルト値を返す")
-    func returnsDefaultDelayWhenBothValuesNil() {
+    func returnsDefaultDelayWhenBothValuesNil() async {
         let processor = FrameDurationProcessor()
 
-        let result = processor.process(
+        let result = await processor.process(
             unclampedDelayTime: { nil },
             delayTime: { nil }
         )
@@ -42,10 +42,10 @@ struct FrameDurationProcessorTests {
     }
 
     @Test("最小遅延よりも短い値はデフォルト遅延に丸められる")
-    func enforcesMinimumDelayThreshold() {
+    func enforcesMinimumDelayThreshold() async {
         let processor = FrameDurationProcessor()
 
-        let result = processor.process(
+        let result = await processor.process(
             unclampedDelayTime: { processor.minimumDelayTime / 2 },
             delayTime: { nil }
         )
@@ -54,10 +54,10 @@ struct FrameDurationProcessorTests {
     }
 
     @Test("最小遅延丁度の値はそのまま採用される")
-    func acceptsMinimumDelay() {
+    func acceptsMinimumDelay() async {
         let processor = FrameDurationProcessor()
 
-        let result = processor.process(
+        let result = await processor.process(
             unclampedDelayTime: { processor.minimumDelayTime },
             delayTime: { nil }
         )

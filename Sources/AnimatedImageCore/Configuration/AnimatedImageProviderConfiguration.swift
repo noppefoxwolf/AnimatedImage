@@ -4,7 +4,7 @@ public import QuartzCore
 
 /// アニメーション画像プロバイダーの設定を管理する構造体
 /// メモリ使用量、画像サイズ、品質設定などを制御します
-public struct AnimatedImageProviderConfiguration: Sendable {
+public nonisolated struct AnimatedImageProviderConfiguration: Sendable {
     /// 無制限設定：最大限のメモリとサイズを許可し、最高品質で処理
     public static var unlimited: Self {
         Self(
@@ -18,7 +18,7 @@ public struct AnimatedImageProviderConfiguration: Sendable {
     }
 
     /// デフォルト設定：バランスの取れたメモリ使用量と品質設定
-    public nonisolated static var `default`: Self {
+    public static var `default`: Self {
         Self(
             maxMemoryUsage: .init(value: 1, unit: .megabytes),
             maxSize: Size(width: 128, height: 128),

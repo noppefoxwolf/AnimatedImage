@@ -5,11 +5,11 @@ import Foundation
 public actor FrameDecimator: Sendable {
 
     /// フレーム間引きの結果
-    public actor Result: Sendable {
+    public struct Result: Sendable {
         /// 表示するフレームのインデックス配列
-        public let displayIndices: [Int]
+        public nonisolated let displayIndices: [Int]
         /// 最適化されたフレーム間隔（秒）
-        public let delayTime: Double
+        public nonisolated let delayTime: Double
 
         public init(displayIndices: [Int], delayTime: Double) {
             self.displayIndices = displayIndices
