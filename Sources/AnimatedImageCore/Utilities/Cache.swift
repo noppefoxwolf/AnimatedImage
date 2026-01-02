@@ -1,6 +1,6 @@
 import Foundation
 
-final class Cache<Key: Hashable, Value>: @unchecked Sendable {
+nonisolated final class Cache<Key: Hashable, Value>: @unchecked Sendable {
     private let wrapped = NSCache<WrappedKey, Entry>()
 
     public init(name: String) {
@@ -43,7 +43,7 @@ final class Cache<Key: Hashable, Value>: @unchecked Sendable {
 
 //Our WrappedKey type will, wrap our Key values in order to make them NSCache compatible
 extension Cache {
-    fileprivate final class WrappedKey: Hashable {
+    fileprivate nonisolated final class WrappedKey: Hashable {
         let key: Key
         
         init(_ key: Key) {
@@ -59,7 +59,7 @@ extension Cache {
         }
     }
 
-    fileprivate final class Entry {
+    fileprivate nonisolated final class Entry {
         let value: Value
 
         init(_ value: Value) {

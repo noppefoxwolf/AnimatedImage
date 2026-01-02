@@ -34,14 +34,15 @@ public final class AnimatedImageProvider: Sendable {
     }
 
     func startImageProcessingTask(renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
-        task = Task.detached(priority: configuration.taskPriority) { [image, cache] in
-            await withTaskCancellationHandler {
-                await self.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
-            } onCancel: { [cache] in
-                Task {
-                    await cache.removeAllObjects()
+        task = Task.detached(priority: configuration.taskPriority) { [weak self] in
+            await withTaskCancellationHandler(
+                operation: {
+                    await self?.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
+                },
+                onCancel: {
+                    self?.cache.removeAllObjects()
                 }
-            }
+            )
         }
     }
 
