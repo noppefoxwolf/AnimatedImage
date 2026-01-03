@@ -33,11 +33,11 @@ struct ImageProcessor: Sendable {
         guard imageCount > 0 else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        guard let firstImage = await image.image(at: 0) else { return nil }
+        guard let firstImageSize = await image.size(at: 0) else { return nil }
         let optimizedSize = await optimizedSize(
             for: renderSize,
             scale: scale,
-            imageSize: Size(width: firstImage.width, height: firstImage.height),
+            imageSize: firstImageSize,
             imageCount: imageCount
         )
         guard await isValidRenderSize(optimizedSize) else { return nil }
