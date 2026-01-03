@@ -33,7 +33,7 @@ let package = Package(
         .target(
             name: "AnimatedImageCore",
             swiftSettings: [
-                .defaultIsolation(MainActor.self),
+                .defaultIsolation(MainActor.self)
             ]
         ),
         .target(
@@ -46,7 +46,7 @@ let package = Package(
                 "AnimatedImageCore",
             ],
             swiftSettings: [
-                .defaultIsolation(MainActor.self),
+                .defaultIsolation(MainActor.self)
             ]
         ),
         .target(
@@ -56,7 +56,7 @@ let package = Package(
                 "AnimatedImageCore",
             ],
             swiftSettings: [
-                .defaultIsolation(MainActor.self),
+                .defaultIsolation(MainActor.self)
             ]
         ),
         .target(
@@ -69,7 +69,7 @@ let package = Package(
                 .target(name: "_AppKit_AnimatedImage", condition: .when(platforms: [.macOS])),
             ],
             swiftSettings: [
-                .defaultIsolation(MainActor.self),
+                .defaultIsolation(MainActor.self)
             ]
         ),
         .testTarget(
@@ -94,4 +94,3 @@ package.targets.forEach { target in
     target.swiftSettings = target.swiftSettings ?? []
     target.swiftSettings?.append(contentsOf: swiftSettings)
 }
-

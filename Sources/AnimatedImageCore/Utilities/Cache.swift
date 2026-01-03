@@ -45,16 +45,18 @@ nonisolated final class Cache<Key: Hashable, Value>: @unchecked Sendable {
 extension Cache {
     fileprivate nonisolated final class WrappedKey: Hashable {
         let key: Key
-        
+
         init(_ key: Key) {
             self.key = key
         }
-        
+
         func hash(into hasher: inout Hasher) {
             hasher.combine(key)
         }
-        
-        static func == (lhs: Cache<Key, Value>.WrappedKey, rhs: Cache<Key, Value>.WrappedKey) -> Bool {
+
+        static func == (lhs: Cache<Key, Value>.WrappedKey, rhs: Cache<Key, Value>.WrappedKey)
+            -> Bool
+        {
             lhs.key == rhs.key
         }
     }

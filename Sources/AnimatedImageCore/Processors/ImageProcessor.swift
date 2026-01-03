@@ -98,8 +98,11 @@ struct ImageProcessor: Sendable {
         image: any AnimatedImage
     ) async -> ProcessingResult {
         let levelOfIntegrity = await integrityLevel(for: imageSize, imageCount: imageCount)
-        
-        let delayTimes: [Double] = await withTaskGroup(of: (Int, Double).self, returning: [Double].self) { group in
+
+        let delayTimes: [Double] = await withTaskGroup(
+            of: (Int, Double).self,
+            returning: [Double].self
+        ) { group in
             for index in 0..<imageCount {
                 group.addTask {
                     let delay: Double = await image.delayTime(at: index)
@@ -176,4 +179,3 @@ struct ImageProcessor: Sendable {
         return decodedImage
     }
 }
-

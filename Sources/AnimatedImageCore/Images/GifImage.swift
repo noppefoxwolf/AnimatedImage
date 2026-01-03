@@ -18,7 +18,7 @@ public final class GifImage: AnimatedImage, Sendable {
             return CGImageSourceGetCount(source)
         }
     }
-    
+
     @concurrent
     public func size(at index: Int) async -> Size? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
@@ -34,15 +34,18 @@ public final class GifImage: AnimatedImage, Sendable {
             return nil
         }
     }
-    
+
     @concurrent
     public func delayTime(at index: Int) async -> Double {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0.1 }
-        let imageProperty = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+        let imageProperty =
+            CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
         let frameProperty = imageProperty?[kCGImagePropertyGIFDictionary] as? [CFString: Any]
         let frameDurationProcessor = FrameDurationProcessor()
         let delayTime = await frameDurationProcessor.process(
-            unclampedDelayTime: { frameProperty?[kCGImagePropertyGIFUnclampedDelayTime] as? Double },
+            unclampedDelayTime: {
+                frameProperty?[kCGImagePropertyGIFUnclampedDelayTime] as? Double
+            },
             delayTime: { frameProperty?[kCGImagePropertyGIFDelayTime] as? Double }
         )
         return delayTime

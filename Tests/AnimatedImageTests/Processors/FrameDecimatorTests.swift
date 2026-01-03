@@ -15,7 +15,7 @@ struct FrameDecimatorTests {
         #expect(!result.displayIndices.isEmpty)
         #expect(result.displayIndices.count <= delays.count)
         #expect(result.delayTime > 0)
-        #expect(result.displayIndices == [0,2,4])
+        #expect(result.displayIndices == [0, 2, 4])
     }
 
     @Test("品質レベル1.0で全フレーム表示")
@@ -66,12 +66,18 @@ struct FrameDecimatorTests {
         let delays = Array(repeating: 0.1, count: 10)
 
         // 品質レベル0.0（最小）
-        let minResult = await decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 0.0)
+        let minResult = await decimator.optimizeFrameSelection(
+            delays: delays,
+            levelOfIntegrity: 0.0
+        )
         #expect(!minResult.displayIndices.isEmpty)
         #expect(minResult.displayIndices.count <= delays.count)
 
         // 品質レベル1.0（最大）
-        let maxResult = await decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 1.0)
+        let maxResult = await decimator.optimizeFrameSelection(
+            delays: delays,
+            levelOfIntegrity: 1.0
+        )
         #expect(maxResult.displayIndices.count == delays.count)
 
         // 範囲外の値（負の値）
@@ -82,7 +88,10 @@ struct FrameDecimatorTests {
         #expect(!negativeResult.displayIndices.isEmpty)
 
         // 範囲外の値（1.0を超える値）
-        let overResult = await decimator.optimizeFrameSelection(delays: delays, levelOfIntegrity: 1.5)
+        let overResult = await decimator.optimizeFrameSelection(
+            delays: delays,
+            levelOfIntegrity: 1.5
+        )
         #expect(overResult.displayIndices.count == delays.count)
     }
 

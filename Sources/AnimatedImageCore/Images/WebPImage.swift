@@ -18,7 +18,7 @@ public final class WebPImage: AnimatedImage, Sendable {
             return CGImageSourceGetCount(source)
         }
     }
-    
+
     @concurrent
     public func size(at index: Int) async -> Size? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
@@ -38,11 +38,14 @@ public final class WebPImage: AnimatedImage, Sendable {
     @concurrent
     public func delayTime(at index: Int) async -> Double {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0.1 }
-        let imageProperty = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+        let imageProperty =
+            CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
         let frameProperty = imageProperty?[kCGImagePropertyWebPDictionary] as? [CFString: Any]
         let frameDurationProcessor = FrameDurationProcessor()
         let delayTime = await frameDurationProcessor.process(
-            unclampedDelayTime: { frameProperty?[kCGImagePropertyWebPUnclampedDelayTime] as? Double },
+            unclampedDelayTime: {
+                frameProperty?[kCGImagePropertyWebPUnclampedDelayTime] as? Double
+            },
             delayTime: { frameProperty?[kCGImagePropertyWebPDelayTime] as? Double }
         )
         return delayTime

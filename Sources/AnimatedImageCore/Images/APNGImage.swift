@@ -18,7 +18,7 @@ public final class APNGImage: AnimatedImage, Sendable {
             return CGImageSourceGetCount(source)
         }
     }
-    
+
     @concurrent
     public func size(at index: Int) async -> Size? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
@@ -43,7 +43,9 @@ public final class APNGImage: AnimatedImage, Sendable {
         let frameProperty = imageProperty?[kCGImagePropertyPNGDictionary] as? [CFString: Any]
         let frameDurationProcessor = FrameDurationProcessor()
         let delayTime = await frameDurationProcessor.process(
-            unclampedDelayTime: { frameProperty?[kCGImagePropertyAPNGUnclampedDelayTime] as? Double },
+            unclampedDelayTime: {
+                frameProperty?[kCGImagePropertyAPNGUnclampedDelayTime] as? Double
+            },
             delayTime: { frameProperty?[kCGImagePropertyAPNGDelayTime] as? Double }
         )
         return delayTime

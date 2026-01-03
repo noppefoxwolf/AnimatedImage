@@ -37,7 +37,8 @@ public final class AnimatedImageProvider: Sendable {
         task = Task.detached(priority: configuration.taskPriority) { [weak self] in
             await withTaskCancellationHandler(
                 operation: {
-                    await self?.processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
+                    await self?
+                        .processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
                 },
                 onCancel: {
                     self?.cache.removeAllObjects()
@@ -64,7 +65,7 @@ public final class AnimatedImageProvider: Sendable {
             delayTime: processingResult.delayTime
         )
     }
-    
+
     func updateFrameState(indices: [Int], delayTime: Double) {
         self.indices = indices
         self.delayTime = delayTime

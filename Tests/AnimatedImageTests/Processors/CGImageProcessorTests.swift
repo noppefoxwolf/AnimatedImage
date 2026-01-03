@@ -181,7 +181,7 @@ struct CGImageProcessorTests {
     private func createGrayscaleTestImage(width: Int, height: Int) -> CGImage {
         let colorSpace = CGColorSpaceCreateDeviceGray()
         let pixelCount = width * height
-        let data = Data(repeating: 0x80, count: pixelCount) // mid-gray
+        let data = Data(repeating: 0x80, count: pixelCount)  // mid-gray
         let provider = CGDataProvider(data: data as CFData)!
 
         let image = CGImage(
@@ -204,7 +204,7 @@ struct CGImageProcessorTests {
     private func createGrayscaleMask(width: Int, height: Int) -> CGImage {
         // Create a simple mask with constant mid alpha.
         let pixelCount = width * height
-        let data = Data(repeating: 0x80, count: pixelCount) // 128 alpha
+        let data = Data(repeating: 0x80, count: pixelCount)  // 128 alpha
         let provider = CGDataProvider(data: data as CFData)!
         let mask = CGImage(
             maskWidth: width,
