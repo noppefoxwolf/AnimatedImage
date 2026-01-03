@@ -20,6 +20,22 @@ public final class GifImage: AnimatedImage, Sendable {
     }
     
     @concurrent
+    public func size(at index: Int) async -> Size? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        let imageProperty =
+            CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+        let width = imageProperty?[kCGImagePropertyPixelWidth] as? Int
+        let height = imageProperty?[kCGImagePropertyPixelHeight] as? Int
+        if let width, let height {
+            return Size(width: width, height: height)
+        } else if let image = await image(at: index) {
+            return Size(width: image.width, height: image.height)
+        } else {
+            return nil
+        }
+    }
+    
+    @concurrent
     public func delayTime(at index: Int) async -> Double {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return 0.1 }
         let imageProperty = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
