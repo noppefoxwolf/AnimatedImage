@@ -64,7 +64,7 @@ struct ImageProcessorTests {
 }
 
 // テスト用のモック
-private final class MockAnimatedImage: AnimatedImage, @unchecked Sendable {
+private final class MockAnimatedImage: AnimatedImage, Sendable {
     private let frameCount: Int
     private let delayTime: Double
 
@@ -82,8 +82,12 @@ private final class MockAnimatedImage: AnimatedImage, @unchecked Sendable {
     nonisolated func delayTime(at index: Int) -> Double {
         delayTime
     }
+    
+    func size(at index: Int) -> Size? {
+        .init(width: 10, height: 10)
+    }
 
-    nonisolated func image(at index: Int) -> CGImage? {
+    func image(at index: Int) -> CGImage? {
         guard index >= 0 && index < frameCount else { return nil }
 
         // 簡単なテスト用CGImageを作成
