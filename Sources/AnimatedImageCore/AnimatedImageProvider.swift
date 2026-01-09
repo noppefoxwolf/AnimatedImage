@@ -24,21 +24,37 @@ public final class AnimatedImageProvider: Sendable {
     var task: Task<Void, Never>? = nil
     var currentIndex: Int? = nil
 
-    public func update(for renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
+    public func update(
+        for renderSize: CGSize,
+        scale: CGFloat,
+        imageSource: any AnimatedImageSource
+    ) {
         cancelCurrentTask()
-        startImageProcessingTask(renderSize: renderSize, scale: scale, image: image)
+        startImageProcessingTask(
+            renderSize: renderSize,
+            scale: scale,
+            imageSource: imageSource
+        )
     }
 
     public func cancelCurrentTask() {
         task?.cancel()
     }
 
-    func startImageProcessingTask(renderSize: CGSize, scale: CGFloat, image: any AnimatedImage) {
+    func startImageProcessingTask(
+        renderSize: CGSize,
+        scale: CGFloat,
+        imageSource: any AnimatedImageSource
+    ) {
         task = Task.detached(priority: configuration.taskPriority) { [weak self] in
             await withTaskCancellationHandler(
                 operation: {
                     await self?
-                        .processAnimatedImage(renderSize: renderSize, scale: scale, image: image)
+                        .processAnimatedImage(
+                            renderSize: renderSize,
+                            scale: scale,
+                            imageSource: imageSource
+                        )
                 },
                 onCancel: {
                     self?.cache.removeAllObjects()
@@ -51,12 +67,12 @@ public final class AnimatedImageProvider: Sendable {
     func processAnimatedImage(
         renderSize: CGSize,
         scale: CGFloat,
-        image: any AnimatedImage
+        imageSource: any AnimatedImageSource
     ) async {
         let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(renderSize),
             scale: scale,
-            image: image
+            imageSource: imageSource
         )
         guard let processingResult else { return }
 

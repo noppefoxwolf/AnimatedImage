@@ -42,8 +42,8 @@ AnimatedImage uses `AnimatedImageProvider` to pre-decode and cache animation fra
 import AnimatedImage
 
 let imageView = AnimatedImageView(frame: .zero)
-let image = APNGImage(data: data) // or GifImage(data: data), WebPImage(data: data)
-imageView.image = image
+let imageSource = APNGImageSource(data: data) // or GifImageSource(data: data), WebPImageSource(data: data)
+imageView.imageSource = imageSource
 imageView.startAnimating()
 ```
 
@@ -53,10 +53,10 @@ imageView.startAnimating()
 import AnimatedImage
 
 struct ContentView: View {
-    @State var image = GifImage(data: data)
+    @State var imageSource = GifImageSource(data: data)
 
     var body: some View {
-        AnimatedImagePlayer(image: image) // .init(image:contentMode:) supports .fit/.fill
+        AnimatedImagePlayer(imageSource: imageSource) // .init(imageSource:contentMode:) supports .fit/.fill
     }
 }
 ```
@@ -70,7 +70,7 @@ Control memory, size, quality, and processing priority using `AnimatedImageProvi
   let imageView = AnimatedImageView(frame: .zero)
   imageView.configuration = .default // .default, .performance, .unlimited
   imageView.contentMode = .scaleAspectFill
-  imageView.image = GifImage(data: data)
+  imageView.imageSource = GifImageSource(data: data)
   imageView.startAnimating()
   ```
 
@@ -79,7 +79,7 @@ Control memory, size, quality, and processing priority using `AnimatedImageProvi
   let config: AnimatedImageProviderConfiguration = .default
 
   var body: some View {
-      AnimatedImagePlayer(image: GifImage(data: data))
+      AnimatedImagePlayer(imageSource: GifImageSource(data: data))
           .environment(\.animatedImageProviderConfiguration, config)
   }
   ```
@@ -112,10 +112,10 @@ Synchronizes frame updates for smooth animation playback.
 
 ### Custom Animation Support
 
-Create your own animated images by conforming to the `AnimatedImage` protocol:
+Create your own animated images by conforming to the `AnimatedImageSource` protocol:
 
 ```swift
-public final class ManualAnimatedImage: AnimatedImage, @unchecked Sendable {
+public final class ManualAnimatedImageSource: AnimatedImageSource, @unchecked Sendable {
     public let name: String
     public let imageCount: Int
     private let images: [CGImage]

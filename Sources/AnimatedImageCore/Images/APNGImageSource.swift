@@ -2,7 +2,7 @@ public import CoreGraphics
 public import Foundation
 import ImageIO
 
-public final class APNGImage: AnimatedImage, Sendable {
+public final class APNGImageSource: AnimatedImageSource, Sendable {
     public let name: String
     let data: Data
 

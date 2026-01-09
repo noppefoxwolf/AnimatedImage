@@ -5,11 +5,11 @@ public import _UIKit_AnimatedImage
 import UIKit
 
 public struct AnimatedImagePlayer: UIViewRepresentable {
-    let image: any AnimatedImage
+    let imageSource: any AnimatedImageSource
     let contentMode: ContentMode
 
-    public init(image: any AnimatedImage, contentMode: ContentMode = .fit) {
-        self.image = image
+    public init(imageSource: any AnimatedImageSource, contentMode: ContentMode = .fit) {
+        self.imageSource = imageSource
         self.contentMode = contentMode
     }
 
@@ -20,13 +20,13 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
         uiView.configuration = context.environment.animatedImageProviderConfiguration
         uiView.contentMode = contentMode.asUIKit()
-        uiView.image = image
+        uiView.imageSource = imageSource
         uiView.startAnimating()
     }
 
     public static func dismantleUIView(_ uiView: AnimatedImageView, coordinator: ()) {
         uiView.stopAnimating()
-        uiView.image = nil
+        uiView.imageSource = nil
     }
 }
 

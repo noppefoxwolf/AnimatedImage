@@ -1,7 +1,7 @@
 public import CoreGraphics
 import Foundation
 
-public protocol AnimatedImage: Sendable {
+public protocol AnimatedImageSource: Sendable {
     var name: String { get }
     var imageCount: Int { get async }
     func size(at index: Int) async -> Size?

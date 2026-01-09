@@ -34,11 +34,11 @@ struct ImageProcessorTests {
         let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
         let processor = await ImageProcessor(configuration: configuration, cache: cache)
 
-        let mockImage = MockAnimatedImage(frameCount: 10, delayTime: 0.1)
+        let mockImage = MockAnimatedImageSource(frameCount: 10, delayTime: 0.1)
         let result = await processor.optimizeFrameSelection(
             for: Size(width: 100, height: 100),
             imageCount: 10,
-            image: mockImage
+            imageSource: mockImage
         )
 
         #expect(!result.indices.isEmpty)
@@ -51,9 +51,9 @@ struct ImageProcessorTests {
         let cache = Cache<Int, CGImage>(name: "Test.ImageProcessor")
         let processor = await ImageProcessor(configuration: configuration, cache: cache)
 
-        let mockImage = MockAnimatedImage(frameCount: 5, delayTime: 0.1)
+        let mockImage = MockAnimatedImageSource(frameCount: 5, delayTime: 0.1)
         let image = await processor.createAndCacheImage(
-            image: mockImage,
+            imageSource: mockImage,
             size: Size(width: 50, height: 50),
             index: 0,
             interpolationQuality: .default
@@ -64,7 +64,7 @@ struct ImageProcessorTests {
 }
 
 // テスト用のモック
-private final class MockAnimatedImage: AnimatedImage, Sendable {
+private final class MockAnimatedImageSource: AnimatedImageSource, Sendable {
     private let frameCount: Int
     private let delayTime: Double
 

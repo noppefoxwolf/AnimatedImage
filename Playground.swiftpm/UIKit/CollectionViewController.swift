@@ -49,18 +49,18 @@ class CollectionViewController: UICollectionViewController {
         case .apng(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "png")!
             let data = try! Data(contentsOf: url)
-            let image = APNGImage(name: name, data: data)
-            cell.animatedImageView.image = image
+            let imageSource = APNGImageSource(name: name, data: data)
+            cell.animatedImageView.imageSource = imageSource
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
             let data = try! Data(contentsOf: url)
-            let image = GifImage(name: name, data: data)
-            cell.animatedImageView.image = image
+            let imageSource = GifImageSource(name: name, data: data)
+            cell.animatedImageView.imageSource = imageSource
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
             let data = try! Data(contentsOf: url)
-            let image = WebPImage(name: name, data: data)
-            cell.animatedImageView.image = image
+            let imageSource = WebPImageSource(name: name, data: data)
+            cell.animatedImageView.imageSource = imageSource
         }
 
         return cell

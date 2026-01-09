@@ -2,17 +2,23 @@ public import AnimatedImageCore
 public import UIKit
 
 open class AnimatedImageView: AnimatableCGImageView {
-    public var image: (any AnimatedImage)? = nil {
+    public var imageSource: (any AnimatedImageSource)? = nil {
         didSet {
-            guard let image else { return }
-            provider = AnimatedImageProvider(name: image.name, configuration: configuration)
+            guard let imageSource else { return }
+            provider = AnimatedImageProvider(
+                name: imageSource.name,
+                configuration: configuration
+            )
         }
     }
 
     public var configuration: AnimatedImageProviderConfiguration = .default {
         didSet {
-            if let image {
-                provider = AnimatedImageProvider(name: image.name, configuration: configuration)
+            if let imageSource {
+                provider = AnimatedImageProvider(
+                    name: imageSource.name,
+                    configuration: configuration
+                )
             }
             layer.magnificationFilter = configuration.contentsFilter
         }
@@ -22,9 +28,12 @@ open class AnimatedImageView: AnimatableCGImageView {
         didSet {
             contents = nil
 
-            if let image {
-                provider?
-                    .update(for: bounds.size, scale: traitCollection.displayScale, image: image)
+            if let imageSource {
+                provider?.update(
+                    for: bounds.size,
+                    scale: traitCollection.displayScale,
+                    imageSource: imageSource
+                )
             }
 
             setNeedsDisplay()
@@ -40,8 +49,12 @@ open class AnimatedImageView: AnimatableCGImageView {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        if let image {
-            provider?.update(for: bounds.size, scale: traitCollection.displayScale, image: image)
+        if let imageSource {
+            provider?.update(
+                for: bounds.size,
+                scale: traitCollection.displayScale,
+                imageSource: imageSource
+            )
         }
     }
 
