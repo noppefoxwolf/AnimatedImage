@@ -6,23 +6,20 @@ private let logger = Logger(
     category: #file
 )
 
-public final class AnimatedImageProvider: Sendable {
-    private let cache: Cache<Int, CGImage>
+public final class AnimatedImage: Sendable {
     private let configuration: AnimatedImageProviderConfiguration
     private let imageProcessor: ImageProcessor
-    private let timingCalculator: AnimationTimingCalculator
+    private var state: AnimatedImageState
 
     public init(name: String, configuration: AnimatedImageProviderConfiguration) {
-        self.cache = Cache(name: name)
         self.configuration = configuration
+        let cache = Cache<Int, CGImage>(name: name)
         self.imageProcessor = ImageProcessor(configuration: configuration, cache: cache)
-        self.timingCalculator = AnimationTimingCalculator()
+        self.state = AnimatedImageState(cache: cache)
     }
 
-    var indices: [Int] = []
-    var delayTime: Double = 0.1
     var task: Task<Void, Never>? = nil
-    var currentIndex: Int? = nil
+    var currentFrameIndex: Int? = nil
 
     public func update(
         for renderSize: CGSize,
@@ -57,7 +54,7 @@ public final class AnimatedImageProvider: Sendable {
                         )
                 },
                 onCancel: {
-                    self?.cache.removeAllObjects()
+                    self?.state.removeAllCachedImages()
                 }
             )
         }
@@ -69,43 +66,35 @@ public final class AnimatedImageProvider: Sendable {
         scale: CGFloat,
         imageSource: any AnimatedImageSource
     ) async {
-        let processingResult = await imageProcessor.processAnimatedImage(
+        let frameState = await imageProcessor.processAnimatedImage(
             renderSize: Size(renderSize),
             scale: scale,
             imageSource: imageSource
         )
-        guard let processingResult else { return }
+        guard let frameState else { return }
 
-        await updateFrameState(
-            indices: processingResult.indices,
-            delayTime: processingResult.delayTime
-        )
+        await updateFrameState(with: frameState)
     }
 
-    func updateFrameState(indices: [Int], delayTime: Double) {
-        self.indices = indices
-        self.delayTime = delayTime
+    func updateFrameState(with frameState: AnimatedImageState.FrameState) {
+        state.update(with: frameState)
     }
 
     func image(at index: Int) -> CGImage? {
-        cache.value(forKey: index)
+        state.image(at: index)
     }
 
     func index(for targetTimestamp: TimeInterval) -> Int? {
-        timingCalculator.frameIndex(
-            for: targetTimestamp,
-            indices: indices,
-            delayTime: delayTime
-        )
+        state.frameIndex(for: targetTimestamp)
     }
 
     public func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
         let index = self.index(for: targetTimestamp)
-        guard let index, currentIndex != index else { return nil }
+        guard let index, currentFrameIndex != index else { return nil }
 
         let image = self.image(at: index)
         if image != nil {
-            currentIndex = index
+            currentFrameIndex = index
         }
         return image
     }

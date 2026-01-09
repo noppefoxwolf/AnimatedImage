@@ -32,7 +32,7 @@ let package = Package(
 
 ## How It Works
 
-AnimatedImage uses `AnimatedImageProvider` to pre-decode and cache animation frames for optimal performance. It dynamically optimizes frame processing based on drawing size and timing to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
+AnimatedImage uses the core `AnimatedImage` type to pre-decode and cache animation frames for optimal performance. It dynamically optimizes frame processing based on drawing size and timing to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
 
 ## Usage
 
@@ -149,7 +149,7 @@ The library consists of multiple internal modules unified under a single product
 
 - **`AnimatedImageCore`**: Core animation logic and image processing
   - Image decoders for APNG, GIF, and WebP
-  - `AnimatedImageProvider` for animation caching and frame management
+  - `AnimatedImage` for animation caching and frame management
   - Image processing and timing calculations
 - **Platform-specific modules**:
   - `_UIKit_AnimatedImage`: UIKit support with `AnimatedImageView`

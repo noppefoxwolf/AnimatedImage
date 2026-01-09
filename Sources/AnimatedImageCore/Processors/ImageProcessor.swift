@@ -3,16 +3,6 @@ import QuartzCore
 import os
 
 struct ImageProcessor: Sendable {
-    nonisolated struct ProcessingResult: Sendable {
-        let indices: [Int]
-        let delayTime: Double
-
-        init(indices: [Int], delayTime: Double) {
-            self.indices = indices
-            self.delayTime = delayTime
-        }
-    }
-
     private let configuration: AnimatedImageProviderConfiguration
     private let cache: Cache<Int, CGImage>
     private let sizeOptimizer: SizeOptimizer
@@ -28,7 +18,7 @@ struct ImageProcessor: Sendable {
         renderSize: Size,
         scale: CGFloat,
         imageSource: any AnimatedImageSource
-    ) async -> ProcessingResult? {
+    ) async -> AnimatedImageState.FrameState? {
         let imageCount = await imageSource.imageCount
         guard imageCount > 0 else { return nil }
         guard !Task.isCancelled else { return nil }
@@ -96,7 +86,7 @@ struct ImageProcessor: Sendable {
         for imageSize: Size,
         imageCount: Int,
         imageSource: any AnimatedImageSource
-    ) async -> ProcessingResult {
+    ) async -> AnimatedImageState.FrameState {
         let levelOfIntegrity = await integrityLevel(for: imageSize, imageCount: imageCount)
 
         let delayTimes: [Double] = await withTaskGroup(
@@ -123,7 +113,7 @@ struct ImageProcessor: Sendable {
             levelOfIntegrity: levelOfIntegrity
         )
 
-        return ProcessingResult(
+        return AnimatedImageState.FrameState(
             indices: decimationResult.displayIndices,
             delayTime: decimationResult.delayTime
         )

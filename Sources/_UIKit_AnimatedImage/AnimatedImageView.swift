@@ -5,7 +5,7 @@ open class AnimatedImageView: AnimatableCGImageView {
     public var imageSource: (any AnimatedImageSource)? = nil {
         didSet {
             guard let imageSource else { return }
-            provider = AnimatedImageProvider(
+            animatedImage = AnimatedImage(
                 name: imageSource.name,
                 configuration: configuration
             )
@@ -15,7 +15,7 @@ open class AnimatedImageView: AnimatableCGImageView {
     public var configuration: AnimatedImageProviderConfiguration = .default {
         didSet {
             if let imageSource {
-                provider = AnimatedImageProvider(
+                animatedImage = AnimatedImage(
                     name: imageSource.name,
                     configuration: configuration
                 )
@@ -24,12 +24,12 @@ open class AnimatedImageView: AnimatableCGImageView {
         }
     }
 
-    private var provider: AnimatedImageProvider? = nil {
+    private var animatedImage: AnimatedImage? = nil {
         didSet {
             contents = nil
 
             if let imageSource {
-                provider?.update(
+                animatedImage?.update(
                     for: bounds.size,
                     scale: traitCollection.displayScale,
                     imageSource: imageSource
@@ -43,14 +43,14 @@ open class AnimatedImageView: AnimatableCGImageView {
     open override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if superview == nil {
-            provider?.cancelCurrentTask()
+            animatedImage?.cancelCurrentTask()
         }
     }
 
     open override func layoutSubviews() {
         super.layoutSubviews()
         if let imageSource {
-            provider?.update(
+            animatedImage?.update(
                 for: bounds.size,
                 scale: traitCollection.displayScale,
                 imageSource: imageSource
@@ -62,7 +62,7 @@ open class AnimatedImageView: AnimatableCGImageView {
         _ contents: inout CGImage?,
         for targetTimestamp: TimeInterval
     ) {
-        if let image = provider?.contentsForTimestamp(targetTimestamp) {
+        if let image = animatedImage?.contentsForTimestamp(targetTimestamp) {
             contents = image
         }
     }
