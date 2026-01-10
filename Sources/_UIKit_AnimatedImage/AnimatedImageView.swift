@@ -31,7 +31,7 @@ open class AnimatedImageView: AnimatableCGImageView {
         }
     }
     
-    private var currentFrameIndex: Int = 0
+    private var currentFrameIndex: Int? = nil
     
     func decode(
         _ imageLoader: AnimatedImageLoader,
