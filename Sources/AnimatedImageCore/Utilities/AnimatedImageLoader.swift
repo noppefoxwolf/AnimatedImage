@@ -7,6 +7,7 @@ public final class AnimatedImageLoader {
         public let name: String
         public let size: CGSize
         public let scale: CGFloat
+        // FIXME: prepareForDisplayで使われる要素が不足している
     }
     
     // TaskCache

@@ -12,8 +12,7 @@ open class AnimatedImageView: AnimatableCGImageView {
                 decode(
                     AnimatedImageLoader.shared,
                     decodeImage: animatedImage,
-                    // FIXME: サイズは適当な値を入れてる
-                    layout: (CGSize(width: 60, height: 60), 3)
+                    layout: (bounds.size, traitCollection.displayScale)
                 )
             }
             setNeedsDisplay()
@@ -28,8 +27,6 @@ open class AnimatedImageView: AnimatableCGImageView {
             setNeedsDisplay()
         }
     }
-    
-    public var optimizeDecodeForSize: Bool = true
     
     private var currentFrameIndex: Int = 0
     
@@ -46,14 +43,12 @@ open class AnimatedImageView: AnimatableCGImageView {
     open override func layoutSubviews() {
         super.layoutSubviews()
         
-        if optimizeDecodeForSize {
-            if let animatedImage {
-                decode(
-                    AnimatedImageLoader.shared,
-                    decodeImage: animatedImage,
-                    layout: (bounds.size, traitCollection.displayScale)
-                )
-            }
+        if let animatedImage {
+            decode(
+                AnimatedImageLoader.shared,
+                decodeImage: animatedImage,
+                layout: (bounds.size, traitCollection.displayScale)
+            )
         }
     }
 
