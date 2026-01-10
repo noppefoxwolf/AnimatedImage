@@ -12,6 +12,7 @@ nonisolated final class Cache<Key: Hashable, Value>: @unchecked Sendable {
         set { wrapped.countLimit = newValue }
     }
 
+    // If 0, there is no total cost limit. The default value is 0.
     var totalCostLimit: Int {
         get { wrapped.totalCostLimit }
         set { wrapped.totalCostLimit = newValue }

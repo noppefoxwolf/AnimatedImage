@@ -12,13 +12,15 @@ nonisolated struct AnimatedImageState: Sendable {
         size: Size,
         indices: [Int],
         delayTime: TimeInterval = 0.1,
-        images: [Int : CGImage]
+        images: [Int : CGImage],
+        totalCostLimit: Int
     ) {
         self.storage = Cache<Int, CGImage>(name: name)
         self.size = size
         self.indices = indices
         self.delayTime = delayTime
         insertImages(images)
+        storage.totalCostLimit = totalCostLimit
     }
 
     func frameIndex(for targetTimestamp: TimeInterval) -> Int? {
@@ -44,7 +46,8 @@ nonisolated struct AnimatedImageState: Sendable {
 
     func insertImages(_ images: [Int: CGImage]) {
         for (index, image) in images {
-            storage.insert(image, forKey: index)
+            let cost = image.bytesPerRow * image.height
+            storage.insert(image, forKey: index, cost: cost)
         }
     }
 }

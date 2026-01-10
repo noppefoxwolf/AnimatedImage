@@ -29,6 +29,8 @@ open class AnimatedImageView: AnimatableCGImageView {
         }
     }
     
+    public var optimizeDecodeForSize: Bool = true
+    
     private var currentFrameIndex: Int = 0
     
     func decode(
@@ -40,8 +42,6 @@ open class AnimatedImageView: AnimatableCGImageView {
             decodedAnimatedImage = await imageLoader.decode(decodeImage, layout: layout)
         }
     }
-    
-    public var optimizeDecodeForSize: Bool = true
     
     open override func layoutSubviews() {
         super.layoutSubviews()
@@ -56,23 +56,18 @@ open class AnimatedImageView: AnimatableCGImageView {
             }
         }
     }
-    
-    func contents(at index: Int) -> CGImage? {
-        let image = decodedAnimatedImage?.image(at: index)
-        if image != nil {
-            currentFrameIndex = index
-        }
-        return image
-    }
 
-    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
+    func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> (index: Int, CGImage)? {
         let index = decodedAnimatedImage?.index(for: targetTimestamp)
         guard let index, currentFrameIndex != index else { return nil }
-        return contents(at: index)
+        let image = decodedAnimatedImage?.image(at: index)
+        guard let image else { return nil }
+        return (index, image)
     }
     
     open override func updateContents(for targetTimestamp: TimeInterval) {
-        if let image = contentsForTimestamp(targetTimestamp) {
+        if let (index, image) = contentsForTimestamp(targetTimestamp) {
+            self.currentFrameIndex = index
             self.contents = image
         }
     }
@@ -81,7 +76,6 @@ open class AnimatedImageView: AnimatableCGImageView {
 
 final class AnimatedImageLoader {
     static let shared = AnimatedImageLoader()
-    // name, size, scale : [cgimage], indicies, stmap
     
     struct Key: Hashable {
         let name: String

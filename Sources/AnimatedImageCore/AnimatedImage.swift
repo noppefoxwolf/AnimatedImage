@@ -47,7 +47,8 @@ public final class AnimatedImage: Identifiable, Sendable {
             size: processingResult.size,
             indices: processingResult.indices,
             delayTime: processingResult.delayTime,
-            images: processingResult.images
+            images: processingResult.images,
+            totalCostLimit: Int(configuration.maxMemoryUsage.converted(to: .bytes).value)
         )
         let animatedImage = await AnimatedImage(
             imageSource: imageSource,
