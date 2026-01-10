@@ -48,6 +48,16 @@ nonisolated struct AnimatedImageState: Sendable {
         cache.value(forKey: index)
     }
 
+    func insert(_ image: CGImage, for index: Int) {
+        cache.insert(image, forKey: index)
+    }
+
+    func insertImages(_ images: [Int: CGImage]) {
+        for (index, image) in images {
+            cache.insert(image, forKey: index)
+        }
+    }
+
     func removeAllCachedImages() {
         cache.removeAllObjects()
     }

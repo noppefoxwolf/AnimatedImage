@@ -19,7 +19,7 @@ public final class AnimatedImage: Sendable {
         self.imageSource = imageSource
         self.configuration = configuration
         let cache = Cache<Int, CGImage>(name: imageSource.name)
-        self.imageProcessor = ImageProcessor(configuration: configuration, cache: cache)
+        self.imageProcessor = ImageProcessor(configuration: configuration)
         self.state = AnimatedImageState(cache: cache)
     }
 
@@ -70,14 +70,19 @@ public final class AnimatedImage: Sendable {
         renderSize: CGSize,
         scale: CGFloat
     ) async {
-        let frameState = await imageProcessor.processAnimatedImage(
+        let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(renderSize),
             scale: scale,
             imageSource: imageSource
         )
-        guard let frameState else { return }
+        guard let processingResult else { return }
 
-        await updateFrameState(with: frameState)
+        await updateFrameState(with: processingResult.frameState)
+        await cachePrewarmedImages(processingResult.images)
+    }
+
+    func cachePrewarmedImages(_ images: [Int: CGImage]) {
+        state.insertImages(images)
     }
 
     func updateFrameState(with frameState: AnimatedImageState.FrameState) {

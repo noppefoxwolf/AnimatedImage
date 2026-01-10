@@ -66,12 +66,12 @@ struct ContentView: View {
 
 ### Configuration
 
-Control memory, size, quality, and processing priority using `AnimatedImageProviderConfiguration`.
+Control memory, size, quality, and processing priority using `AnimatedImage.Configuration`.
 
 - UIKit
   ```swift
   let imageView = AnimatedImageView(frame: .zero)
-  let configuration: AnimatedImageProviderConfiguration = .default // .default, .performance, .unlimited
+  let configuration: AnimatedImage.Configuration = .default // .default, .performance, .unlimited
   imageView.contentMode = .scaleAspectFill
   let imageSource = GifImageSource(data: data)
   imageView.animatedImage = AnimatedImage(
@@ -83,11 +83,11 @@ Control memory, size, quality, and processing priority using `AnimatedImageProvi
 
 - SwiftUI
   ```swift
-  let config: AnimatedImageProviderConfiguration = .default
+  let config: AnimatedImage.Configuration = .default
 
   var body: some View {
       AnimatedImagePlayer(imageSource: GifImageSource(data: data))
-          .environment(\.animatedImageProviderConfiguration, config)
+          .environment(\.animatedImageConfiguration, config)
   }
   ```
 
