@@ -32,7 +32,21 @@ open class AnimatedImageView: AnimatableCGImageView {
     }
 
     private var currentFrameIndex: Int? = nil
+    
+    public var adjustAnimatedImageForSize: Bool = true
 
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if let image, adjustAnimatedImageForSize {
+            decode(
+                AnimatedImageLoader.shared,
+                decodeImage: image,
+                layout: (bounds.size, traitCollection.displayScale)
+            )
+        }
+    }
+    
     func decode(
         _ imageLoader: AnimatedImageLoader,
         decodeImage: AnimatedImage,
@@ -40,18 +54,6 @@ open class AnimatedImageView: AnimatableCGImageView {
     ) {
         decodeTask = Task {
             decodedImage = await imageLoader.decode(decodeImage, layout: layout)
-        }
-    }
-
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-
-        if let image {
-            decode(
-                AnimatedImageLoader.shared,
-                decodeImage: image,
-                layout: (bounds.size, traitCollection.displayScale)
-            )
         }
     }
 

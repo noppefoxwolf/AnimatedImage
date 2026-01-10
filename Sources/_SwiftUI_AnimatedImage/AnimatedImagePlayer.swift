@@ -14,7 +14,7 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     }
 
     public func makeUIView(context: Context) -> AnimatedImageView {
-        AnimatedImageView(frame: .null)
+        AnimatedImageView(frame: .zero)
     }
 
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
