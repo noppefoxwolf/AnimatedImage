@@ -22,6 +22,17 @@ public final class AnimatedImage: Identifiable, Sendable {
         self.imageProcessor = ImageProcessor(configuration: configuration)
     }
     
+    init(
+        imageSource: any AnimatedImageSource,
+        withConfiguration configuration: AnimatedImage.Configuration,
+        state: AnimatedImageState
+    ) {
+        self.imageSource = imageSource
+        self.configuration = configuration
+        self.imageProcessor = ImageProcessor(configuration: configuration)
+        self.state = state
+    }
+    
     @concurrent
     public func prepareForDisplay(
         for size: CGSize,
@@ -36,23 +47,19 @@ public final class AnimatedImage: Identifiable, Sendable {
         guard let processingResult else {
             return self
         }
-        var animatedImage = await AnimatedImage(
-            imageSource: imageSource,
-            withConfiguration: configuration
-        )
-        await animatedImage.setState(processingResult)
-        return animatedImage
-    }
-    
-    private func setState(_ result: ImageProcessor.ProcessingResult) {
-        var newState = AnimatedImageState(
+        let state = await AnimatedImageState(
             name: imageSource.name,
-            size: result.size,
-            indices: result.indices,
-            delayTime: result.delayTime
+            size: processingResult.size,
+            indices: processingResult.indices,
+            delayTime: processingResult.delayTime,
+            images: processingResult.images
         )
-        newState.insertImages(result.images)
-        state = newState
+        let animatedImage = await AnimatedImage(
+            imageSource: imageSource,
+            withConfiguration: configuration,
+            state: state
+        )
+        return animatedImage
     }
 
     public func image(at index: Int) -> CGImage? {
