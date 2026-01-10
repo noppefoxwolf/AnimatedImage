@@ -9,20 +9,18 @@ struct ImageProcessor: Sendable {
         let delayTime: Double
         let images: [Int: CGImage]
     }
-
-    private let configuration: AnimatedImage.Configuration
-    private let sizeOptimizer: SizeOptimizer
-
-    init(configuration: AnimatedImage.Configuration) {
-        self.configuration = configuration
-        self.sizeOptimizer = SizeOptimizer()
-    }
+    
+    private let sizeOptimizer = SizeOptimizer()
 
     @concurrent
     func processAnimatedImage(
         renderSize: Size,
         scale: CGFloat,
-        imageSource: any AnimatedImageSource
+        imageSource: any AnimatedImageSource,
+        interpolationQuality: CGInterpolationQuality,
+        maxSize: Size,
+        maxMemoryUsage: Double,
+        maxLevelOfIntegrity: Double
     ) async -> ProcessingResult? {
         let imageCount = await imageSource.imageCount
         guard imageCount > 0 else { return nil }
@@ -33,7 +31,9 @@ struct ImageProcessor: Sendable {
             for: renderSize,
             scale: scale,
             imageSize: firstImageSize,
-            imageCount: imageCount
+            imageCount: imageCount,
+            maxSize: maxSize,
+            maxMemoryUsage: maxMemoryUsage
         )
         guard await isValidRenderSize(optimizedSize) else { return nil }
         guard !Task.isCancelled else { return nil }
@@ -41,15 +41,19 @@ struct ImageProcessor: Sendable {
         let frameState = await optimizeFrameSelection(
             for: optimizedSize,
             imageCount: imageCount,
-            imageSource: imageSource
+            imageSource: imageSource,
+            maxMemoryUsage: maxMemoryUsage,
+            maxLevelOfIntegrity: maxLevelOfIntegrity
         )
+        guard !Task.isCancelled else { return nil }
 
         let images = await prewarmFrameImages(
             indices: frameState.displayIndices,
             optimizedSize: optimizedSize,
-            interpolationQuality: configuration.interpolationQuality,
+            interpolationQuality: interpolationQuality,
             imageSource: imageSource
         )
+        guard !Task.isCancelled else { return nil }
 
         return ProcessingResult(
             size: optimizedSize,
@@ -69,25 +73,32 @@ struct ImageProcessor: Sendable {
         for renderSize: Size,
         scale: CGFloat,
         imageSize: Size,
-        imageCount: Int = 1
+        imageCount: Int = 1,
+        maxSize: Size,
+        maxMemoryUsage: Double
     ) async -> Size {
         await sizeOptimizer.optimizedSize(
             for: renderSize,
-            maxSize: configuration.maxSize,
+            maxSize: maxSize,
             scale: scale,
             imageSize: imageSize,
             imageCount: imageCount,
-            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value
+            maxMemoryUsage: maxMemoryUsage
         )
     }
 
     @concurrent
-    func integrityLevel(for imageSize: Size, imageCount: Int) async -> Double {
+    func integrityLevel(
+        for imageSize: Size,
+        imageCount: Int,
+        maxMemoryUsage: Double,
+        maxLevelOfIntegrity: Double
+    ) async -> Double {
         await sizeOptimizer.integrityLevel(
             for: imageSize,
             imageCount: imageCount,
-            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value,
-            maxLevelOfIntegrity: configuration.maxLevelOfIntegrity
+            maxMemoryUsage: maxMemoryUsage,
+            maxLevelOfIntegrity: maxLevelOfIntegrity
         )
     }
 
@@ -95,9 +106,16 @@ struct ImageProcessor: Sendable {
     func optimizeFrameSelection(
         for imageSize: Size,
         imageCount: Int,
-        imageSource: any AnimatedImageSource
+        imageSource: any AnimatedImageSource,
+        maxMemoryUsage: Double,
+        maxLevelOfIntegrity: Double
     ) async -> FrameDecimator.Result {
-        let levelOfIntegrity = await integrityLevel(for: imageSize, imageCount: imageCount)
+        let levelOfIntegrity = await integrityLevel(
+            for: imageSize,
+            imageCount: imageCount,
+            maxMemoryUsage: maxMemoryUsage,
+            maxLevelOfIntegrity: maxLevelOfIntegrity
+        )
 
         let delayTimes: [Double] = await withTaskGroup(
             of: (Int, Double).self,

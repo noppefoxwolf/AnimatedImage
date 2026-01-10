@@ -10,26 +10,17 @@ public final class AnimatedImage: Identifiable, Sendable {
     public var id: String { imageSource.name }
     private let imageSource: any AnimatedImageSource
     private let configuration: AnimatedImage.Configuration
-    private let imageProcessor: ImageProcessor
-    private var state: AnimatedImageState?
-
-    public init(
-        imageSource: any AnimatedImageSource,
-        withConfiguration configuration: AnimatedImage.Configuration
-    ) {
-        self.imageSource = imageSource
-        self.configuration = configuration
-        self.imageProcessor = ImageProcessor(configuration: configuration)
-    }
+    private let state: AnimatedImageState?
+    
+    private let imageProcessor = ImageProcessor()
     
     init(
         imageSource: any AnimatedImageSource,
         withConfiguration configuration: AnimatedImage.Configuration,
-        state: AnimatedImageState
+        state: AnimatedImageState?
     ) {
         self.imageSource = imageSource
         self.configuration = configuration
-        self.imageProcessor = ImageProcessor(configuration: configuration)
         self.state = state
     }
     
@@ -42,7 +33,11 @@ public final class AnimatedImage: Identifiable, Sendable {
         let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(size),
             scale: scale,
-            imageSource: imageSource
+            imageSource: imageSource,
+            interpolationQuality: configuration.interpolationQuality,
+            maxSize: configuration.maxSize,
+            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value,
+            maxLevelOfIntegrity: configuration.maxLevelOfIntegrity
         )
         guard let processingResult else {
             return self
@@ -68,5 +63,18 @@ public final class AnimatedImage: Identifiable, Sendable {
 
     public func index(for targetTimestamp: TimeInterval) -> Int? {
         state?.frameIndex(for: targetTimestamp)
+    }
+}
+
+extension AnimatedImage {
+    public convenience init(
+        imageSource: any AnimatedImageSource,
+        withConfiguration configuration: AnimatedImage.Configuration
+    ) {
+        self.init(
+            imageSource: imageSource,
+            withConfiguration: configuration,
+            state: nil
+        )
     }
 }
