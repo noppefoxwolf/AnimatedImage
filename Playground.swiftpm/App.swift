@@ -27,6 +27,11 @@ struct App: SwiftUI.App {
                             Text("Format Demo")
                         }
                         NavigationLink {
+                            PreDecodeDemoView()
+                        } label: {
+                            Text("Pre-decode Demo")
+                        }
+                        NavigationLink {
                             QualityDemoView()
                         } label: {
                             Text("Adjust quality Demo")
