@@ -30,12 +30,14 @@ open class AnimatableCGImageView: CGImageView {
     @MainActor public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    open func startAnimating() {
+    
+    open override func didMoveToSuperview() {
+        super.didMoveToSuperview()
         updateLink.isEnabled = true
     }
-
-    open func stopAnimating() {
+    
+    open override func removeFromSuperview() {
+        super.removeFromSuperview()
         updateLink.isEnabled = false
     }
 

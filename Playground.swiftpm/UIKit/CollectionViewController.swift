@@ -75,20 +75,4 @@ class CollectionViewController: UICollectionViewController {
 
         return cell
     }
-
-    override func collectionView(
-        _ collectionView: UICollectionView,
-        willDisplay cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
-        (cell as? CollectionViewCell)?.animatedImageView.startAnimating()
-    }
-
-    override func collectionView(
-        _ collectionView: UICollectionView,
-        didEndDisplaying cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
-        (cell as? CollectionViewCell)?.animatedImageView.stopAnimating()
-    }
 }

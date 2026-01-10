@@ -21,11 +21,9 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
         uiView.animatedImage = animatedImage
         uiView.contentMode = contentMode.asUIKit()
         uiView.layer.magnificationFilter = .nearest
-        uiView.startAnimating()
     }
 
     public static func dismantleUIView(_ uiView: AnimatedImageView, coordinator: ()) {
-        uiView.stopAnimating()
         uiView.animatedImage = nil
     }
 }
