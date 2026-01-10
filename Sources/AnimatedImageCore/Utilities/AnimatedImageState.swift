@@ -17,11 +17,11 @@ nonisolated struct AnimatedImageState: Sendable {
     private(set) var delayTime: TimeInterval
 
     init(
-        cache: Cache<Int, CGImage>,
+        name: String,
         indices: [Int] = [],
         delayTime: TimeInterval = 0.1
     ) {
-        self.cache = cache
+        self.cache = Cache<Int, CGImage>(name: name)
         self.indices = indices
         self.delayTime = delayTime
     }

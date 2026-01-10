@@ -18,9 +18,8 @@ public final class AnimatedImage: Sendable {
     ) {
         self.imageSource = imageSource
         self.configuration = configuration
-        let cache = Cache<Int, CGImage>(name: imageSource.name)
         self.imageProcessor = ImageProcessor(configuration: configuration)
-        self.state = AnimatedImageState(cache: cache)
+        self.state = AnimatedImageState(name: imageSource.name)
     }
 
     var task: Task<Void, Never>? = nil
