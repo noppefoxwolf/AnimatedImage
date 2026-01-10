@@ -32,7 +32,7 @@ let package = Package(
 
 ## How It Works
 
-AnimatedImage uses `AnimatedImageProvider` to pre-decode and cache animation frames for optimal performance. It dynamically optimizes frame processing based on drawing size and timing to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
+AnimatedImage uses the core `AnimatedImage` type to pre-decode and cache animation frames for optimal performance. It dynamically optimizes frame processing based on drawing size and timing to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
 
 ## Usage
 
@@ -42,8 +42,11 @@ AnimatedImage uses `AnimatedImageProvider` to pre-decode and cache animation fra
 import AnimatedImage
 
 let imageView = AnimatedImageView(frame: .zero)
-let image = APNGImage(data: data) // or GifImage(data: data), WebPImage(data: data)
-imageView.image = image
+let imageSource = APNGImageSource(data: data) // or GifImageSource(data: data), WebPImageSource(data: data)
+imageView.animatedImage = AnimatedImage(
+    imageSource: imageSource,
+    configuration: .default
+)
 imageView.startAnimating()
 ```
 
@@ -53,34 +56,38 @@ imageView.startAnimating()
 import AnimatedImage
 
 struct ContentView: View {
-    @State var image = GifImage(data: data)
+    @State var imageSource = GifImageSource(data: data)
 
     var body: some View {
-        AnimatedImagePlayer(image: image) // .init(image:contentMode:) supports .fit/.fill
+        AnimatedImagePlayer(imageSource: imageSource) // .init(imageSource:contentMode:) supports .fit/.fill
     }
 }
 ```
 
 ### Configuration
 
-Control memory, size, quality, and processing priority using `AnimatedImageProviderConfiguration`.
+Control memory, size, quality, and processing priority using `AnimatedImage.Configuration`.
 
 - UIKit
   ```swift
   let imageView = AnimatedImageView(frame: .zero)
-  imageView.configuration = .default // .default, .performance, .unlimited
+  let configuration: AnimatedImage.Configuration = .default // .default, .performance, .unlimited
   imageView.contentMode = .scaleAspectFill
-  imageView.image = GifImage(data: data)
+  let imageSource = GifImageSource(data: data)
+  imageView.animatedImage = AnimatedImage(
+      imageSource: imageSource,
+      configuration: configuration
+  )
   imageView.startAnimating()
   ```
 
 - SwiftUI
   ```swift
-  let config: AnimatedImageProviderConfiguration = .default
+  let config: AnimatedImage.Configuration = .default
 
   var body: some View {
-      AnimatedImagePlayer(image: GifImage(data: data))
-          .environment(\.animatedImageProviderConfiguration, config)
+      AnimatedImagePlayer(imageSource: GifImageSource(data: data))
+          .environment(\.animatedImageConfiguration, config)
   }
   ```
 
@@ -112,10 +119,10 @@ Synchronizes frame updates for smooth animation playback.
 
 ### Custom Animation Support
 
-Create your own animated images by conforming to the `AnimatedImage` protocol:
+Create your own animated images by conforming to the `AnimatedImageSource` protocol:
 
 ```swift
-public final class ManualAnimatedImage: AnimatedImage, @unchecked Sendable {
+public final class ManualAnimatedImageSource: AnimatedImageSource, @unchecked Sendable {
     public let name: String
     public let imageCount: Int
     private let images: [CGImage]
@@ -149,7 +156,7 @@ The library consists of multiple internal modules unified under a single product
 
 - **`AnimatedImageCore`**: Core animation logic and image processing
   - Image decoders for APNG, GIF, and WebP
-  - `AnimatedImageProvider` for animation caching and frame management
+  - `AnimatedImage` for animation caching and frame management
   - Image processing and timing calculations
 - **Platform-specific modules**:
   - `_UIKit_AnimatedImage`: UIKit support with `AnimatedImageView`

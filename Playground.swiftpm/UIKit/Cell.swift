@@ -7,8 +7,8 @@ final class CollectionViewCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        animatedImageView.configuration = .performance
         animatedImageView.contentMode = .scaleAspectFit
+        animatedImageView.layer.magnificationFilter = .nearest
         animatedImageView.translatesAutoresizingMaskIntoConstraints = false
         animatedImageView.backgroundColor = .systemGray4
         contentView.addSubview(animatedImageView)

@@ -16,7 +16,7 @@ struct SwiftUIDemoView: View {
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
     }
 
-    let animatedImageConfiguration: AnimatedImageProviderConfiguration = .performance
+    let animatedImageConfiguration: AnimatedImage.Configuration = .performance
 
     var body: some View {
         let layout = [
@@ -32,25 +32,28 @@ struct SwiftUIDemoView: View {
                 }
             }
         }
-        .environment(\.animatedImageProviderConfiguration, animatedImageConfiguration)
     }
 
-    func image(for item: AnimatedImageResourceItem) -> any AnimatedImage {
-        let image: any AnimatedImage
+    func image(for item: AnimatedImageResourceItem) -> AnimatedImage {
         switch item.rawValue {
         case .apng(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "png")!
-            let data = try! Data(contentsOf: url)
-            image = APNGImage(name: name, data: data)
+            return try! AnimatedImage(
+                contentsOf: url,
+                withConfiguration: animatedImageConfiguration
+            )
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
-            let data = try! Data(contentsOf: url)
-            image = GifImage(name: name, data: data)
+            return try! AnimatedImage(
+                contentsOf: url,
+                withConfiguration: animatedImageConfiguration
+            )
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
-            let data = try! Data(contentsOf: url)
-            image = WebPImage(name: name, data: data)
+            return try! AnimatedImage(
+                contentsOf: url,
+                withConfiguration: animatedImageConfiguration
+            )
         }
-        return image
     }
 }

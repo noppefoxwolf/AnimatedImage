@@ -31,7 +31,7 @@ enum ImageFormat: String, CaseIterable {
 
 struct QualityDemoView: View {
     @State
-    var configuration: AnimatedImageProviderConfiguration = .qualityDemo
+    var configuration: AnimatedImage.Configuration = .qualityDemo
 
     @State
     var width: Double = 100
@@ -47,7 +47,6 @@ struct QualityDemoView: View {
             VStack {
                 Section {
                     AnimatedImagePlayer(image: currentImage)
-                        .environment(\.animatedImageProviderConfiguration, configuration)
                         .frame(width: width, height: width)
                         .background(Color.gray)
                 }
@@ -160,30 +159,20 @@ struct QualityDemoView: View {
         }
     }
 
-    private var currentImage: any AnimatedImage {
+    private var currentImage: AnimatedImage {
         let url = Bundle.main.url(
             forResource: selectedFormat.fileName,
             withExtension: selectedFormat.fileExtension
         )!
-        let data = try! Data(contentsOf: url)
-
-        switch selectedFormat {
-        case .gif:
-            return GifImage(name: selectedFormat.fileName, data: data)
-        case .apng:
-            return APNGImage(name: selectedFormat.fileName, data: data)
-        case .webp:
-            return WebPImage(name: selectedFormat.fileName, data: data)
-        }
+        return try! AnimatedImage(contentsOf: url, withConfiguration: configuration)
     }
 }
 
-extension AnimatedImageProviderConfiguration {
+extension AnimatedImage.Configuration {
     @MainActor
     public static var qualityDemo: Self {
         var configuration = Self.default
         configuration.maxMemoryUsage = .init(value: 1, unit: .megabits)
-        configuration.taskPriority = .userInitiated
         return configuration
     }
 }

@@ -2,8 +2,8 @@ import AnimatedImage
 import SwiftUI
 
 struct SynchronizeDemoView: View {
-    @State var image1: (any AnimatedImage)? = nil
-    @State var image2: (any AnimatedImage)? = nil
+    @State var image1: AnimatedImage? = nil
+    @State var image2: AnimatedImage? = nil
 
     var body: some View {
         HStack {
@@ -15,8 +15,7 @@ struct SynchronizeDemoView: View {
                 }
                 Button {
                     let url = Bundle.main.url(forResource: "7896-blob-jam", withExtension: "gif")!
-                    let data = try! Data(contentsOf: url)
-                    image1 = GifImage(data: data)
+                    image1 = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
                 } label: {
                     Text("Load 1")
                 }
@@ -30,8 +29,7 @@ struct SynchronizeDemoView: View {
                 }
                 Button {
                     let url = Bundle.main.url(forResource: "7896-blob-jam", withExtension: "gif")!
-                    let data = try! Data(contentsOf: url)
-                    image2 = GifImage(data: data)
+                    image2 = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
                 } label: {
                     Text("Load 2")
                 }

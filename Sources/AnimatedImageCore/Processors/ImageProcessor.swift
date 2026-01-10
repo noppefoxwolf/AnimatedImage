@@ -3,60 +3,64 @@ import QuartzCore
 import os
 
 struct ImageProcessor: Sendable {
-    nonisolated struct ProcessingResult: Sendable {
+    struct ProcessingResult {
+        let size: Size
         let indices: [Int]
         let delayTime: Double
-
-        init(indices: [Int], delayTime: Double) {
-            self.indices = indices
-            self.delayTime = delayTime
-        }
+        let images: [Int: CGImage]
     }
 
-    private let configuration: AnimatedImageProviderConfiguration
-    private let cache: Cache<Int, CGImage>
-    private let sizeOptimizer: SizeOptimizer
-
-    init(configuration: AnimatedImageProviderConfiguration, cache: Cache<Int, CGImage>) {
-        self.configuration = configuration
-        self.cache = cache
-        self.sizeOptimizer = SizeOptimizer()
-    }
+    private let sizeOptimizer = SizeOptimizer()
 
     @concurrent
     func processAnimatedImage(
         renderSize: Size,
         scale: CGFloat,
-        image: any AnimatedImage
+        imageSource: any AnimatedImageSource,
+        interpolationQuality: CGInterpolationQuality,
+        maxSize: Size,
+        maxMemoryUsage: Double,
+        maxLevelOfIntegrity: Double
     ) async -> ProcessingResult? {
-        let imageCount = await image.imageCount
+        let imageCount = await imageSource.imageCount
         guard imageCount > 0 else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        guard let firstImageSize = await image.size(at: 0) else { return nil }
+        guard let firstImageSize = await imageSource.size(at: 0) else { return nil }
         let optimizedSize = await optimizedSize(
             for: renderSize,
             scale: scale,
             imageSize: firstImageSize,
-            imageCount: imageCount
+            imageCount: imageCount,
+            maxSize: maxSize,
+            maxMemoryUsage: maxMemoryUsage
         )
         guard await isValidRenderSize(optimizedSize) else { return nil }
         guard !Task.isCancelled else { return nil }
 
-        let result = await optimizeFrameSelection(
+        let frameState = await optimizeFrameSelection(
             for: optimizedSize,
             imageCount: imageCount,
-            image: image
+            imageSource: imageSource,
+            maxMemoryUsage: maxMemoryUsage,
+            maxLevelOfIntegrity: maxLevelOfIntegrity
         )
+        guard !Task.isCancelled else { return nil }
 
-        await prewarmFrameImages(
-            indices: result.indices,
+        let images = await prewarmFrameImages(
+            indices: frameState.displayIndices,
             optimizedSize: optimizedSize,
-            interpolationQuality: configuration.interpolationQuality,
-            image: image
+            interpolationQuality: interpolationQuality,
+            imageSource: imageSource
         )
+        guard !Task.isCancelled else { return nil }
 
-        return result
+        return ProcessingResult(
+            size: optimizedSize,
+            indices: frameState.displayIndices,
+            delayTime: frameState.delayTime,
+            images: images
+        )
     }
 
     @concurrent
@@ -69,25 +73,32 @@ struct ImageProcessor: Sendable {
         for renderSize: Size,
         scale: CGFloat,
         imageSize: Size,
-        imageCount: Int = 1
+        imageCount: Int = 1,
+        maxSize: Size,
+        maxMemoryUsage: Double
     ) async -> Size {
         await sizeOptimizer.optimizedSize(
             for: renderSize,
-            maxSize: configuration.maxSize,
+            maxSize: maxSize,
             scale: scale,
             imageSize: imageSize,
             imageCount: imageCount,
-            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value
+            maxMemoryUsage: maxMemoryUsage
         )
     }
 
     @concurrent
-    func integrityLevel(for imageSize: Size, imageCount: Int) async -> Double {
+    func integrityLevel(
+        for imageSize: Size,
+        imageCount: Int,
+        maxMemoryUsage: Double,
+        maxLevelOfIntegrity: Double
+    ) async -> Double {
         await sizeOptimizer.integrityLevel(
             for: imageSize,
             imageCount: imageCount,
-            maxMemoryUsage: configuration.maxMemoryUsage.converted(to: .bytes).value,
-            maxLevelOfIntegrity: configuration.maxLevelOfIntegrity
+            maxMemoryUsage: maxMemoryUsage,
+            maxLevelOfIntegrity: maxLevelOfIntegrity
         )
     }
 
@@ -95,9 +106,16 @@ struct ImageProcessor: Sendable {
     func optimizeFrameSelection(
         for imageSize: Size,
         imageCount: Int,
-        image: any AnimatedImage
-    ) async -> ProcessingResult {
-        let levelOfIntegrity = await integrityLevel(for: imageSize, imageCount: imageCount)
+        imageSource: any AnimatedImageSource,
+        maxMemoryUsage: Double,
+        maxLevelOfIntegrity: Double
+    ) async -> FrameDecimator.Result {
+        let levelOfIntegrity = await integrityLevel(
+            for: imageSize,
+            imageCount: imageCount,
+            maxMemoryUsage: maxMemoryUsage,
+            maxLevelOfIntegrity: maxLevelOfIntegrity
+        )
 
         let delayTimes: [Double] = await withTaskGroup(
             of: (Int, Double).self,
@@ -105,7 +123,7 @@ struct ImageProcessor: Sendable {
         ) { group in
             for index in 0..<imageCount {
                 group.addTask {
-                    let delay: Double = await image.delayTime(at: index)
+                    let delay: Double = await imageSource.delayTime(at: index)
                     return (index, delay)
                 }
             }
@@ -123,10 +141,7 @@ struct ImageProcessor: Sendable {
             levelOfIntegrity: levelOfIntegrity
         )
 
-        return ProcessingResult(
-            indices: decimationResult.displayIndices,
-            delayTime: decimationResult.delayTime
-        )
+        return decimationResult
     }
 
     @concurrent
@@ -134,13 +149,16 @@ struct ImageProcessor: Sendable {
         indices: [Int],
         optimizedSize: Size,
         interpolationQuality: CGInterpolationQuality,
-        image: any AnimatedImage
-    ) async {
-        await withTaskGroup { taskGroup in
+        imageSource: any AnimatedImageSource
+    ) async -> [Int: CGImage] {
+        await withTaskGroup(
+            of: (Int, CGImage?).self,
+            returning: [Int: CGImage].self
+        ) { taskGroup in
             for index in Set(indices) {
                 taskGroup.addTask {
-                    let processedImage = await createAndCacheImage(
-                        image: image,
+                    let processedImage = await createImage(
+                        imageSource: imageSource,
                         size: optimizedSize,
                         index: index,
                         interpolationQuality: interpolationQuality
@@ -149,18 +167,24 @@ struct ImageProcessor: Sendable {
                 }
             }
 
-            await taskGroup.waitForAll()
+            var images: [Int: CGImage] = [:]
+            for await (index, image) in taskGroup {
+                if let image {
+                    images[index] = image
+                }
+            }
+            return images
         }
     }
 
     @concurrent
-    func createAndCacheImage(
-        image: any AnimatedImage,
+    func createImage(
+        imageSource: any AnimatedImageSource,
         size: Size,
         index: Int,
         interpolationQuality: CGInterpolationQuality
     ) async -> CGImage? {
-        let cgImage = await image.image(at: index)
+        let cgImage = await imageSource.image(at: index)
 
         guard !Task.isCancelled else { return nil }
         guard let cgImage = cgImage else { return nil }
@@ -173,9 +197,6 @@ struct ImageProcessor: Sendable {
         )
 
         guard !Task.isCancelled else { return nil }
-        if let decodedImage {
-            cache.insert(decodedImage, forKey: index)
-        }
         return decodedImage
     }
 }

@@ -22,23 +22,25 @@ open class AnimatableCGImageView: CGImageView {
             maximum: 60
         )
         updateLink.addAction(handler: { [unowned self] _, info in
-            willUpdateContents(&contents, for: info.modelTime)
+            updateContents(for: info.modelTime)
         })
         updateLink.requiresContinuousUpdates = true
     }
 
-    @MainActor public required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    open func startAnimating() {
+    open override func didMoveToSuperview() {
+        super.didMoveToSuperview()
         updateLink.isEnabled = true
     }
 
-    open func stopAnimating() {
+    open override func removeFromSuperview() {
+        super.removeFromSuperview()
         updateLink.isEnabled = false
     }
 
-    open func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
+    open func updateContents(for targetTimestamp: TimeInterval) {
     }
 }

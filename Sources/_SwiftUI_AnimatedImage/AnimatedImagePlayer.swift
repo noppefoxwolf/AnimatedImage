@@ -5,10 +5,10 @@ public import _UIKit_AnimatedImage
 import UIKit
 
 public struct AnimatedImagePlayer: UIViewRepresentable {
-    let image: any AnimatedImage
+    let image: AnimatedImage
     let contentMode: ContentMode
 
-    public init(image: any AnimatedImage, contentMode: ContentMode = .fit) {
+    public init(image: AnimatedImage, contentMode: ContentMode = .fit) {
         self.image = image
         self.contentMode = contentMode
     }
@@ -18,27 +18,13 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
-        uiView.configuration = context.environment.animatedImageProviderConfiguration
-        uiView.contentMode = contentMode.asUIKit()
         uiView.image = image
-        uiView.startAnimating()
+        uiView.contentMode = contentMode.asUIKit()
+        uiView.layer.magnificationFilter = .nearest
     }
 
     public static func dismantleUIView(_ uiView: AnimatedImageView, coordinator: ()) {
-        uiView.stopAnimating()
         uiView.image = nil
-    }
-}
-
-private struct AnimatedImageConfigurationKey: EnvironmentKey {
-    static var defaultValue: AnimatedImageProviderConfiguration { .default }
-}
-
-extension EnvironmentValues {
-    @MainActor
-    public var animatedImageProviderConfiguration: AnimatedImageProviderConfiguration {
-        get { self[AnimatedImageConfigurationKey.self] }
-        set { self[AnimatedImageConfigurationKey.self] = newValue }
     }
 }
 

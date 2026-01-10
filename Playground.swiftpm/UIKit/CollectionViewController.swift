@@ -28,6 +28,7 @@ class CollectionViewController: UICollectionViewController {
             )
         return dataSource.map(AnimatedImageResourceItem.init(rawValue:))
     }()
+    private let configuration: AnimatedImage.Configuration = .performance
 
     override func collectionView(
         _ collectionView: UICollectionView,
@@ -49,36 +50,29 @@ class CollectionViewController: UICollectionViewController {
         case .apng(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "png")!
             let data = try! Data(contentsOf: url)
-            let image = APNGImage(name: name, data: data)
-            cell.animatedImageView.image = image
+            let imageSource = APNGImageSource(name: name, data: data)
+            cell.animatedImageView.image = AnimatedImage(
+                imageSource: imageSource,
+                withConfiguration: configuration
+            )
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
             let data = try! Data(contentsOf: url)
-            let image = GifImage(name: name, data: data)
-            cell.animatedImageView.image = image
+            let imageSource = GifImageSource(name: name, data: data)
+            cell.animatedImageView.image = AnimatedImage(
+                imageSource: imageSource,
+                withConfiguration: configuration
+            )
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
             let data = try! Data(contentsOf: url)
-            let image = WebPImage(name: name, data: data)
-            cell.animatedImageView.image = image
+            let imageSource = WebPImageSource(name: name, data: data)
+            cell.animatedImageView.image = AnimatedImage(
+                imageSource: imageSource,
+                withConfiguration: configuration
+            )
         }
 
         return cell
-    }
-
-    override func collectionView(
-        _ collectionView: UICollectionView,
-        willDisplay cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
-        (cell as? CollectionViewCell)?.animatedImageView.startAnimating()
-    }
-
-    override func collectionView(
-        _ collectionView: UICollectionView,
-        didEndDisplaying cell: UICollectionViewCell,
-        forItemAt indexPath: IndexPath
-    ) {
-        (cell as? CollectionViewCell)?.animatedImageView.stopAnimating()
     }
 }

@@ -1,42 +1,43 @@
 import Foundation
 
-nonisolated final class Cache<Key: Hashable, Value>: @unchecked Sendable {
+nonisolated package final class Cache<Key: Hashable, Value>: @unchecked Sendable {
     private let wrapped = NSCache<WrappedKey, Entry>()
 
-    public init(name: String) {
+    package init(name: String) {
         wrapped.name = name
     }
 
-    var countLimit: Int {
+    package var countLimit: Int {
         get { wrapped.countLimit }
         set { wrapped.countLimit = newValue }
     }
 
-    var totalCostLimit: Int {
+    // If 0, there is no total cost limit. The default value is 0.
+    package var totalCostLimit: Int {
         get { wrapped.totalCostLimit }
         set { wrapped.totalCostLimit = newValue }
     }
 
-    func insert(_ value: Value, forKey key: Key) {
+    package func insert(_ value: Value, forKey key: Key) {
         let entry = Entry(value)
         wrapped.setObject(entry, forKey: WrappedKey(key))
     }
 
-    func insert(_ value: Value, forKey key: Key, cost: Int) {
+    package func insert(_ value: Value, forKey key: Key, cost: Int) {
         let entry = Entry(value)
         wrapped.setObject(entry, forKey: WrappedKey(key), cost: cost)
     }
 
-    func value(forKey key: Key) -> Value? {
+    package func value(forKey key: Key) -> Value? {
         let entry = wrapped.object(forKey: WrappedKey(key))
         return entry?.value
     }
 
-    func removeValue(forKey key: Key) {
+    package func removeValue(forKey key: Key) {
         wrapped.removeObject(forKey: WrappedKey(key))
     }
 
-    func removeAllObjects() {
+    package func removeAllObjects() {
         wrapped.removeAllObjects()
     }
 }
@@ -72,7 +73,7 @@ extension Cache {
 
 //Let's make a subscript for easy use
 extension Cache {
-    subscript(key: Key) -> Value? {
+    package subscript(key: Key) -> Value? {
         get { return value(forKey: key) }
         set {
             guard let value = newValue else {
