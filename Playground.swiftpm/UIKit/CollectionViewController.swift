@@ -53,7 +53,7 @@ class CollectionViewController: UICollectionViewController {
             let imageSource = APNGImageSource(name: name, data: data)
             cell.animatedImageView.animatedImage = AnimatedImage(
                 imageSource: imageSource,
-                configuration: configuration
+                withConfiguration: configuration
             )
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
@@ -61,7 +61,7 @@ class CollectionViewController: UICollectionViewController {
             let imageSource = GifImageSource(name: name, data: data)
             cell.animatedImageView.animatedImage = AnimatedImage(
                 imageSource: imageSource,
-                configuration: configuration
+                withConfiguration: configuration
             )
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
@@ -69,7 +69,7 @@ class CollectionViewController: UICollectionViewController {
             let imageSource = WebPImageSource(name: name, data: data)
             cell.animatedImageView.animatedImage = AnimatedImage(
                 imageSource: imageSource,
-                configuration: configuration
+                withConfiguration: configuration
             )
         }
 

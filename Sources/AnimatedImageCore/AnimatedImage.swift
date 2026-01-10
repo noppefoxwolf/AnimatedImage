@@ -14,7 +14,7 @@ public final class AnimatedImage: Sendable {
 
     public init(
         imageSource: any AnimatedImageSource,
-        configuration: AnimatedImage.Configuration
+        withConfiguration configuration: AnimatedImage.Configuration
     ) {
         self.imageSource = imageSource
         self.configuration = configuration
@@ -28,14 +28,6 @@ public final class AnimatedImage: Sendable {
 
     public var contentsFilter: CALayerContentsFilter {
         configuration.contentsFilter
-    }
-    
-    public func byPreparingForDisplay(for size: CGSize, scale: CGFloat) async -> AnimatedImage {
-        let a = await processAnimatedImage(
-            renderSize: size,
-            scale: scale
-        )
-        return AnimatedImage(imageSource: imageSource, configuration: configuration)
     }
 
     public func update(

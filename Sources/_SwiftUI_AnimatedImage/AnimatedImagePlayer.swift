@@ -20,7 +20,7 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
         uiView.animatedImage = AnimatedImage(
             imageSource: imageSource,
-            configuration: context.environment.animatedImageConfiguration
+            withConfiguration: context.environment.animatedImageConfiguration
         )
         uiView.contentMode = contentMode.asUIKit()
         uiView.startAnimating()
