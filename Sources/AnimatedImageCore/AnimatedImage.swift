@@ -26,7 +26,7 @@ public final class AnimatedImage: Sendable {
         for size: CGSize,
         scale: CGFloat
     ) async -> AnimatedImage {
-        // TODO: if self is prepared, return self.
+        // TODO: if self is prepared and much size and scale, return self.
         let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(size),
             scale: scale,

@@ -22,7 +22,7 @@ open class AnimatableCGImageView: CGImageView {
             maximum: 60
         )
         updateLink.addAction(handler: { [unowned self] _, info in
-            willUpdateContents(&contents, for: info.modelTime)
+            updateContents(for: info.modelTime)
         })
         updateLink.requiresContinuousUpdates = true
     }
@@ -39,6 +39,6 @@ open class AnimatableCGImageView: CGImageView {
         updateLink.isEnabled = false
     }
 
-    open func willUpdateContents(_ contents: inout CGImage?, for targetTimestamp: TimeInterval) {
+    open func updateContents(for targetTimestamp: TimeInterval) {
     }
 }
