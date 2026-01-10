@@ -12,8 +12,6 @@ public final class AnimatedImage: Identifiable, Sendable {
     public let configuration: AnimatedImage.Configuration
     private let state: AnimatedImageState?
 
-    private let imageProcessor = ImageProcessor()
-
     init(
         imageSource: any AnimatedImageSource,
         withConfiguration configuration: AnimatedImage.Configuration,
@@ -29,6 +27,7 @@ public final class AnimatedImage: Identifiable, Sendable {
         for size: CGSize,
         scale: CGFloat
     ) async -> AnimatedImage {
+        let imageProcessor = ImageProcessor()
         let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(size),
             scale: scale,
