@@ -9,7 +9,7 @@ struct SynchronizeDemoView: View {
         HStack {
             VStack {
                 if let image1 {
-                    AnimatedImagePlayer(animatedImage: image1)
+                    AnimatedImagePlayer(image: image1)
                         .frame(width: 100, height: 100)
                         .background(Color.gray)
                 }
@@ -23,7 +23,7 @@ struct SynchronizeDemoView: View {
             }
             VStack {
                 if let image2 {
-                    AnimatedImagePlayer(animatedImage: image2)
+                    AnimatedImagePlayer(image: image2)
                         .frame(width: 100, height: 100)
                         .background(Color.gray)
                 }

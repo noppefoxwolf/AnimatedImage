@@ -7,8 +7,8 @@ struct FormatDemoView: View {
             HStack {
                 VStack {
                     let url = Bundle.main.url(forResource: "elephant", withExtension: "png")!
-                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
-                    AnimatedImagePlayer(animatedImage: animatedImage)
+                    let image = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(image: image)
                         .frame(width: 100, height: 100)
                     Text("APNG")
                 }
@@ -17,15 +17,15 @@ struct FormatDemoView: View {
                         forResource: "animated-webp-supported",
                         withExtension: "webp"
                     )!
-                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
-                    AnimatedImagePlayer(animatedImage: animatedImage)
+                    let image = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(image: image)
                         .frame(width: 100, height: 100)
                     Text("WebP")
                 }
                 VStack {
                     let url = Bundle.main.url(forResource: "1342-splash", withExtension: "gif")!
-                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
-                    AnimatedImagePlayer(animatedImage: animatedImage)
+                    let image = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(image: image)
                         .frame(width: 100, height: 100)
                     Text("GIF")
                 }
@@ -33,8 +33,8 @@ struct FormatDemoView: View {
             HStack {
                 VStack {
                     let url = Bundle.main.url(forResource: "single-frame", withExtension: "png")!
-                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
-                    AnimatedImagePlayer(animatedImage: animatedImage)
+                    let image = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(image: image)
                         .frame(width: 100, height: 100)
                     Text("PNG")
                 }
@@ -43,8 +43,8 @@ struct FormatDemoView: View {
                         forResource: "b848520ba07a354c",
                         withExtension: "png"
                     )!
-                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
-                    AnimatedImagePlayer(animatedImage: animatedImage)
+                    let image = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(image: image)
                         .frame(width: 100, height: 100)
                     Text("PNG(Gray)")
                 }

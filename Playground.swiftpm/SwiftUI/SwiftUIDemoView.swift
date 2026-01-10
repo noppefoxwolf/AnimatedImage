@@ -26,7 +26,7 @@ struct SwiftUIDemoView: View {
         ScrollView {
             LazyVGrid(columns: layout) {
                 ForEach(items) { item in
-                    AnimatedImagePlayer(animatedImage: image(for: item))
+                    AnimatedImagePlayer(image: image(for: item))
                         .scaledToFill()
                         .background(Color.gray)
                 }

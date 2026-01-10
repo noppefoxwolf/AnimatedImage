@@ -46,7 +46,7 @@ struct QualityDemoView: View {
         VStack(spacing: 0) {
             VStack {
                 Section {
-                    AnimatedImagePlayer(animatedImage: currentImage)
+                    AnimatedImagePlayer(image: currentImage)
                         .frame(width: width, height: width)
                         .background(Color.gray)
                 }

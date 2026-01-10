@@ -2,19 +2,19 @@ public import AnimatedImageCore
 public import UIKit
 
 open class AnimatedImageView: AnimatableCGImageView {
-    public var animatedImage: AnimatedImage? = nil {
+    public var image: AnimatedImage? = nil {
         willSet {
-            decodedAnimatedImage = nil
+            decodedImage = nil
             contents = nil
         }
         didSet {
-            if let animatedImage {
-                if animatedImage.image(at: 0) != nil {
-                    decodedAnimatedImage = animatedImage
+            if let image {
+                if image.image(at: 0) != nil {
+                    decodedImage = image
                 } else {
                     decode(
                         AnimatedImageLoader.shared,
-                        decodeImage: animatedImage,
+                        decodeImage: image,
                         layout: (bounds.size, traitCollection.displayScale)
                     )
                 }
@@ -25,7 +25,7 @@ open class AnimatedImageView: AnimatableCGImageView {
     
     private var decodeTask: Task<Void, Never>? = nil
     
-    private var decodedAnimatedImage: AnimatedImage? = nil {
+    private var decodedImage: AnimatedImage? = nil {
         didSet {
             setNeedsDisplay()
         }
@@ -39,26 +39,26 @@ open class AnimatedImageView: AnimatableCGImageView {
         layout: (CGSize, CGFloat)
     ) {
         decodeTask = Task {
-            decodedAnimatedImage = await imageLoader.decode(decodeImage, layout: layout)
+            decodedImage = await imageLoader.decode(decodeImage, layout: layout)
         }
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
         
-        if let animatedImage {
+        if let image {
             decode(
                 AnimatedImageLoader.shared,
-                decodeImage: animatedImage,
+                decodeImage: image,
                 layout: (bounds.size, traitCollection.displayScale)
             )
         }
     }
 
     func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> (index: Int, CGImage)? {
-        let index = decodedAnimatedImage?.index(for: targetTimestamp)
+        let index = decodedImage?.index(for: targetTimestamp)
         guard let index, currentFrameIndex != index else { return nil }
-        let image = decodedAnimatedImage?.image(at: index)
+        let image = decodedImage?.image(at: index)
         guard let image else { return nil }
         return (index, image)
     }
