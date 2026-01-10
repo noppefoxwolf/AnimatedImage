@@ -7,9 +7,8 @@ struct FormatDemoView: View {
             HStack {
                 VStack {
                     let url = Bundle.main.url(forResource: "elephant", withExtension: "png")!
-                    let data = try! Data(contentsOf: url)
-                    let imageSource = APNGImageSource(data: data)
-                    AnimatedImagePlayer(imageSource: imageSource)
+                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(animatedImage: animatedImage)
                         .frame(width: 100, height: 100)
                     Text("APNG")
                 }
@@ -18,17 +17,15 @@ struct FormatDemoView: View {
                         forResource: "animated-webp-supported",
                         withExtension: "webp"
                     )!
-                    let data = try! Data(contentsOf: url)
-                    let imageSource = WebPImageSource(data: data)
-                    AnimatedImagePlayer(imageSource: imageSource)
+                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(animatedImage: animatedImage)
                         .frame(width: 100, height: 100)
                     Text("WebP")
                 }
                 VStack {
                     let url = Bundle.main.url(forResource: "1342-splash", withExtension: "gif")!
-                    let data = try! Data(contentsOf: url)
-                    let imageSource = GifImageSource(data: data)
-                    AnimatedImagePlayer(imageSource: imageSource)
+                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(animatedImage: animatedImage)
                         .frame(width: 100, height: 100)
                     Text("GIF")
                 }
@@ -36,9 +33,8 @@ struct FormatDemoView: View {
             HStack {
                 VStack {
                     let url = Bundle.main.url(forResource: "single-frame", withExtension: "png")!
-                    let data = try! Data(contentsOf: url)
-                    let imageSource = APNGImageSource(data: data)
-                    AnimatedImagePlayer(imageSource: imageSource)
+                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(animatedImage: animatedImage)
                         .frame(width: 100, height: 100)
                     Text("PNG")
                 }
@@ -47,9 +43,8 @@ struct FormatDemoView: View {
                         forResource: "b848520ba07a354c",
                         withExtension: "png"
                     )!
-                    let data = try! Data(contentsOf: url)
-                    let imageSource = APNGImageSource(data: data)
-                    AnimatedImagePlayer(imageSource: imageSource)
+                    let animatedImage = try! AnimatedImage(contentsOf: url, withConfiguration: .default)
+                    AnimatedImagePlayer(animatedImage: animatedImage)
                         .frame(width: 100, height: 100)
                     Text("PNG(Gray)")
                 }

@@ -26,31 +26,25 @@ struct SwiftUIDemoView: View {
         ScrollView {
             LazyVGrid(columns: layout) {
                 ForEach(items) { item in
-                    AnimatedImagePlayer(imageSource: image(for: item))
+                    AnimatedImagePlayer(animatedImage: image(for: item))
                         .scaledToFill()
                         .background(Color.gray)
                 }
             }
         }
-        .environment(\.animatedImageConfiguration, animatedImageConfiguration)
     }
 
-    func image(for item: AnimatedImageResourceItem) -> any AnimatedImageSource {
-        let imageSource: any AnimatedImageSource
+    func image(for item: AnimatedImageResourceItem) -> AnimatedImage {
         switch item.rawValue {
         case .apng(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "png")!
-            let data = try! Data(contentsOf: url)
-            imageSource = APNGImageSource(name: name, data: data)
+            return try! AnimatedImage(contentsOf: url, withConfiguration: animatedImageConfiguration)
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
-            let data = try! Data(contentsOf: url)
-            imageSource = GifImageSource(name: name, data: data)
+            return try! AnimatedImage(contentsOf: url, withConfiguration: animatedImageConfiguration)
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
-            let data = try! Data(contentsOf: url)
-            imageSource = WebPImageSource(name: name, data: data)
+            return try! AnimatedImage(contentsOf: url, withConfiguration: animatedImageConfiguration)
         }
-        return imageSource
     }
 }

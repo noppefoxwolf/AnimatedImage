@@ -46,8 +46,7 @@ struct QualityDemoView: View {
         VStack(spacing: 0) {
             VStack {
                 Section {
-                    AnimatedImagePlayer(imageSource: currentImage)
-                        .environment(\.animatedImageConfiguration, configuration)
+                    AnimatedImagePlayer(animatedImage: currentImage)
                         .frame(width: width, height: width)
                         .background(Color.gray)
                 }
@@ -160,21 +159,12 @@ struct QualityDemoView: View {
         }
     }
 
-    private var currentImage: any AnimatedImageSource {
+    private var currentImage: AnimatedImage {
         let url = Bundle.main.url(
             forResource: selectedFormat.fileName,
             withExtension: selectedFormat.fileExtension
         )!
-        let data = try! Data(contentsOf: url)
-
-        switch selectedFormat {
-        case .gif:
-            return GifImageSource(name: selectedFormat.fileName, data: data)
-        case .apng:
-            return APNGImageSource(name: selectedFormat.fileName, data: data)
-        case .webp:
-            return WebPImageSource(name: selectedFormat.fileName, data: data)
-        }
+        return try! AnimatedImage(contentsOf: url, withConfiguration: configuration)
     }
 }
 
