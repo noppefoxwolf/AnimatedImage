@@ -11,7 +11,7 @@ open class AnimatedImageView: AnimatableCGImageView {
             if let animatedImage {
                 preparingTask = Task {
                     let a = await animatedImage.prepareForDisplay(
-                        renderSize: bounds.size,
+                        for: bounds.size,
                         scale: traitCollection.displayScale
                     )
                     preparedAnimatedImage = a
@@ -39,7 +39,7 @@ open class AnimatedImageView: AnimatableCGImageView {
         if layoutChanged {
             preparingTask = Task {
                 let a = await animatedImage?.prepareForDisplay(
-                    renderSize: bounds.size,
+                    for: bounds.size,
                     scale: traitCollection.displayScale
                 )
                 preparedAnimatedImage = a

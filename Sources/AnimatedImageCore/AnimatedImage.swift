@@ -23,11 +23,12 @@ public final class AnimatedImage: Sendable {
     
     @concurrent
     public func prepareForDisplay(
-        renderSize: CGSize,
+        for size: CGSize,
         scale: CGFloat
     ) async -> AnimatedImage {
+        // TODO: if self is prepared, return self.
         let processingResult = await imageProcessor.processAnimatedImage(
-            renderSize: Size(renderSize),
+            renderSize: Size(size),
             scale: scale,
             imageSource: imageSource
         )!
