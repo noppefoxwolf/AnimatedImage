@@ -2,13 +2,13 @@
 
 [![Swift Package Manager Test](https://github.com/noppefoxwolf/AnimatedImage/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/noppefoxwolf/AnimatedImage/actions/workflows/test.yml)
 
-High-performance animation image library for Swift.
+High-performance animated image rendering for Swift (APNG, GIF, WebP).
 
 ![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
 
 ## Overview
 
-`AnimatedImage` provides a fast, memory-aware pipeline to render animated images (APNG, GIF, WebP) on Apple platforms. The public `AnimatedImage` module re-exports platform and SwiftUI layers so you can `import AnimatedImage` and use it from UIKit and SwiftUI. Heavy processing is kept off the main thread.
+`AnimatedImage` provides a memory-aware, asynchronous pipeline to render animated images on Apple platforms. The `AnimatedImage` type combines an `AnimatedImageSource` with a `Configuration`, and decoding is performed off the main thread. UIKit and SwiftUI layers are available on UIKit platforms.
 
 ## Installation
 
@@ -17,7 +17,7 @@ High-performance animation image library for Swift.
 ```swift
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/noppefoxwolf/AnimatedImage", from: "0.0.14")
+        .package(url: "https://github.com/noppefoxwolf/AnimatedImage", from: "0.2.0")
     ],
     targets: [
         .target(
@@ -30,10 +30,6 @@ let package = Package(
 )
 ```
 
-## How It Works
-
-AnimatedImage uses the core `AnimatedImage` type to pre-decode and cache animation frames for optimal performance. It dynamically optimizes frame processing based on drawing size and timing to prevent excessive cache usage. The entire processing pipeline is designed to operate independently of MainActor, ensuring smooth UI performance.
-
 ## Usage
 
 ### UIKit
@@ -41,132 +37,134 @@ AnimatedImage uses the core `AnimatedImage` type to pre-decode and cache animati
 ```swift
 import AnimatedImage
 
-let imageView = AnimatedImageView(frame: .zero)
-let imageSource = APNGImageSource(data: data) // or GifImageSource(data: data), WebPImageSource(data: data)
-imageView.animatedImage = AnimatedImage(
-    imageSource: imageSource,
-    configuration: .default
+let data: Data = ...
+let image = AnimatedImage(
+    imageSource: GifImageSource(data: data),
+    withConfiguration: .default
 )
-imageView.startAnimating()
+
+let imageView = AnimatedImageView(frame: .zero)
+imageView.contentMode = .scaleAspectFit
+imageView.image = image
 ```
 
-### SwiftUI
+### SwiftUI (UIKit platforms)
 
 ```swift
 import AnimatedImage
+import SwiftUI
 
 struct ContentView: View {
-    @State var imageSource = GifImageSource(data: data)
+    let image: AnimatedImage = AnimatedImage(
+        imageSource: GifImageSource(data: data),
+        withConfiguration: .default
+    )
 
     var body: some View {
-        AnimatedImagePlayer(imageSource: imageSource) // .init(imageSource:contentMode:) supports .fit/.fill
+        AnimatedImagePlayer(image: image, contentMode: .fit)
     }
 }
+```
+
+### Convenience Initializers
+
+```swift
+let urlImage = try AnimatedImage(contentsOf: url, withConfiguration: .default)
+let gifImage = AnimatedImage(gif: data, withConfiguration: .default)
+let apngImage = AnimatedImage(apng: data, withConfiguration: .default)
+let webpImage = AnimatedImage(webP: data, withConfiguration: .default)
+```
+
+### Pre-decode / Cache
+
+`AnimatedImageView` automatically decodes when its layout changes. If you want to warm the cache manually, use `AnimatedImageLoader`:
+
+```swift
+let loader = AnimatedImageLoader.shared
+let decoded = await loader.decode(
+    image,
+    layout: (size: CGSize(width: 200, height: 200), scale: UIScreen.main.scale)
+)
 ```
 
 ### Configuration
 
-Control memory, size, quality, and processing priority using `AnimatedImage.Configuration`.
+`AnimatedImage.Configuration` controls the memory budget, size limits, integrity level, and interpolation quality.
 
-- UIKit
-  ```swift
-  let imageView = AnimatedImageView(frame: .zero)
-  let configuration: AnimatedImage.Configuration = .default // .default, .performance, .unlimited
-  imageView.contentMode = .scaleAspectFill
-  let imageSource = GifImageSource(data: data)
-  imageView.animatedImage = AnimatedImage(
-      imageSource: imageSource,
-      configuration: configuration
-  )
-  imageView.startAnimating()
-  ```
+```swift
+var config = AnimatedImage.Configuration.default
+config.maxMemoryUsage = .init(value: 4, unit: .megabytes)
+config.maxSize = Size(width: 256, height: 256)
+config.maxLevelOfIntegrity = 0.9
+config.interpolationQuality = .high
 
-- SwiftUI
-  ```swift
-  let config: AnimatedImage.Configuration = .default
+let image = AnimatedImage(
+    imageSource: GifImageSource(data: data),
+    withConfiguration: config
+)
+```
 
-  var body: some View {
-      AnimatedImagePlayer(imageSource: GifImageSource(data: data))
-          .environment(\.animatedImageConfiguration, config)
-  }
-  ```
+## Custom AnimatedImageSource
 
-## Features
-
-### Low MainActor Usage
-
-![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Instruments.png)
-
-All heavy processing is performed off the main thread, keeping your UI responsive.
-
-### Multiple Format Support
-
-![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Format.gif)
-
-Supports APNG, GIF, and WebP animated formats.
-
-### Automatic Quality Adjustment
-
-![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/AdjustQuality.gif)
-
-Automatically adjusts playback quality based on available resources.
-
-### Frame Synchronization
-
-![](https://github.com/noppefoxwolf/AnimatedImage/blob/main/.github/Synchronize.gif)
-
-Synchronizes frame updates for smooth animation playback.
-
-### Custom Animation Support
-
-Create your own animated images by conforming to the `AnimatedImageSource` protocol:
+Create your own animated images by conforming to `AnimatedImageSource`:
 
 ```swift
 public final class ManualAnimatedImageSource: AnimatedImageSource, @unchecked Sendable {
     public let name: String
-    public let imageCount: Int
     private let images: [CGImage]
-    
-    public init(name: String = UUID().uuidString, images: [CGImage]) {
+    private let delay: Double
+
+    public init(name: String = UUID().uuidString, images: [CGImage], delay: Double = 0.1) {
         self.name = name
         self.images = images
-        self.imageCount = images.count
+        self.delay = delay
     }
-    
-    public func delayTime(at index: Int) -> Double {
-        0.1
+
+    public var imageCount: Int {
+        get async { images.count }
     }
-    
-    public func image(at index: Int) -> CGImage? {
-        images[index]
+
+    public func size(at index: Int) async -> Size? {
+        guard images.indices.contains(index) else { return nil }
+        let image = images[index]
+        return Size(width: image.width, height: image.height)
+    }
+
+    public func delayTime(at index: Int) async -> Double {
+        delay
+    }
+
+    public func image(at index: Int) async -> CGImage? {
+        guard images.indices.contains(index) else { return nil }
+        return images[index]
     }
 }
 ```
+
+## Features
+
+- Asynchronous decoding with frame decimation and size optimization
+- Memory-aware caching via `AnimatedImageLoader`
+- APNG/GIF/WebP support through `ImageIO`
+- UIKit view (`AnimatedImageView`) and SwiftUI player (`AnimatedImagePlayer`) on UIKit platforms
 
 ## Requirements
 
 - Swift 6.2+
 - iOS 16.0+
-- macOS 14.0+
 - visionOS 1.0+
+- macOS 14.0+
+
+Note: SwiftUI/UIKit rendering is available on iOS/visionOS/macCatalyst. The AppKit layer is currently a stub.
 
 ## Architecture
 
-The library consists of multiple internal modules unified under a single product:
-
-- **`AnimatedImageCore`**: Core animation logic and image processing
-  - Image decoders for APNG, GIF, and WebP
-  - `AnimatedImage` for animation caching and frame management
-  - Image processing and timing calculations
-- **Platform-specific modules**:
-  - `_UIKit_AnimatedImage`: UIKit support with `AnimatedImageView`
-  - `_AppKit_AnimatedImage`: macOS support (in development)
-  - `_SwiftUI_AnimatedImage`: SwiftUI integration with `AnimatedImagePlayer`
-- **`UpdateLink`**: Display link and frame timing control
-
-Notes:
-- `Sources/AnimatedImage/` is the public API that re-exports platform layers and includes `Resources/PrivacyInfo.xcprivacy`.
-- `UpdateLink` uses `UIUpdateLink` on iOS 18+/visionOS 2+ and a `CADisplayLink` backport otherwise.
+- **`AnimatedImage`**: Public umbrella module that re-exports platform layers and `AnimatedImageCore`
+- **`AnimatedImageCore`**: Image sources, decoding, frame selection, and configuration
+- **`_UIKit_AnimatedImage`**: UIKit `AnimatedImageView` and `UpdateLink` integration
+- **`_SwiftUI_AnimatedImage`**: SwiftUI `AnimatedImagePlayer` (UIKit-backed)
+- **`UpdateLink`**: Abstraction over `UIUpdateLink` (iOS 18+/visionOS 2+) and `CADisplayLink`
+- **`_AppKit_AnimatedImage`**: Placeholder target for future AppKit support
 
 ## Apps Using AnimatedImage
 
@@ -182,20 +180,9 @@ Notes:
 - Build: `swift build` (use `-c release` for optimized builds)
 - Test: `swift test`
   - Filter: `swift test --filter ImageProcessorTests`
-- Xcode project (optional): `swift package generate-xcodeproj`
-- Example local demo: open `Playground.swiftpm` in Xcode and run.
+- Example local demo: open `Playground.swiftpm` in Xcode and run
 
-## Coding Style
-
-- Indentation: 4 spaces; line length: 100; ordered imports. See `.swift-format`.
-- Format: `swift format --configuration .swift-format --in-place Sources Tests`
-- Naming: Types/protocols UpperCamelCase; methods/vars lowerCamelCase.
-
-## Testing
-
-- Framework: Swift Testing (`import Testing`, `@Suite`, `@Test`).
-- Scope: Focus on core processing (timing, decimation, image ops). Add mocks for images where needed.
-- CI: GitHub Actions runs on macOS 15 with Xcode 16.4; ensure tests pass there.
+CI runs on macOS 26 with Xcode 26.2 (see `.github/workflows/test.yml`).
 
 ## License
 
