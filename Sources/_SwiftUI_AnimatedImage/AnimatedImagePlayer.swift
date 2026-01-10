@@ -23,6 +23,7 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
             withConfiguration: context.environment.animatedImageConfiguration
         )
         uiView.contentMode = contentMode.asUIKit()
+        uiView.layer.magnificationFilter = .nearest
         uiView.startAnimating()
     }
 

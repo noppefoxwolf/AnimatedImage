@@ -19,14 +19,20 @@ public final class AnimatedImageLoader {
     
     public func decode(
         _ animatedImage: AnimatedImage,
-        layout: (size: CGSize, scale: CGFloat)
+        layout: (size: CGSize, scale: CGFloat),
+        taskPriority: TaskPriority = .background
     ) async -> AnimatedImage {
-        await decodeTask(animatedImage, layout: layout).value
+        await decodeTask(
+            animatedImage,
+            layout: layout,
+            taskPriority: taskPriority
+        ).value
     }
     
     public func decodeTask(
         _ animatedImage: AnimatedImage,
-        layout: (size: CGSize, scale: CGFloat)
+        layout: (size: CGSize, scale: CGFloat),
+        taskPriority: TaskPriority
     ) -> Task<AnimatedImage, Never> {
         let key = Key(
             name: animatedImage.id,
@@ -37,7 +43,7 @@ public final class AnimatedImageLoader {
         if let task = taskCache[key] {
             return task
         }
-        let task = Task {
+        let task = Task(priority: taskPriority) {
             await animatedImage.prepareForDisplay(
                 for: layout.size,
                 scale: layout.scale

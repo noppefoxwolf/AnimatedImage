@@ -5,7 +5,7 @@ public import QuartzCore
 /// アニメーション画像プロバイダーの設定を管理する構造体
 /// メモリ使用量、画像サイズ、品質設定などを制御します
 extension AnimatedImage {
-    public nonisolated struct Configuration: Sendable, Equatable {
+    public nonisolated struct Configuration: Sendable, Equatable, Hashable {
         /// 無制限設定：最大限のメモリとサイズを許可し、最高品質で処理
         public static var unlimited: Self {
             Self(
@@ -14,7 +14,6 @@ extension AnimatedImage {
                 maxLevelOfIntegrity: 1,
                 interpolationQuality: .high,
                 contentsFilter: .trilinear,
-                taskPriority: .userInitiated
             )
         }
 
@@ -26,7 +25,6 @@ extension AnimatedImage {
                 maxLevelOfIntegrity: 0.8,
                 interpolationQuality: .default,
                 contentsFilter: .linear,
-                taskPriority: .medium
             )
         }
 
@@ -38,7 +36,6 @@ extension AnimatedImage {
                 maxLevelOfIntegrity: 0.25,
                 interpolationQuality: .none,
                 contentsFilter: .nearest,
-                taskPriority: .low
             )
         }
 
@@ -52,8 +49,6 @@ extension AnimatedImage {
         public var interpolationQuality: CGInterpolationQuality
         /// レイヤーコンテンツフィルター
         public var contentsFilter: CALayerContentsFilter
-        /// タスク優先度
-        public var taskPriority: TaskPriority
     }
 
 }

@@ -183,7 +183,7 @@ extension AnimatedImage.Configuration {
     public static var qualityDemo: Self {
         var configuration = Self.default
         configuration.maxMemoryUsage = .init(value: 1, unit: .megabits)
-        configuration.taskPriority = .userInitiated
+//        configuration.taskPriority = .userInitiated
         return configuration
     }
 }
