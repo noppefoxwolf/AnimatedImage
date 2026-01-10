@@ -18,9 +18,10 @@ public struct AnimatedImagePlayer: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
-        uiView.image = image
         uiView.contentMode = contentMode.asUIKit()
         uiView.layer.magnificationFilter = .nearest
+        uiView.adjustAnimatedImageForSize = context.environment.adjustAnimatedImageForSize
+        uiView.image = image
     }
 
     public static func dismantleUIView(_ uiView: AnimatedImageView, coordinator: ()) {
