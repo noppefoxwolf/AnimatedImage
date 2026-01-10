@@ -28,11 +28,11 @@ public nonisolated struct Size: Sendable, Hashable {
 
 // MARK: - CGSize変換
 extension Size {
-    public init(_ cgSize: CGSize) {
+    public nonisolated init(_ cgSize: CGSize) {
         self.init(width: Int(cgSize.width), height: Int(cgSize.height))
     }
 
-    public var cgSize: CGSize {
+    public nonisolated var cgSize: CGSize {
         CGSize(width: width, height: height)
     }
 }
