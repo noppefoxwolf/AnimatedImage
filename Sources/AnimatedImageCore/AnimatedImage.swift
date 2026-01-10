@@ -57,6 +57,14 @@ public final class AnimatedImage: Identifiable, Sendable {
         )
         return animatedImage
     }
+    
+    public static func estimatedMemoryCost(
+        size: CGSize,
+        scale: CGFloat,
+    ) -> Int {
+        let pixelSize = size.applying(CGAffineTransform(scaleX: scale, y: scale))
+        return Int(pixelSize.width) * 4 * Int(pixelSize.height)
+    }
 
     public func image(at index: Int) -> CGImage? {
         state?.image(at: index)

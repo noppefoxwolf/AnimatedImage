@@ -84,7 +84,11 @@ final class AnimatedImageLoader {
     }
     
     // TaskCache
-    var taskCache: [Key : Task<AnimatedImage, Never>] = [:]
+    private let taskCache = Cache<Key, Task<AnimatedImage, Never>>(name: "dev.noppe.animated-image-loader")
+    
+    private init() {
+        taskCache.totalCostLimit = 1024 * 1024 * 50 // 50MB
+    }
     
     func decode(
         _ animatedImage: AnimatedImage,
@@ -112,7 +116,8 @@ final class AnimatedImageLoader {
                 scale: layout.scale
             )
         }
-        taskCache[key] = task
+        let estimatedCost = AnimatedImage.estimatedMemoryCost(size: layout.size, scale: layout.scale)
+        taskCache.insert(task, forKey: key, cost: estimatedCost)
         return task
     }
 }
