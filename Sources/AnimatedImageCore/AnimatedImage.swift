@@ -20,65 +20,26 @@ public final class AnimatedImage: Sendable {
         self.configuration = configuration
         self.imageProcessor = ImageProcessor(configuration: configuration)
     }
-
-    var task: Task<Void, Never>? = nil
-    var currentFrameIndex: Int? = nil
-
-    public var contentsFilter: CALayerContentsFilter {
-        configuration.contentsFilter
-    }
-
-    public func update(
-        for renderSize: CGSize,
-        scale: CGFloat
-    ) {
-        cancelCurrentTask()
-        startImageProcessingTask(
-            renderSize: renderSize,
-            scale: scale
-        )
-    }
-
-    public func cancelCurrentTask() {
-        task?.cancel()
-    }
-
-    func startImageProcessingTask(
-        renderSize: CGSize,
-        scale: CGFloat
-    ) {
-        task = Task.detached(priority: configuration.taskPriority) { [weak self] in
-            await withTaskCancellationHandler(
-                operation: {
-                    await self?
-                        .processAnimatedImage(
-                            renderSize: renderSize,
-                            scale: scale
-                        )
-                },
-                onCancel: {
-                    //self?.state.removeAllCachedImages()
-                }
-            )
-        }
-    }
-
+    
     @concurrent
-    func processAnimatedImage(
+    public func prepareForDisplay(
         renderSize: CGSize,
         scale: CGFloat
-    ) async {
+    ) async -> AnimatedImage {
         let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(renderSize),
             scale: scale,
             imageSource: imageSource
+        )!
+        var animatedImage = await AnimatedImage(
+            imageSource: imageSource,
+            withConfiguration: configuration
         )
-        guard let processingResult else { return }
-
-        await setState(processingResult)
+        await animatedImage.setState(processingResult)
+        return animatedImage
     }
     
-    func setState(_ result: ImageProcessor.ProcessingResult) {
+    private func setState(_ result: ImageProcessor.ProcessingResult) {
         var newState = AnimatedImageState(
             name: imageSource.name,
             indices: result.frameState.indices,
@@ -88,25 +49,11 @@ public final class AnimatedImage: Sendable {
         state = newState
     }
 
-    func image(at index: Int) -> CGImage? {
+    public func image(at index: Int) -> CGImage? {
         state?.image(at: index)
     }
 
-    func index(for targetTimestamp: TimeInterval) -> Int? {
+    public func index(for targetTimestamp: TimeInterval) -> Int? {
         state?.frameIndex(for: targetTimestamp)
-    }
-    
-    public func contents(at index: Int) -> CGImage? {
-        let image = self.image(at: index)
-        if image != nil {
-            currentFrameIndex = index
-        }
-        return image
-    }
-
-    public func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
-        let index = self.index(for: targetTimestamp)
-        guard let index, currentFrameIndex != index else { return nil }
-        return contents(at: index)
     }
 }
