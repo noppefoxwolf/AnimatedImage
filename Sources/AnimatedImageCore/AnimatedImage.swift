@@ -6,7 +6,8 @@ private let logger = Logger(
     category: #file
 )
 
-public final class AnimatedImage: Sendable {
+public final class AnimatedImage: Identifiable, Sendable {
+    public var id: String { imageSource.name }
     private let imageSource: any AnimatedImageSource
     private let configuration: AnimatedImage.Configuration
     private let imageProcessor: ImageProcessor
@@ -31,7 +32,10 @@ public final class AnimatedImage: Sendable {
             renderSize: Size(size),
             scale: scale,
             imageSource: imageSource
-        )!
+        )
+        guard let processingResult else {
+            return self
+        }
         var animatedImage = await AnimatedImage(
             imageSource: imageSource,
             withConfiguration: configuration
