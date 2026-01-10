@@ -31,7 +31,7 @@ enum ImageFormat: String, CaseIterable {
 
 struct QualityDemoView: View {
     @State
-    var configuration: AnimatedImageProviderConfiguration = .qualityDemo
+    var configuration: AnimatedImage.Configuration = .qualityDemo
 
     @State
     var width: Double = 100
@@ -47,7 +47,7 @@ struct QualityDemoView: View {
             VStack {
                 Section {
                     AnimatedImagePlayer(imageSource: currentImage)
-                        .environment(\.animatedImageProviderConfiguration, configuration)
+                        .environment(\.animatedImageConfiguration, configuration)
                         .frame(width: width, height: width)
                         .background(Color.gray)
                 }
@@ -178,7 +178,7 @@ struct QualityDemoView: View {
     }
 }
 
-extension AnimatedImageProviderConfiguration {
+extension AnimatedImage.Configuration {
     @MainActor
     public static var qualityDemo: Self {
         var configuration = Self.default

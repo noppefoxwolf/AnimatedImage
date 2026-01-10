@@ -2,37 +2,17 @@ public import AnimatedImageCore
 public import UIKit
 
 open class AnimatedImageView: AnimatableCGImageView {
-    public var imageSource: (any AnimatedImageSource)? = nil {
-        didSet {
-            guard let imageSource else { return }
-            animatedImage = AnimatedImage(
-                name: imageSource.name,
-                configuration: configuration
-            )
+    public var animatedImage: AnimatedImage? = nil {
+        willSet {
+            animatedImage?.cancelCurrentTask()
         }
-    }
-
-    public var configuration: AnimatedImageProviderConfiguration = .default {
-        didSet {
-            if let imageSource {
-                animatedImage = AnimatedImage(
-                    name: imageSource.name,
-                    configuration: configuration
-                )
-            }
-            layer.magnificationFilter = configuration.contentsFilter
-        }
-    }
-
-    private var animatedImage: AnimatedImage? = nil {
         didSet {
             contents = nil
-
-            if let imageSource {
-                animatedImage?.update(
+            if let animatedImage {
+                layer.magnificationFilter = animatedImage.contentsFilter
+                animatedImage.update(
                     for: bounds.size,
-                    scale: traitCollection.displayScale,
-                    imageSource: imageSource
+                    scale: traitCollection.displayScale
                 )
             }
 
@@ -49,13 +29,10 @@ open class AnimatedImageView: AnimatableCGImageView {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        if let imageSource {
-            animatedImage?.update(
-                for: bounds.size,
-                scale: traitCollection.displayScale,
-                imageSource: imageSource
-            )
-        }
+        animatedImage?.update(
+            for: bounds.size,
+            scale: traitCollection.displayScale
+        )
     }
 
     open override func willUpdateContents(

@@ -43,7 +43,10 @@ import AnimatedImage
 
 let imageView = AnimatedImageView(frame: .zero)
 let imageSource = APNGImageSource(data: data) // or GifImageSource(data: data), WebPImageSource(data: data)
-imageView.imageSource = imageSource
+imageView.animatedImage = AnimatedImage(
+    imageSource: imageSource,
+    configuration: .default
+)
 imageView.startAnimating()
 ```
 
@@ -68,9 +71,13 @@ Control memory, size, quality, and processing priority using `AnimatedImageProvi
 - UIKit
   ```swift
   let imageView = AnimatedImageView(frame: .zero)
-  imageView.configuration = .default // .default, .performance, .unlimited
+  let configuration: AnimatedImageProviderConfiguration = .default // .default, .performance, .unlimited
   imageView.contentMode = .scaleAspectFill
-  imageView.imageSource = GifImageSource(data: data)
+  let imageSource = GifImageSource(data: data)
+  imageView.animatedImage = AnimatedImage(
+      imageSource: imageSource,
+      configuration: configuration
+  )
   imageView.startAnimating()
   ```
 

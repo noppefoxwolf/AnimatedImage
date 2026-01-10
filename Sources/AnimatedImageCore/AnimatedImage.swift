@@ -7,13 +7,18 @@ private let logger = Logger(
 )
 
 public final class AnimatedImage: Sendable {
-    private let configuration: AnimatedImageProviderConfiguration
+    private let imageSource: any AnimatedImageSource
+    private let configuration: AnimatedImage.Configuration
     private let imageProcessor: ImageProcessor
     private var state: AnimatedImageState
 
-    public init(name: String, configuration: AnimatedImageProviderConfiguration) {
+    public init(
+        imageSource: any AnimatedImageSource,
+        configuration: AnimatedImage.Configuration
+    ) {
+        self.imageSource = imageSource
         self.configuration = configuration
-        let cache = Cache<Int, CGImage>(name: name)
+        let cache = Cache<Int, CGImage>(name: imageSource.name)
         self.imageProcessor = ImageProcessor(configuration: configuration, cache: cache)
         self.state = AnimatedImageState(cache: cache)
     }
@@ -21,16 +26,26 @@ public final class AnimatedImage: Sendable {
     var task: Task<Void, Never>? = nil
     var currentFrameIndex: Int? = nil
 
+    public var contentsFilter: CALayerContentsFilter {
+        configuration.contentsFilter
+    }
+    
+    public func byPreparingForDisplay(for size: CGSize, scale: CGFloat) async -> AnimatedImage {
+        let a = await processAnimatedImage(
+            renderSize: size,
+            scale: scale
+        )
+        return AnimatedImage(imageSource: imageSource, configuration: configuration)
+    }
+
     public func update(
         for renderSize: CGSize,
-        scale: CGFloat,
-        imageSource: any AnimatedImageSource
+        scale: CGFloat
     ) {
         cancelCurrentTask()
         startImageProcessingTask(
             renderSize: renderSize,
-            scale: scale,
-            imageSource: imageSource
+            scale: scale
         )
     }
 
@@ -40,8 +55,7 @@ public final class AnimatedImage: Sendable {
 
     func startImageProcessingTask(
         renderSize: CGSize,
-        scale: CGFloat,
-        imageSource: any AnimatedImageSource
+        scale: CGFloat
     ) {
         task = Task.detached(priority: configuration.taskPriority) { [weak self] in
             await withTaskCancellationHandler(
@@ -49,12 +63,11 @@ public final class AnimatedImage: Sendable {
                     await self?
                         .processAnimatedImage(
                             renderSize: renderSize,
-                            scale: scale,
-                            imageSource: imageSource
+                            scale: scale
                         )
                 },
                 onCancel: {
-                    self?.state.removeAllCachedImages()
+                    //self?.state.removeAllCachedImages()
                 }
             )
         }
@@ -63,8 +76,7 @@ public final class AnimatedImage: Sendable {
     @concurrent
     func processAnimatedImage(
         renderSize: CGSize,
-        scale: CGFloat,
-        imageSource: any AnimatedImageSource
+        scale: CGFloat
     ) async {
         let frameState = await imageProcessor.processAnimatedImage(
             renderSize: Size(renderSize),
@@ -87,15 +99,18 @@ public final class AnimatedImage: Sendable {
     func index(for targetTimestamp: TimeInterval) -> Int? {
         state.frameIndex(for: targetTimestamp)
     }
-
-    public func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
-        let index = self.index(for: targetTimestamp)
-        guard let index, currentFrameIndex != index else { return nil }
-
+    
+    public func contents(at index: Int) -> CGImage? {
         let image = self.image(at: index)
         if image != nil {
             currentFrameIndex = index
         }
         return image
+    }
+
+    public func contentsForTimestamp(_ targetTimestamp: TimeInterval) -> CGImage? {
+        let index = self.index(for: targetTimestamp)
+        guard let index, currentFrameIndex != index else { return nil }
+        return contents(at: index)
     }
 }

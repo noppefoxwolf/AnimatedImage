@@ -1,8 +1,8 @@
 import CoreGraphics
 import Foundation
 
-struct AnimatedImageState: Sendable {
-    struct FrameState: Sendable {
+nonisolated struct AnimatedImageState: Sendable {
+    nonisolated struct FrameState: Sendable {
         let indices: [Int]
         let delayTime: TimeInterval
 

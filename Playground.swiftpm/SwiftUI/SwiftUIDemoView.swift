@@ -16,7 +16,7 @@ struct SwiftUIDemoView: View {
         self.items = dataSource.map(AnimatedImageResourceItem.init(rawValue:))
     }
 
-    let animatedImageConfiguration: AnimatedImageProviderConfiguration = .performance
+    let animatedImageConfiguration: AnimatedImage.Configuration = .performance
 
     var body: some View {
         let layout = [
@@ -32,7 +32,7 @@ struct SwiftUIDemoView: View {
                 }
             }
         }
-        .environment(\.animatedImageProviderConfiguration, animatedImageConfiguration)
+        .environment(\.animatedImageConfiguration, animatedImageConfiguration)
     }
 
     func image(for item: AnimatedImageResourceItem) -> any AnimatedImageSource {

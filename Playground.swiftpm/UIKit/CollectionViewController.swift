@@ -28,6 +28,7 @@ class CollectionViewController: UICollectionViewController {
             )
         return dataSource.map(AnimatedImageResourceItem.init(rawValue:))
     }()
+    private let configuration: AnimatedImage.Configuration = .performance
 
     override func collectionView(
         _ collectionView: UICollectionView,
@@ -50,17 +51,26 @@ class CollectionViewController: UICollectionViewController {
             let url = Bundle.main.url(forResource: name, withExtension: "png")!
             let data = try! Data(contentsOf: url)
             let imageSource = APNGImageSource(name: name, data: data)
-            cell.animatedImageView.imageSource = imageSource
+            cell.animatedImageView.animatedImage = AnimatedImage(
+                imageSource: imageSource,
+                configuration: configuration
+            )
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
             let data = try! Data(contentsOf: url)
             let imageSource = GifImageSource(name: name, data: data)
-            cell.animatedImageView.imageSource = imageSource
+            cell.animatedImageView.animatedImage = AnimatedImage(
+                imageSource: imageSource,
+                configuration: configuration
+            )
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
             let data = try! Data(contentsOf: url)
             let imageSource = WebPImageSource(name: name, data: data)
-            cell.animatedImageView.imageSource = imageSource
+            cell.animatedImageView.animatedImage = AnimatedImage(
+                imageSource: imageSource,
+                configuration: configuration
+            )
         }
 
         return cell

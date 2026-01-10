@@ -3,11 +3,11 @@ import QuartzCore
 import os
 
 struct ImageProcessor: Sendable {
-    private let configuration: AnimatedImageProviderConfiguration
+    private let configuration: AnimatedImage.Configuration
     private let cache: Cache<Int, CGImage>
     private let sizeOptimizer: SizeOptimizer
 
-    init(configuration: AnimatedImageProviderConfiguration, cache: Cache<Int, CGImage>) {
+    init(configuration: AnimatedImage.Configuration, cache: Cache<Int, CGImage>) {
         self.configuration = configuration
         self.cache = cache
         self.sizeOptimizer = SizeOptimizer()
