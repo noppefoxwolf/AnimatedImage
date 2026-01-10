@@ -9,13 +9,12 @@ public final class AnimatedImageLoader {
         public let scale: CGFloat
         public let configuration: AnimatedImage.Configuration
     }
+    
+    private let taskCache: Cache<Key, Task<AnimatedImage, Never>>
 
-    // TaskCache
-    private let taskCache = Cache<Key, Task<AnimatedImage, Never>>(
-        name: "dev.noppe.animated-image-loader"
-    )
-
-    private init() {
+    public init(name: String = "dev.noppe.animated-image-loader") {
+        self.taskCache = Cache<Key, Task<AnimatedImage, Never>>(name: name)
+        
         let measurement = Measurement<UnitInformationStorage>(value: 50, unit: .megabytes)
         totalCostLimit = Int(measurement.converted(to: .bytes).value)
     }
