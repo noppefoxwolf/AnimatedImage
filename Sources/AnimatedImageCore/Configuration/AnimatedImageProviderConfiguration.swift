@@ -13,7 +13,6 @@ extension AnimatedImage {
                 maxSize: Size(width: .max, height: .max),
                 maxLevelOfIntegrity: 1,
                 interpolationQuality: .high,
-                contentsFilter: .trilinear,
             )
         }
 
@@ -24,7 +23,6 @@ extension AnimatedImage {
                 maxSize: Size(width: 128, height: 128),
                 maxLevelOfIntegrity: 0.8,
                 interpolationQuality: .default,
-                contentsFilter: .linear,
             )
         }
 
@@ -35,7 +33,6 @@ extension AnimatedImage {
                 maxSize: Size(width: 32, height: 32),
                 maxLevelOfIntegrity: 0.25,
                 interpolationQuality: .none,
-                contentsFilter: .nearest,
             )
         }
 
@@ -47,8 +44,6 @@ extension AnimatedImage {
         public var maxLevelOfIntegrity: Double
         /// 画像補間品質
         public var interpolationQuality: CGInterpolationQuality
-        /// レイヤーコンテンツフィルター
-        public var contentsFilter: CALayerContentsFilter
     }
 
 }
