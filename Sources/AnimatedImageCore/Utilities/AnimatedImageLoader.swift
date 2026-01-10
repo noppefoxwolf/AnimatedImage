@@ -7,7 +7,7 @@ public final class AnimatedImageLoader {
         public let name: String
         public let size: CGSize
         public let scale: CGFloat
-        // FIXME: prepareForDisplayで使われる要素が不足している
+        public let configuration: AnimatedImage.Configuration
     }
     
     // TaskCache
@@ -37,13 +37,14 @@ public final class AnimatedImageLoader {
         let key = Key(
             name: animatedImage.id,
             size: layout.size,
-            scale: layout.scale
+            scale: layout.scale,
+            configuration: animatedImage.configuration
         )
         
         if let task = taskCache[key] {
             return task
         }
-        let task = Task(priority: taskPriority) {
+        let task = Task.detached(priority: taskPriority) {
             await animatedImage.prepareForDisplay(
                 for: layout.size,
                 scale: layout.scale

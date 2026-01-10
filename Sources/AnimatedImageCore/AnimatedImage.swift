@@ -9,7 +9,7 @@ private let logger = Logger(
 public final class AnimatedImage: Identifiable, Sendable {
     public var id: String { imageSource.name }
     private let imageSource: any AnimatedImageSource
-    private let configuration: AnimatedImage.Configuration
+    public let configuration: AnimatedImage.Configuration
     private let state: AnimatedImageState?
     
     private let imageProcessor = ImageProcessor()
