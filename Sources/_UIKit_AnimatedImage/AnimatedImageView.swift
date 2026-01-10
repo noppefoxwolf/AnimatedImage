@@ -9,11 +9,15 @@ open class AnimatedImageView: AnimatableCGImageView {
         }
         didSet {
             if let animatedImage {
-                decode(
-                    AnimatedImageLoader.shared,
-                    decodeImage: animatedImage,
-                    layout: (bounds.size, traitCollection.displayScale)
-                )
+                if animatedImage.image(at: 0) != nil {
+                    decodedAnimatedImage = animatedImage
+                } else {
+                    decode(
+                        AnimatedImageLoader.shared,
+                        decodeImage: animatedImage,
+                        layout: (bounds.size, traitCollection.displayScale)
+                    )
+                }
             }
             setNeedsDisplay()
         }
@@ -23,7 +27,6 @@ open class AnimatedImageView: AnimatableCGImageView {
     
     private var decodedAnimatedImage: AnimatedImage? = nil {
         didSet {
-            // TODO: 比較して更新されているかチェック
             setNeedsDisplay()
         }
     }

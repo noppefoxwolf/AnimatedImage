@@ -29,10 +29,6 @@ public final class AnimatedImage: Identifiable, Sendable {
         for size: CGSize,
         scale: CGFloat
     ) async -> AnimatedImage {
-        // FIXME: if decoded self, returning wrong size,scale format.
-        if state != nil {
-            return self
-        }
         let processingResult = await imageProcessor.processAnimatedImage(
             renderSize: Size(size),
             scale: scale,
