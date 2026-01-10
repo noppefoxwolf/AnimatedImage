@@ -47,8 +47,9 @@ public final class AnimatedImage: Identifiable, Sendable {
     private func setState(_ result: ImageProcessor.ProcessingResult) {
         var newState = AnimatedImageState(
             name: imageSource.name,
-            indices: result.frameState.indices,
-            delayTime: result.frameState.delayTime
+            size: result.size,
+            indices: result.indices,
+            delayTime: result.delayTime
         )
         newState.insertImages(result.images)
         state = newState

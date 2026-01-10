@@ -4,7 +4,9 @@ import os
 
 struct ImageProcessor: Sendable {
     struct ProcessingResult {
-        let frameState: AnimatedImageState.FrameState
+        let size: Size
+        let indices: [Int]
+        let delayTime: Double
         let images: [Int: CGImage]
     }
 
@@ -43,13 +45,18 @@ struct ImageProcessor: Sendable {
         )
 
         let images = await prewarmFrameImages(
-            indices: frameState.indices,
+            indices: frameState.displayIndices,
             optimizedSize: optimizedSize,
             interpolationQuality: configuration.interpolationQuality,
             imageSource: imageSource
         )
 
-        return ProcessingResult(frameState: frameState, images: images)
+        return ProcessingResult(
+            size: optimizedSize,
+            indices: frameState.displayIndices,
+            delayTime: frameState.delayTime,
+            images: images
+        )
     }
 
     @concurrent
@@ -89,7 +96,7 @@ struct ImageProcessor: Sendable {
         for imageSize: Size,
         imageCount: Int,
         imageSource: any AnimatedImageSource
-    ) async -> AnimatedImageState.FrameState {
+    ) async -> FrameDecimator.Result {
         let levelOfIntegrity = await integrityLevel(for: imageSize, imageCount: imageCount)
 
         let delayTimes: [Double] = await withTaskGroup(
@@ -116,10 +123,7 @@ struct ImageProcessor: Sendable {
             levelOfIntegrity: levelOfIntegrity
         )
 
-        return AnimatedImageState.FrameState(
-            indices: decimationResult.displayIndices,
-            delayTime: decimationResult.delayTime
-        )
+        return decimationResult
     }
 
     @concurrent

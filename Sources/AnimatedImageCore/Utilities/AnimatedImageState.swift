@@ -2,33 +2,21 @@ import CoreGraphics
 import Foundation
 
 nonisolated struct AnimatedImageState: Sendable {
-    nonisolated struct FrameState: Sendable {
-        let indices: [Int]
-        let delayTime: TimeInterval
-
-        init(indices: [Int], delayTime: TimeInterval) {
-            self.indices = indices
-            self.delayTime = delayTime
-        }
-    }
-
-    let cache: Cache<Int, CGImage>
-    private(set) var indices: [Int]
-    private(set) var delayTime: TimeInterval
+    let storage: Cache<Int, CGImage>
+    let size: Size
+    let indices: [Int]
+    let delayTime: TimeInterval
 
     init(
         name: String,
+        size: Size,
         indices: [Int] = [],
         delayTime: TimeInterval = 0.1
     ) {
-        self.cache = Cache<Int, CGImage>(name: name)
+        self.storage = Cache<Int, CGImage>(name: name)
+        self.size = size
         self.indices = indices
         self.delayTime = delayTime
-    }
-
-    mutating func update(with state: FrameState) {
-        indices = state.indices
-        delayTime = state.delayTime
     }
 
     func frameIndex(for targetTimestamp: TimeInterval) -> Int? {
@@ -45,20 +33,16 @@ nonisolated struct AnimatedImageState: Sendable {
     }
 
     func image(at index: Int) -> CGImage? {
-        cache.value(forKey: index)
+        storage.value(forKey: index)
     }
 
     func insert(_ image: CGImage, for index: Int) {
-        cache.insert(image, forKey: index)
+        storage.insert(image, forKey: index)
     }
 
     func insertImages(_ images: [Int: CGImage]) {
         for (index, image) in images {
-            cache.insert(image, forKey: index)
+            storage.insert(image, forKey: index)
         }
-    }
-
-    func removeAllCachedImages() {
-        cache.removeAllObjects()
     }
 }

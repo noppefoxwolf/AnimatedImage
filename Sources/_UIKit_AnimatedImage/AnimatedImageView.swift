@@ -24,7 +24,6 @@ open class AnimatedImageView: AnimatableCGImageView {
     
     private var decodedAnimatedImage: AnimatedImage? = nil {
         didSet {
-            print(#function)
             // TODO: 比較して更新されているかチェック
             setNeedsDisplay()
         }
