@@ -14,7 +14,13 @@ public final class AnimatedImageLoader {
     private let taskCache = Cache<Key, Task<AnimatedImage, Never>>(name: "dev.noppe.animated-image-loader")
     
     private init() {
-        taskCache.totalCostLimit = 1024 * 1024 * 50 // 50MB
+        let measurement = Measurement<UnitInformationStorage>(value: 50, unit: .megabytes)
+        totalCostLimit = Int(measurement.converted(to: .bytes).value)
+    }
+    
+    public var totalCostLimit: Int {
+        get { taskCache.totalCostLimit }
+        set { taskCache.totalCostLimit = newValue }
     }
     
     public func decode(
