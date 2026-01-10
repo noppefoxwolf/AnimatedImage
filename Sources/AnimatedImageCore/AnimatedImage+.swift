@@ -22,7 +22,7 @@ extension AnimatedImage {
             withConfiguration: configuration
         )
     }
-    
+
     public convenience init(
         webP data: Data,
         withConfiguration configuration: AnimatedImage.Configuration
@@ -33,7 +33,7 @@ extension AnimatedImage {
             withConfiguration: configuration
         )
     }
-    
+
     public convenience init(
         apng data: Data,
         withConfiguration configuration: AnimatedImage.Configuration
@@ -44,7 +44,7 @@ extension AnimatedImage {
             withConfiguration: configuration
         )
     }
-    
+
     public convenience init(
         gif data: Data,
         withConfiguration configuration: AnimatedImage.Configuration

@@ -38,13 +38,22 @@ struct SwiftUIDemoView: View {
         switch item.rawValue {
         case .apng(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "png")!
-            return try! AnimatedImage(contentsOf: url, withConfiguration: animatedImageConfiguration)
+            return try! AnimatedImage(
+                contentsOf: url,
+                withConfiguration: animatedImageConfiguration
+            )
         case .gif(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "gif")!
-            return try! AnimatedImage(contentsOf: url, withConfiguration: animatedImageConfiguration)
+            return try! AnimatedImage(
+                contentsOf: url,
+                withConfiguration: animatedImageConfiguration
+            )
         case .webp(let name):
             let url = Bundle.main.url(forResource: name, withExtension: "webp")!
-            return try! AnimatedImage(contentsOf: url, withConfiguration: animatedImageConfiguration)
+            return try! AnimatedImage(
+                contentsOf: url,
+                withConfiguration: animatedImageConfiguration
+            )
         }
     }
 }

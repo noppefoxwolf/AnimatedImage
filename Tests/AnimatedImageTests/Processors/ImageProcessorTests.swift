@@ -84,7 +84,7 @@ private final class MockAnimatedImageSource: AnimatedImageSource, Sendable {
     func delayTime(at index: Int) async -> Double {
         delayTime
     }
-    
+
     func size(at index: Int) async -> Size? {
         .init(width: 10, height: 10)
     }

@@ -9,7 +9,7 @@ struct ImageProcessor: Sendable {
         let delayTime: Double
         let images: [Int: CGImage]
     }
-    
+
     private let sizeOptimizer = SizeOptimizer()
 
     @concurrent

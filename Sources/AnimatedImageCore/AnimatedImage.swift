@@ -11,9 +11,9 @@ public final class AnimatedImage: Identifiable, Sendable {
     private let imageSource: any AnimatedImageSource
     public let configuration: AnimatedImage.Configuration
     private let state: AnimatedImageState?
-    
+
     private let imageProcessor = ImageProcessor()
-    
+
     init(
         imageSource: any AnimatedImageSource,
         withConfiguration configuration: AnimatedImage.Configuration,
@@ -23,7 +23,7 @@ public final class AnimatedImage: Identifiable, Sendable {
         self.configuration = configuration
         self.state = state
     }
-    
+
     @concurrent
     public func prepareForDisplay(
         for size: CGSize,
@@ -56,7 +56,7 @@ public final class AnimatedImage: Identifiable, Sendable {
         )
         return animatedImage
     }
-    
+
     public static func estimatedMemoryCost(
         size: CGSize,
         scale: CGFloat,

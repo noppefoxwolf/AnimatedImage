@@ -22,17 +22,17 @@ open class AnimatedImageView: AnimatableCGImageView {
             setNeedsDisplay()
         }
     }
-    
+
     private var decodeTask: Task<Void, Never>? = nil
-    
+
     private var decodedImage: AnimatedImage? = nil {
         didSet {
             setNeedsDisplay()
         }
     }
-    
+
     private var currentFrameIndex: Int? = nil
-    
+
     func decode(
         _ imageLoader: AnimatedImageLoader,
         decodeImage: AnimatedImage,
@@ -42,10 +42,10 @@ open class AnimatedImageView: AnimatableCGImageView {
             decodedImage = await imageLoader.decode(decodeImage, layout: layout)
         }
     }
-    
+
     open override func layoutSubviews() {
         super.layoutSubviews()
-        
+
         if let image {
             decode(
                 AnimatedImageLoader.shared,
@@ -62,7 +62,7 @@ open class AnimatedImageView: AnimatableCGImageView {
         guard let image else { return nil }
         return (index, image)
     }
-    
+
     open override func updateContents(for targetTimestamp: TimeInterval) {
         if let (index, image) = contentsForTimestamp(targetTimestamp) {
             self.currentFrameIndex = index
@@ -70,5 +70,3 @@ open class AnimatedImageView: AnimatableCGImageView {
         }
     }
 }
-
-

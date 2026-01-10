@@ -12,7 +12,7 @@ nonisolated struct AnimatedImageState: Sendable {
         size: Size,
         indices: [Int],
         delayTime: TimeInterval = 0.1,
-        images: [Int : CGImage],
+        images: [Int: CGImage],
         totalCostLimit: Int
     ) {
         self.storage = Cache<Int, CGImage>(name: name)
