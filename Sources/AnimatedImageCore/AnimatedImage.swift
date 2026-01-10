@@ -10,7 +10,7 @@ public final class AnimatedImage: Sendable {
     private let imageSource: any AnimatedImageSource
     private let configuration: AnimatedImage.Configuration
     private let imageProcessor: ImageProcessor
-    private var state: AnimatedImageState
+    private var state: AnimatedImageState?
 
     public init(
         imageSource: any AnimatedImageSource,
@@ -19,7 +19,6 @@ public final class AnimatedImage: Sendable {
         self.imageSource = imageSource
         self.configuration = configuration
         self.imageProcessor = ImageProcessor(configuration: configuration)
-        self.state = AnimatedImageState(name: imageSource.name)
     }
 
     var task: Task<Void, Never>? = nil
@@ -76,24 +75,25 @@ public final class AnimatedImage: Sendable {
         )
         guard let processingResult else { return }
 
-        await updateFrameState(with: processingResult.frameState)
-        await cachePrewarmedImages(processingResult.images)
+        await setState(processingResult)
     }
-
-    func cachePrewarmedImages(_ images: [Int: CGImage]) {
-        state.insertImages(images)
-    }
-
-    func updateFrameState(with frameState: AnimatedImageState.FrameState) {
-        state.update(with: frameState)
+    
+    func setState(_ result: ImageProcessor.ProcessingResult) {
+        var newState = AnimatedImageState(
+            name: imageSource.name,
+            indices: result.frameState.indices,
+            delayTime: result.frameState.delayTime
+        )
+        newState.insertImages(result.images)
+        state = newState
     }
 
     func image(at index: Int) -> CGImage? {
-        state.image(at: index)
+        state?.image(at: index)
     }
 
     func index(for targetTimestamp: TimeInterval) -> Int? {
-        state.frameIndex(for: targetTimestamp)
+        state?.frameIndex(for: targetTimestamp)
     }
     
     public func contents(at index: Int) -> CGImage? {
