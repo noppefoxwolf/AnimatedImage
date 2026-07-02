@@ -27,6 +27,7 @@ open class AnimatedImageView: AnimatableCGImageView {
 
     private var decodedImage: AnimatedImage? = nil {
         didSet {
+            currentFrameIndex = nil
             setNeedsDisplay()
         }
     }
