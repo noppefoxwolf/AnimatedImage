@@ -35,6 +35,20 @@ struct AnimatedImageStateTests {
         #expect(longTimeIndex == 50)
     }
 
+    @Test("保存した画像を取得できる")
+    func storedImageCanBeRetrieved() {
+        let image = makeImage()
+        let state = AnimatedImageState(
+            name: "TestState",
+            size: Size(width: 10, height: 10),
+            indices: [0],
+            images: [0: image],
+            totalCostLimit: 1024 * 1024
+        )
+
+        #expect(state.image(at: 0) === image)
+    }
+
     private func makeState(indices: [Int], delayTime: TimeInterval) -> AnimatedImageState {
         AnimatedImageState(
             name: "TestState",
@@ -44,5 +58,18 @@ struct AnimatedImageStateTests {
             images: [:],
             totalCostLimit: 1024 * 1024
         )
+    }
+
+    private func makeImage() -> CGImage {
+        let context = CGContext(
+            data: nil,
+            width: 10,
+            height: 10,
+            bitsPerComponent: 8,
+            bytesPerRow: 10 * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )!
+        return context.makeImage()!
     }
 }

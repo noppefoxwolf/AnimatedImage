@@ -44,21 +44,20 @@ nonisolated package final class Cache<Key: Hashable, Value>: @unchecked Sendable
 
 //Our WrappedKey type will, wrap our Key values in order to make them NSCache compatible
 extension Cache {
-    fileprivate nonisolated final class WrappedKey: Hashable {
+    fileprivate nonisolated final class WrappedKey: NSObject {
         let key: Key
 
         init(_ key: Key) {
             self.key = key
         }
 
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(key)
+        override var hash: Int {
+            key.hashValue
         }
 
-        static func == (lhs: Cache<Key, Value>.WrappedKey, rhs: Cache<Key, Value>.WrappedKey)
-            -> Bool
-        {
-            lhs.key == rhs.key
+        override func isEqual(_ object: Any?) -> Bool {
+            guard let other = object as? WrappedKey else { return false }
+            return key == other.key
         }
     }
 
