@@ -4,7 +4,9 @@ public import UIKit
 open class AnimatedImageView: AnimatableCGImageView {
     public var image: AnimatedImage? = nil {
         willSet {
+            guard image !== newValue else { return }
             decodedImage = nil
+            currentFrameIndex = nil
             contents = nil
         }
         didSet {

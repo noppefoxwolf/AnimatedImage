@@ -41,6 +41,11 @@ struct App: SwiftUI.App {
                         } label: {
                             Text("Synchronize Demo")
                         }
+                        NavigationLink {
+                            ImageReplacementReproView()
+                        } label: {
+                            Text("Image Replacement Repro")
+                        }
                     }
                 }
             })
