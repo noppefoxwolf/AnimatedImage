@@ -29,7 +29,7 @@ open class AnimatedImageView: AnimatableCGImageView {
         }
     }
 
-    private var decodeTask: Task<Void, Never>? = nil
+    private(set) var decodeTask: Task<Void, Never>? = nil
 
     private struct DecodeRequest: Equatable {
         let image: ObjectIdentifier

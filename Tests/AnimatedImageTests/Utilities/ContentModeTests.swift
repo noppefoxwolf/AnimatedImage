@@ -3,6 +3,7 @@ import Testing
 import UIKit
 @testable import AnimatedImage
 
+@MainActor
 @Suite("ContentMode変換テスト")
 struct ContentModeTests {
 

@@ -3,6 +3,7 @@ import Testing
 
 @testable import AnimatedImageCore
 
+@MainActor
 @Suite
 struct SizeTests {
     @Test
