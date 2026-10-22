@@ -4,6 +4,7 @@ import Testing
 
 @testable import AnimatedImageCore
 
+@MainActor
 @Suite("ImageProcessor テスト")
 struct ImageProcessorTests {
 
